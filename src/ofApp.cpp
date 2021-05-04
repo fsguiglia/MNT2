@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 	//NNI
-	_nni.setup(200, 200);
+	_nni.setup(400, 400);
 	_nni.addParameter("id", 0.);
 	_selNNISite = -1;
 	_interpolate = false;
@@ -33,7 +33,7 @@ void ofApp::draw(){
 	if (_interpolate)
 	{
 		ofDrawBitmapString(ofToString("id") + ": " + ofToString(_weights["id"]), 500, 200);
-		_nni.drawInterpolation(_NNIx, _NNIy);
+		//_nni.drawInterpolation(_NNIx + _nni.getWidth(), _NNIy);
 	}
 	if (_selNNISite >= 0) _gSites[_selNNISite]->draw();
 }

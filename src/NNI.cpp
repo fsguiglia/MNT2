@@ -15,7 +15,7 @@ void NNI::setup(int width, int height)
 	_colorFbo.begin();
 	ofClear(0);
 	_colorFbo.end();
-	_idFbo.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION); //ver resolución
+	_idFbo.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION);
 	_interpolateFbo.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION);
 	_curState.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION, ofImageType::OF_IMAGE_COLOR);
 	_nniPixels.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION, ofImageType::OF_IMAGE_COLOR);
@@ -33,7 +33,7 @@ void NNI::setup(int width, int height)
 	_voronoi.setUniformTexture("tex", _tex, 0);
 	_voronoi.end();
 
-	_mesh = ofMesh::cone(_width * 1.5, 100, 64, 6);
+	_mesh = ofMesh::cone(_width * 1.5, 25, 64, 6);
 	_mesh.setUsage(GL_STATIC_DRAW);
 	_mesh.getColors().resize(_matrices.size());
 	for (size_t i = 0; i < _mesh.getColors().size(); i++) {
@@ -71,11 +71,11 @@ void NNI::randomize(float speed)
 	for (int i = 0; i < _sites.size(); i++)
 	{
 		ofVec2f curPosition = _sites[i].getPosition();
-		curPosition.x += 10 * (0.5 - ofNoise(ofGetElapsedTimef() * speed, (i * 2) * 1000));
-		curPosition.y += 10 * (0.5 - ofNoise(ofGetElapsedTimef() * speed, (i * 2 + 1) * 1000));
-		if(curPosition.x > _width) curPosition.x = _width;
+		curPosition.x += .01 * (0.5 - ofNoise(ofGetElapsedTimef() * speed, (i * 2) * 1000));
+		curPosition.y += .01 * (0.5 - ofNoise(ofGetElapsedTimef() * speed, (i * 2 + 1) * 1000));
+		if(curPosition.x > 1) curPosition.x = 1;
 		if (curPosition.x < 0) curPosition.x = 0;
-		if (curPosition.y > _height) curPosition.y = _height;
+		if (curPosition.y > 1) curPosition.y = 1;
 		if (curPosition.y < 0) curPosition.y = 0;
 		_sites[i].setPosition(curPosition);
 	}

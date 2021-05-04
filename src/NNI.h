@@ -4,7 +4,7 @@
 #include "point.h"
 #include "map.h"
 #define MAX_SITES 128
-#define ID_FBO_RESOLUTION 600
+#define ID_FBO_RESOLUTION 200
 
 /*
 random walk, en cpu o gpu? optimizar
