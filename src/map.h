@@ -13,15 +13,10 @@ public:
 	Map();
 
 	template<typename T>
-	void addElement(vector<T>& points, set<string> parameters, map<string, float> values, ofVec2f position)
+	void addElement(vector<T>& points, map<string, float> values, ofVec2f position)
 	{
 		T point;
-		map<string, float> curParameters;
-		for (auto value : values)
-		{
-			if (parameters.find(value.first) != parameters.end()) curParameters.insert(value);
-		}
-		point.setValues(curParameters);
+		point.setValues(values);
 		point.setPosition(position);
 		points.push_back(point);
 	}
@@ -33,23 +28,34 @@ public:
 	}
 
 	template<typename T>
-	void addParameter(vector<T>& points, set<string>& parameters, string parameter, float value)
+	void addParameter(vector<T>& points, map<string, float>& parameters, string parameter, float value)
 	{
 		if (parameters.find(parameter) == parameters.end())
 		{
-			parameters.insert(parameter);
-			for (Point& point : points)
+			parameters[parameter] = value;
+			for (auto& point : points)
 			{
 				if (!point.hasValue(parameter)) point.setValue(parameter, value);
 			}
 		}
 	}
 
+	void setParameter(map<string, float>& parameters, string parameter, float value)
+	{
+		if (parameters.find(parameter) != parameters.end()) parameters[parameter] = value;
+	}
+
 	template<typename T>
-	void removeParameter(vector<T>& points, set<string>& parameters, string parameter)
+	void setParameter(vector<T>& points, int index, string parameter, float value)
+	{
+		if (points[index].hasValue(parameter)) points[index].setValue(parameter, value);
+	}
+
+	template<typename T>
+	void removeParameter(vector<T>& points, map<string, float>& parameters, string parameter)
 	{
 		if (parameters.find(parameter) != parameters.end()) parameters.erase(parameter);
-		for (Point& point : points) point.deleteValue(parameter);
+		for (auto& point : points) point.deleteValue(parameter);
 
 	}
 

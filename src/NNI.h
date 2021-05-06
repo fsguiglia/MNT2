@@ -3,8 +3,6 @@
 #include "ofMain.h"
 #include "point.h"
 #include "map.h"
-#define MAX_SITES 128
-#define ID_FBO_RESOLUTION 200
 
 /*
 random walk, en cpu o gpu? optimizar
@@ -13,13 +11,15 @@ colores
 manejar parametros
 */
 
-class NNI : protected Map
+class NNI : private Map
 {
 public:
 	NNI();
 	void setup(int width, int height);
-	void add(map<string, float> values, ofVec2f position);
+	void add(ofVec2f position);
 	void addParameter(string parameter, float value);
+	void setParameter(string parameter, float value);
+	void setParameter(int site, string parameter, float value);
 	void move(int index, ofVec2f pos);
 	void randomize(float speed);
 	void remove(int index);
@@ -28,14 +28,18 @@ public:
 	vector<Point> getSites();
 	int getWidth();
 	int getHeight();
-	set<string> getParameters();
+	map<string, float> getParameters();
 	void draw(int x, int y);
+	void draw(int x, int y, int w, int h);
 	void drawId(int x, int y);
 	void drawInterpolation(int x, int y);
 	map<string, float> interpolate(ofVec2f pos, bool renderNewZone = false);
 private:
 	void update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites);
 	void updateIdMap();
+	
+	const int maxSize = 128;
+	const int idFboResolution = 200;
 
 	int _width, _height;
 	bool _updateIdMap;
@@ -48,7 +52,7 @@ private:
 	ofPixels _curState, _nniPixels;
 
 	vector<Point> _sites;
-	set<string> _parameters;
+	map<string, float> _parameters;
 };
 
 #endif // !_NNI

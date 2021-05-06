@@ -22,7 +22,7 @@ public:
 	int getClass();
 	vector<pair<float, int>> getClosest(vector<ofVec2f>& positions, int n);
 	pair<float,int> getClosest(vector<ofVec2f>& positions);
-private:
+protected:
 	map<string, float> _parameters;
 	ofVec2f _position;
 	int _class;

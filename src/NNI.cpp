@@ -15,12 +15,12 @@ void NNI::setup(int width, int height)
 	_colorFbo.begin();
 	ofClear(0);
 	_colorFbo.end();
-	_idFbo.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION);
-	_interpolateFbo.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION);
-	_curState.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION, ofImageType::OF_IMAGE_COLOR);
-	_nniPixels.allocate(ID_FBO_RESOLUTION, ID_FBO_RESOLUTION, ofImageType::OF_IMAGE_COLOR);
+	_idFbo.allocate(idFboResolution, idFboResolution);
+	_interpolateFbo.allocate(idFboResolution, idFboResolution);
+	_curState.allocate(idFboResolution, idFboResolution, ofImageType::OF_IMAGE_COLOR);
+	_nniPixels.allocate(idFboResolution, idFboResolution, ofImageType::OF_IMAGE_COLOR);
 
-	_matrices.resize(128);
+	_matrices.resize(maxSize);
 
 	_buffer.allocate();
 	_buffer.bind(GL_TEXTURE_BUFFER);
@@ -44,16 +44,29 @@ void NNI::setup(int width, int height)
 	_mesh.getVbo().setAttributeDivisor(ofShader::COLOR_ATTRIBUTE, 1);
 }
 
-void NNI::add(map<string, float> values, ofVec2f position)
+void NNI::add(ofVec2f position)
 {
-	Map::addElement(_sites, _parameters, values, position);
-	update(_colorFbo, 1, -1, _sites);
-	_updateIdMap = true;
+	if (_sites.size() < maxSize)
+	{
+		Map::addElement(_sites, _parameters, position);
+		update(_colorFbo, 1, -1, _sites);
+		_updateIdMap = true;
+	}
 }
 
 void NNI::addParameter(string parameter, float value)
 {
 	Map::addParameter(_sites, _parameters, parameter, value);
+}
+
+void NNI::setParameter(string parameter, float value)
+{
+	Map::setParameter(_parameters, parameter, value);
+}
+
+void NNI::setParameter(int site, string parameter, float value)
+{
+	Map::setParameter(_sites, site, parameter, value);
 }
 
 void NNI::move(int index, ofVec2f pos)
@@ -128,23 +141,27 @@ int NNI::getHeight()
 	return _height;
 }
 
-set<string> NNI::getParameters()
+map<string, float> NNI::getParameters()
 {
 	return _parameters;
 }
 
 void NNI::draw(int x, int y)
 {
-	//tambien se tendria que poder escalar
+	draw(x, y, _width, _height);
+}
+
+void NNI::draw(int x, int y, int w, int h)
+{
 	ofPushStyle();
 	ofSetColor(255);
-	_colorFbo.draw(x, y);
+	_colorFbo.draw(x, y, w, h);
 	ofSetColor(255);
-	
+
 
 	for (int i = 0; i < _sites.size(); i++)
 	{
-		ofVec2f pos = _sites[i].getPosition() * ofVec2f(_colorFbo.getWidth(), _colorFbo.getHeight());
+		ofVec2f pos = _sites[i].getPosition() * ofVec2f(w, h);
 		ofDrawBitmapString(ofToString(i), pos + ofVec2f(x, y));
 	}
 	ofPopStyle();
@@ -237,9 +254,9 @@ map<string, float> NNI::interpolate(ofVec2f pos, bool renderNewZone)
 		float value = 0;
 		for (int i = 0; i < _sites.size(); i++)
 		{
-			if(_sites[i].hasValue(parameter)) value += _sites[i].getValue(parameter) * weights[i];
+			if(_sites[i].hasValue(parameter.first)) value += _sites[i].getValue(parameter.first) * weights[i];
 		}
-		values[parameter] = value;
+		values[parameter.first] = value;
 	}
 	return values;
 }
