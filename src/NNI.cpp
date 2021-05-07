@@ -13,7 +13,11 @@ void NNI::setup(int width, int height)
 
 	_colorFbo.allocate(_width, _height);
 	_colorFbo.begin();
-	ofClear(0);
+	ofPushStyle();
+	ofClear(255);
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, _width, _height);
+	ofPopStyle();
 	_colorFbo.end();
 	_idFbo.allocate(idFboResolution, idFboResolution);
 	_interpolateFbo.allocate(idFboResolution, idFboResolution);

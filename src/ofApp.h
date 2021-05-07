@@ -7,6 +7,7 @@
 #include "ofxOsc.h"
 #include "ofxMidi.h"
 #include "NNI.h"
+#include "mntUtils.h"
 
 /*
 en nni los parametros se podrian mapear todos a partir de un diccionario, no los agrego con learn
@@ -21,26 +22,24 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void updateGuis();
 		void draw();
 		void exit();
-
-		ofRectangle centerMapPosition(int w, int h);
-		ofVec2f normalizeMapCursor(int x, int y, ofRectangle mapPosition);
-
+		//--------------------------------------------------------------
 		void setupNNI();
 		void setupNNIGui(map<string, float> parameters, bool toggleState);
-		void addNNISite(float x, float y, int id);
-		void selectNNISite(float x, float y);
 		void NNIToggle(ofxDatGuiToggleEvent e);
 		void NNISlider(ofxDatGuiSliderEvent e);
 		void NNIMIDI(ofxMidiMessage& msg);
+		void addNNISite(float x, float y, int id);
+		void selectNNISite(float x, float y);
 		void drawNNI();
-
+		//--------------------------------------------------------------
 		void setupMIDI();
-		void drawMIDI();
+		void setupMIDIGui();
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
 		void sendMIDICC(map<string, float> parameters, ofxMidiOut port);
-
+		void drawMIDI();
+		//--------------------------------------------------------------
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -52,8 +51,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-
-		
 
 		//NNI
 		NNI _nni;
@@ -71,7 +68,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		const size_t _guiWidth = 300;
 		int _page;
 		ofxDatGui* _gNNI;
-		ofxDatGuiScrollView* _gNNIParameters;
 		ofxDatGui* _gMIDIIn;
 		ofxDatGui* _gMIDIOut;
 

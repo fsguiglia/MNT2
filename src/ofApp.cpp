@@ -1,18 +1,15 @@
 #include "ofApp.h"
 
-//--------------------------------------------------------------
 void ofApp::setup(){
+	ofSetWindowTitle("El mapa no es el territorio - untitled");
 	//NNI
 	setupNNI();
-	
 	//MIDI
 	setupMIDI();
-
 	//GUI
 	_page = 0;
 }
 
-//--------------------------------------------------------------
 void ofApp::update() {
 	if (_nniRandom) _nni.randomize(1);
 	if (_nniInterpolate) _nniWeights = _nni.interpolate(_nniCursor, true);
@@ -37,10 +34,8 @@ void ofApp::updateGuis()
 		_gMIDIOut->setEnabled(true);
 		_gMIDIOut->update();
 	}
-
-	cout << _gNNI->getWidth() << endl;
 }
-//--------------------------------------------------------------
+
 void ofApp::draw(){
 	ofClear(50);
 	ofSetColor(0);
@@ -71,37 +66,12 @@ void ofApp::exit()
 	}
 }
 
-ofRectangle ofApp::centerMapPosition(int w, int h)
-{
-	ofRectangle rect;
-	int max = w;
-	int min = h;
-
-	if (ofGetWidth() < ofGetHeight())
-	{
-		max = w;
-		min = h;
-	}
-	rect.setWidth(min);
-	rect.setHeight(min);
-	rect.setX((w - min) * 0.5);
-	rect.setY((h - min) * 0.5);
-	
-	return rect;
-}
-
-ofVec2f ofApp::normalizeMapCursor(int x, int y, ofRectangle mapPosition)
-{
-	ofVec2f normalized;
-	normalized.x = (float)(x - mapPosition.x) / mapPosition.getWidth();
-	normalized.y = (float)(y - mapPosition.y) / mapPosition.getHeight();
-	return normalized;
-}
+//--------------------------------------------------------------
 
 void ofApp::setupNNI()
 {
 	_nni.setup(1024, 1024);
-	_nniPosition = centerMapPosition(ofGetWidth() - _guiWidth, ofGetHeight());
+	_nniPosition = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	_selNNISite = -1;
 	_nniInterpolate = false;
 	_nniMouseControl = false;
@@ -113,6 +83,9 @@ void ofApp::setupNNI()
 
 void ofApp::setupNNIGui(map<string, float> parameters, bool toggleState)
 {
+	/*
+	aca hay que implementar a mano un scroll
+	*/
 	_gNNI = new ofxDatGui();
 	_gNNI->addHeader("NNI", false);
 	_gNNI->addToggle("interpolate");
@@ -136,28 +109,6 @@ void ofApp::setupNNIGui(map<string, float> parameters, bool toggleState)
 	_gNNI->setWidth(_guiWidth, 0.3);
 	_gNNI->setPosition(ofGetWidth() - _guiWidth, 0);
 	_gNNI->update();
-}
-
-void ofApp::addNNISite(float x, float y, int id)
-{
-	map<string, float> curValues;
-	_nni.add(ofVec2f(x, y));
-}
-
-void ofApp::selectNNISite(float x, float y)
-{
-	float closest = _nni.getClosest(ofVec2f(x, y))[0];
-	if (closest != _selNNISite)
-	{
-		_selNNISite = closest;
-		_gNNI->getLabel("Parameters")->setLabel("Parameters - Site: " + ofToString(_selNNISite));
-		map<string, float> parameters = _nni.getSites()[_selNNISite].getValues();
-		for (auto parameter : parameters)
-		{
-			_gNNI->getSlider(parameter.first)->setValue(parameter.second);
-		}
-		for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
-	}
 }
 
 void ofApp::NNIToggle(ofxDatGuiToggleEvent e)
@@ -262,16 +213,45 @@ void ofApp::NNIMIDI(ofxMidiMessage& msg)
 	}
 }
 
+void ofApp::addNNISite(float x, float y, int id)
+{
+	map<string, float> curValues;
+	_nni.add(ofVec2f(x, y));
+}
+
+void ofApp::selectNNISite(float x, float y)
+{
+	float closest = _nni.getClosest(ofVec2f(x, y))[0];
+	if (closest != _selNNISite)
+	{
+		_selNNISite = closest;
+		_gNNI->getLabel("Parameters")->setLabel("Parameters - Site: " + ofToString(_selNNISite));
+		map<string, float> parameters = _nni.getSites()[_selNNISite].getValues();
+		for (auto parameter : parameters)
+		{
+			_gNNI->getSlider(parameter.first)->setValue(parameter.second);
+		}
+		for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
+	}
+}
+
 void ofApp::drawNNI()
 {
 	_nni.draw(_nniPosition.x, _nniPosition.y, _nniPosition.getWidth(), _nniPosition.getHeight());
 	_gNNI->draw();
 }
 
+
+//--------------------------------------------------------------
+
 void ofApp::setupMIDI()
 {
 	_maxMidiMessages = 10;
+	setupMIDIGui();
+}
 
+void ofApp::setupMIDIGui()
+{
 	ofxMidiIn midiIn;
 	_gMIDIIn = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
 	_gMIDIIn->addLabel("MIDI In");
@@ -291,12 +271,6 @@ void ofApp::setupMIDI()
 	_gMIDIOut->setWidth(100, 0.3);
 	_gMIDIOut->setPosition(320, 20);
 	_gMIDIOut->setTheme(new ofxDatGuiThemeWireframe(), true);
-}
-
-void ofApp::drawMIDI()
-{
-	_gMIDIIn->draw();
-	_gMIDIOut->draw();
 }
 
 void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
@@ -360,12 +334,17 @@ void ofApp::sendMIDICC(map<string, float> parameters, ofxMidiOut port)
 	}
 }
 
+void ofApp::drawMIDI()
+{
+	_gMIDIIn->draw();
+	_gMIDIOut->draw();
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	
 }
 
-//--------------------------------------------------------------
 void ofApp::keyReleased(int key){
 	switch (key)
 	{
@@ -375,18 +354,16 @@ void ofApp::keyReleased(int key){
 	}
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
 	//NNI
 	if (_page == 0)
 	{
 		_nniInside = _nniPosition.inside(x, y);
-		if(_nniInside && _nniMouseControl) _nniCursor.set(normalizeMapCursor(x,y, _nniPosition));
+		if(_nniInside && _nniMouseControl) _nniCursor.set(normalize(ofVec2f(x, y), _nniPosition));
 	}
 	else _nniInside = false;
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
 	//NNI
 	if (_page == 0)
@@ -395,12 +372,11 @@ void ofApp::mouseDragged(int x, int y, int button){
 		bool insideGui = guiPosition.inside(x, y);
 		_nniInside = _nniPosition.inside(x, y);
 		if (button < 2 && _nniInside && !insideGui) {
-			_nni.move(_selNNISite, ofVec2f(normalizeMapCursor(x, y, _nniPosition)));
+			_nni.move(_selNNISite, ofVec2f(normalize(ofVec2f(x, y), _nniPosition)));
 		}
 	}
 }
 
-//--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
 	//NNI
 	if (_page == 0)
@@ -410,14 +386,13 @@ void ofApp::mousePressed(int x, int y, int button){
 		bool insideGui = guiPosition.inside(x, y);
 		if (_nniInside && !insideGui)
 		{
-			ofVec2f pos = normalizeMapCursor(x, y, _nniPosition);
+			ofVec2f pos = normalize(ofVec2f(x, y), _nniPosition);
 			if (button == 0) addNNISite(pos.x, pos.y, _nni.getSites().size());
 			if (button < 2) selectNNISite(pos.x, pos.y);
 		}
 	}
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
 	//NNI
 	if (_page == 0)
@@ -427,34 +402,29 @@ void ofApp::mouseReleased(int x, int y, int button){
 		bool insideGui = guiPosition.inside(x, y);
 		if (button == 2 && _nniInside)
 		{
-			_nni.remove(normalizeMapCursor(x, y, _nniPosition));
+			_nni.remove(normalize(ofVec2f(x, y), _nniPosition));
 		}
 	}
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseEntered(int x, int y){
 
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseExited(int x, int y){
 
 }
 
-//--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-	_nniPosition = centerMapPosition(w - _guiWidth, h);
+	_nniPosition = centerSquarePosition(w - _guiWidth, h);
 	_gNNI->setPosition(ofGetWidth() - _guiWidth, 0);
 	_gNNI->update();
 }
 
-//--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg){
 
 }
 
-//--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }

@@ -127,6 +127,9 @@
     <ClCompile Include="src\midiHandler.cpp">
       <Filter>src\IO</Filter>
     </ClCompile>
+    <ClCompile Include="src\mntUtils.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -218,6 +221,9 @@
     </Filter>
     <Filter Include="src\IO">
       <UniqueIdentifier>{8da50d13-9fcb-4f0c-a2d7-4ba1d84e884b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{7099e957-e49b-47db-b833-d60944de5880}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -430,6 +436,9 @@
     </ClInclude>
     <ClInclude Include="src\midiHandler.h">
       <Filter>src\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mntUtils.h">
+      <Filter>src\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
