@@ -20,12 +20,15 @@ public:
 	void addParameter(string parameter, float value);
 	void setParameter(string parameter, float value);
 	void setParameter(int site, string parameter, float value);
+	void removeParameter(string parameter);
 	void move(int index, ofVec2f pos);
 	void randomize(float speed);
 	void remove(int index);
 	void remove(ofVec2f pos);
+	void clear();
 	array<float, 2> getClosest(ofVec2f pos);
 	vector<Point> getSites();
+	Point getSite(int index);
 	int getWidth();
 	int getHeight();
 	map<string, float> getParameters();

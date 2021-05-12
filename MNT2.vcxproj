@@ -225,6 +225,7 @@
     <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp" />
     <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp" />
     <ClCompile Include="src\point.cpp" />
+    <ClCompile Include="src\scrollGui.cpp" />
     <ClCompile Include="src\trigger.cpp" />
     <ClCompile Include="src\triggerMap.cpp" />
   </ItemGroup>
@@ -298,6 +299,7 @@
     <ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h" />
     <ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h" />
     <ClInclude Include="src\point.h" />
+    <ClInclude Include="src\scrollGui.h" />
     <ClInclude Include="src\trigger.h" />
     <ClInclude Include="src\triggerMap.h" />
   </ItemGroup>

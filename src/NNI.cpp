@@ -73,6 +73,11 @@ void NNI::setParameter(int site, string parameter, float value)
 	Map::setParameter(_sites, site, parameter, value);
 }
 
+void NNI::removeParameter(string parameter)
+{
+	Map::removeParameter(_sites, _parameters, parameter);
+}
+
 void NNI::move(int index, ofVec2f pos)
 {
 	if (index < _sites.size())
@@ -114,6 +119,13 @@ void NNI::remove(ofVec2f pos)
 	_updateIdMap = true;
 }
 
+void NNI::clear()
+{
+	_sites.clear();
+	update(_colorFbo, 1, -1, _sites);
+	_updateIdMap = true;
+}
+
 array<float, 2> NNI::getClosest(ofVec2f pos)
 {
 	int closest = -1;
@@ -133,6 +145,11 @@ array<float, 2> NNI::getClosest(ofVec2f pos)
 vector<Point> NNI::getSites()
 {
 	return _sites;
+}
+
+Point NNI::getSite(int index)
+{
+	return _sites[index];
 }
 
 int NNI::getWidth()

@@ -130,6 +130,9 @@
     <ClCompile Include="src\mntUtils.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\scrollGui.cpp">
+      <Filter>src\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -224,6 +227,9 @@
     </Filter>
     <Filter Include="src\utils">
       <UniqueIdentifier>{7099e957-e49b-47db-b833-d60944de5880}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gui">
+      <UniqueIdentifier>{d03b4d53-df8c-4d71-9221-7aa55a08f842}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -439,6 +445,9 @@
     </ClInclude>
     <ClInclude Include="src\mntUtils.h">
       <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scrollGui.h">
+      <Filter>src\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
