@@ -15,8 +15,9 @@ void ofApp::setup(){
 }
 
 void ofApp::update() {
-	if (_nniRandom) _nni.randomize(1);
-	if (_nniInterpolate) _nniWeights = _nni.interpolate(_nniCursor, true);
+
+	_nni.update();
+	if (_nni.getActive()) NNIMIDIOut(_nni.getWeights());
 	updateGuis();
 }
 
@@ -54,22 +55,6 @@ void ofApp::draw(){
 	}
 }
 
-void ofApp::drawPosition(ofVec2f position, ofRectangle rect)
-{
-	ofVec2f drawPos = position * ofVec2f(rect.getWidth(), rect.getHeight());
-	position *= 100.;
-	position.x = int(position.x);
-	position.y = int(position.y);
-	position /= 100.;
-	drawPos.x += 10;
-	drawPos.y -= 10;
-	string sPosition = ofToString(position.x) + ", " + ofToString(position.y);
-	ofSetColor(0, 100);
-	ofDrawRectangle(verdana.getStringBoundingBox(sPosition, drawPos.x, drawPos.y));
-	ofSetColor(180);
-	verdana.drawString(sPosition, drawPos.x, drawPos.y);
-}
-
 void ofApp::exit()
 {
 	for (auto port : _MIDIInputs)
@@ -94,13 +79,14 @@ void ofApp::setupNNI()
 {
 	_nni.setup(1024, 1024);
 	_nniPosition = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
-	_selNNISite = -1;
-	_nniInterpolate = false;
+	_nni.setActive(false);
+	_nni.setRandomize(0.);
+	_nni.setDrawInterpolation(true);
+	_nni.setDrawSelected(true);
 	_nniMouseControl = false;
-	_nniRandom = false;
 	_nniInside = false;
 
-	setupNNIGui(_nni.getParameters(), false);
+	setupNNIGui(_nni.getParameters() , false);
 }
 
 void ofApp::setupNNIGui(map<string, float> parameters, bool toggleState)
@@ -151,8 +137,8 @@ void ofApp::NNIToggle(ofxDatGuiToggleEvent e)
 			_nniControlLearn = false;
 		}
 	}
-	if (e.target->getName() == "interpolate") _nniInterpolate = e.checked;
-	if (e.target->getName() == "randomize") _nniRandom = e.checked;
+	if (e.target->getName() == "interpolate") _nni.setActive(e.checked);
+	if (e.target->getName() == "randomize") _nni.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _nniMouseControl = e.checked;
 }
 
@@ -164,8 +150,10 @@ void ofApp::NNISlider(ofxDatGuiSliderEvent e)
 		_nniLastSelected = name;
 		if (!_nniControlLearn)
 		{
-			if (name == "x") _nniCursor.x = e.value;
-			if (name == "y") _nniCursor.y = e.value;
+			ofVec2f nniCursor = _nni.getCursor();
+			if (name == "x") nniCursor.x = e.value;
+			if (name == "y") nniCursor.y = e.value;
+			_nni.setCursor(nniCursor);
 		}
 	}
 	else
@@ -184,7 +172,22 @@ void ofApp::NNISlider(ofxDatGuiSliderEvent e)
 	}
 }
 
-void ofApp::NNIMIDI(ofxMidiMessage& msg)
+void ofApp::updateNNISite(int selected, map<string, float> parameters)
+{
+	_gNNI->getLabel("Parameters")->setLabel("Parameters - Site: " + ofToString(selected));
+	for (auto parameter : parameters) _gNNI->getSlider(parameter.first)->setValue(parameter.second);
+	for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
+}
+
+void ofApp::drawNNI()
+{
+	ofPushStyle();
+	_nni.draw(_nniPosition.x, _nniPosition.y, _nniPosition.getWidth(), _nniPosition.getHeight(), verdana);
+	_gNNI->draw();
+	ofPopStyle();
+}
+
+void ofApp::NNIMIDIIn(ofxMidiMessage& msg)
 {
 	//parametro puerto/canal/control/valor
 	if (msg.status == MIDI_CONTROL_CHANGE)
@@ -225,7 +228,7 @@ void ofApp::NNIMIDI(ofxMidiMessage& msg)
 			{
 				_gNNI->getSlider(curParameter)->setValue(value, false);
 				_nni.setParameter(curParameter, value);
-				if (_selNNISite != -1) _nni.setParameter(_selNNISite, curParameter, value);
+				if (_nni.getLastSelected() > 0) _nni.setParameter(_nni.getLastSelected(), curParameter, value);
 			}
 		}
 		else
@@ -236,44 +239,20 @@ void ofApp::NNIMIDI(ofxMidiMessage& msg)
 	}
 }
 
-void ofApp::addNNISite(float x, float y, int id)
+void ofApp::NNIMIDIOut(map<string, float> weights)
 {
-	map<string, float> curValues;
-	_nni.add(ofVec2f(x, y));
-}
-
-void ofApp::selectNNISite(float x, float y)
-{
-	if (_nni.getSites().size() > 0)
+	for (auto weight : weights)
 	{
-		float closest = _nni.getClosest(ofVec2f(x, y))[0];
-		if (closest != _selNNISite)
+		for (auto port : _MIDIOutputs)
 		{
-			_selNNISite = closest;
-			_gNNI->getLabel("Parameters")->setLabel("Parameters - Site: " + ofToString(_selNNISite));
-			map<string, float> parameters = _nni.getSites()[_selNNISite].getValues();
-			for (auto parameter : parameters)
+			vector<string> msg = ofSplitString(weight.first, "/");
+			if (port.second.isOpen())
 			{
-				_gNNI->getSlider(parameter.first)->setValue(parameter.second);
+				port.second.sendControlChange(ofToInt(msg[1]), ofToInt(msg[2]), int(weight.second * 127));
 			}
-			for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
 		}
 	}
-	else _selNNISite = -1;
 }
-
-void ofApp::drawNNI()
-{
-	ofPushStyle();
-	_nni.draw(_nniPosition.x, _nniPosition.y, _nniPosition.getWidth(), _nniPosition.getHeight());
-	_gNNI->draw();
-	if (ofGetElapsedTimeMillis() - _nniDrag < 1000 && _selNNISite >= 0)
-	{
-		drawPosition(_nni.getSite(_selNNISite).getPosition(), _nniPosition);
-	}
-	ofPopStyle();
-}
-
 
 //--------------------------------------------------------------
 
@@ -355,7 +334,23 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 void ofApp::newMidiMessage(ofxMidiMessage & msg)
 {
 	//NNI
-	NNIMIDI(msg);
+	NNIMIDIIn(msg);
+	for (auto port : _MIDIOutputs)
+	{
+		string in, out;
+		for (int i = 0; i < ofSplitString(msg.portName, " ").size() - 1; i++)
+		{
+			in += ofSplitString(msg.portName, " ")[i];
+		}
+		for (int i = 0; i < ofSplitString(port.first, " ").size() - 1; i++)
+		{
+			out += ofSplitString(port.first, " ")[i];
+		}
+		if (port.second.isOpen() && in != out)
+		{
+			port.second.sendMidiBytes(msg.bytes);
+		}
+	}
 }
 
 void ofApp::sendMIDICC(map<string, float> parameters, ofxMidiOut port)
@@ -383,11 +378,10 @@ void ofApp::load()
 	{
 		path = loadFile.getPath();
 		ofJson jLoad = ofLoadJson(path);
-
 		//NNI
 		ofJson jNNI = jLoad["NNI"];
 		///clear current NNI
-		_nni.clear();
+		_nni.clearPoints();
 		_gNNI->clearRemovableSliders();
 		//load parameters to NNI and GUI
 		for (auto parameter : jNNI["parameters"])
@@ -408,13 +402,13 @@ void ofApp::load()
 			{
 				_nni.setParameter(parameter.first, site["parameters"][parameter.first]);
 			}
-			addNNISite(site["pos"]["x"], site["pos"]["y"], site["id"]);
+			_nni.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
 		}
 		//update gui
 		_gNNI->update();
-		if (_nni.getSites().size() != 0)
+		if (_nni.getPoints().size() != 0)
 		{
-			selectNNISite(_nni.getSite(0).getPosition().x, _nni.getSite(0).getPosition().y);
+			updateNNISite(0, _nni.getPoint(0).getValues());
 		}
 
 		//MIDI
@@ -459,7 +453,7 @@ void ofApp::save()
 		ofJson jNNI;
 		map<string, float> nniParameters = _nni.getParameters();
 		for (auto element : nniParameters) jNNI["parameters"].push_back(element.first);
-		vector<Point> nniSites = _nni.getSites();
+		vector<Point> nniSites = _nni.getPoints();
 		for (int i = 0; i < nniSites.size(); i++)
 		{
 			ofJson curSite;
@@ -521,7 +515,7 @@ void ofApp::mouseMoved(int x, int y ){
 	if (_page == 0)
 	{
 		_nniInside = _nniPosition.inside(x, y);
-		if(_nniInside && _nniMouseControl) _nniCursor.set(normalize(ofVec2f(x, y), _nniPosition));
+		if(_nniInside && _nniMouseControl) _nni.setCursor(normalize(ofVec2f(x, y), _nniPosition));
 	}
 	else _nniInside = false;
 }
@@ -535,8 +529,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 		_nniInside = _nniPosition.inside(x, y);
 		if (button < 2 && _nniInside && !insideGui) {
 			ofVec2f normPosition = normalize(ofVec2f(x, y), _nniPosition);
-			_nni.move(_selNNISite, normPosition);
-			_nniDrag = ofGetElapsedTimeMillis();
+			_nni.movePoint(_nni.getLastSelected(), normPosition);
 		}
 	}
 }
@@ -551,8 +544,16 @@ void ofApp::mousePressed(int x, int y, int button){
 		if (_nniInside && !insideGui)
 		{
 			ofVec2f pos = normalize(ofVec2f(x, y), _nniPosition);
-			if (button == 0) addNNISite(pos.x, pos.y, _nni.getSites().size());
-			if (button < 2) selectNNISite(pos.x, pos.y);
+			if (button == 0) _nni.addPoint(pos);
+			if (button < 2)
+			{
+				int lastSelected = _nni.getLastSelected();
+				int curSelected = _nni.getClosest(pos, true)[0];
+				if (curSelected != lastSelected)
+				{
+					updateNNISite(curSelected, _nni.getPoint(curSelected).getValues());
+				}
+			}
 		}
 	}
 }
@@ -561,17 +562,27 @@ void ofApp::mouseReleased(int x, int y, int button){
 	//NNI
 	if (_page == 0)
 	{
+		ofVec2f normalized = normalize(ofVec2f(x, y), _nniPosition);
 		_nniInside = _nniPosition.inside(x, y);
 		if (button == 2)
 		{
 			if (_nniInside)
 			{
-				ofVec2f normalized = normalize(ofVec2f(x, y), _nniPosition);
-				_nni.remove(normalized);
-				selectNNISite(normalized.x, normalized.y);
+				_nni.removePoint(normalized);
+				if (_nni.getPoints().size() > 0)
+				{
+					int curPoint = _nni.getPoints().size() - 1;
+					if (curPoint > 0)
+					{
+						_nni.setLastSelected(curPoint);
+						updateNNISite(curPoint, _nni.getPoint(curPoint).getValues());
+					}
+					else _nni.setLastSelected(-1);
+				}
 			}
 			else
 			{
+				_nni.getClosest(normalized, true);
 				_gNNI->update();
 				_gNNI->updatePositions();
 				string removableSlider = _gNNI->inside(x, y);

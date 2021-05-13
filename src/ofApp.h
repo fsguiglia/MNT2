@@ -11,6 +11,11 @@
 #include "scrollGui.h"
 
 /*
+conflictos con MIDI: cuando interpola mandar solo si cambiaron los valores,
+quilombo cuando varios puertos le dan al mismo cc
+
+deberia hacer una subclase que se llame page? -> puedo primero escribir trigger y ahi veo
+
 en nni los parametros se podrian mapear todos a partir de un diccionario, no los agrego con learn
 sino con un + y después los mapeo
 */
@@ -22,17 +27,16 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void update();
 		void updateGuis();
 		void draw();
-		void drawPosition(ofVec2f position, ofRectangle rect);
 		void exit();
 		//--------------------------------------------------------------
 		void setupNNI();
 		void setupNNIGui(map<string, float> parameters, bool toggleState);
 		void NNIToggle(ofxDatGuiToggleEvent e);
 		void NNISlider(ofxDatGuiSliderEvent e);
-		void NNIMIDI(ofxMidiMessage& msg);
-		void addNNISite(float x, float y, int id);
-		void selectNNISite(float x, float y);
+		void updateNNISite(int selected, map<string, float> parameters);
 		void drawNNI();
+		void NNIMIDIIn(ofxMidiMessage& msg);
+		void NNIMIDIOut(map<string, float> weights);
 		//--------------------------------------------------------------
 		void setupMIDI();
 		void setupMIDIGui();
@@ -61,12 +65,9 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 
 		//NNI
 		NNI _nni;
-		int _selNNISite, _nniDrag;
-		bool _nniInterpolate, _nniMouseControl, _nniRandom, _nniInside;
-		map<string, float> _nniWeights;
+		bool _nniMouseControl, _nniInside;
 		string _nniCCXY[2];
 		string _nniLastSelected;
-		ofVec2f _nniCursor;
 		ofRectangle _nniPosition;
 		bool _nniControlLearn, _nniParameterLearn;
 

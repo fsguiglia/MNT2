@@ -3,69 +3,256 @@
 #include "ofMain.h"
 #include "point.h"
 
-/*
-acá la lista de puntos,
-la lista de parametros, las funciones para devolver parametros y una funcion abstracta update?
-*/
-
-class Map {
+template<typename T> class Map {
 public:
 	Map();
 
-	template<typename T>
-	void addElement(vector<T>& points, map<string, float> values, ofVec2f position)
-	{
-		T point;
-		point.setValues(values);
-		point.setPosition(position);
-		points.push_back(point);
-	}
+	virtual void setup(int width, int height) = 0;
+	virtual void update() = 0;
+	virtual void draw(int x, int y, int w, int h, ofTrueTypeFont& font) = 0;
 
-	template<typename T>
-	void remove(vector<T>& points, int index)
-	{
-		if(index < points.size()) points.erase(points.begin() + index);
-	}
+	void addPoint(ofVec2f position);
+	void removePoint(int index);
+	void removePoint(ofVec2f pos);
+	void clearPoints();
+	void movePoint(int index, ofVec2f pos);
+	T getPoint(int index);
+	vector<T> getPoints();
+	void setRandomize(float randomize);
+	void randomize();
+	array<float, 2> getClosest(ofVec2f pos, bool select=false);
+	void addParameter(string parameter, float value);
+	void setParameter(string parameter, float value);
+	void setParameter(int index, string parameter, float value);
+	void removeParameter(string parameter);
+	map<string, float> getParameters();
+	void setActive(bool active);
+	bool getActive();
+	int getWidth();
+	int getHeight();
+	void setLastSelected(int index, int time=0);
+	int getLastSelected();
+	void setDrawSelected(bool drawSelected);
 
-	template<typename T>
-	void addParameter(vector<T>& points, map<string, float>& parameters, string parameter, float value)
-	{
-		if (parameters.find(parameter) == parameters.end())
-		{
-			parameters[parameter] = value;
-			for (auto& point : points)
-			{
-				if (!point.hasValue(parameter)) point.setValue(parameter, value);
-			}
-		}
-	}
+protected:
+	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font);
 
-	void setParameter(map<string, float>& parameters, string parameter, float value)
-	{
-		if (parameters.find(parameter) != parameters.end()) parameters[parameter] = value;
-	}
-
-	template<typename T>
-	void setParameter(vector<T>& points, int index, string parameter, float value)
-	{
-		if (points[index].hasValue(parameter)) points[index].setValue(parameter, value);
-	}
-
-	template<typename T>
-	void removeParameter(vector<T>& points, map<string, float>& parameters, string parameter)
-	{
-		if (parameters.find(parameter) != parameters.end()) parameters.erase(parameter);
-		for (auto& point : points) point.deleteValue(parameter);
-
-	}
-
-	template<typename T>
-	void updateParameters(T& point, map<string, float> values)
-	{
-		for (auto& value : values)
-		{
-			if (point.hasValue(value.first)) point.setValue(value.first, value.second);
-		}
-	}
+	typename vector<T> _points;
+	map<string, float> _parameters;
+	bool _positionChanged, _drawSelected, _active;
+	float _randomSpeed;
+	int _width, _height, _lastSelectedMs , _lastSelected;
 };
+
+template<typename T>
+Map<T>::Map()
+{
+	_positionChanged = false;
+	_lastSelected = -1;
+	_width = 100;
+	_height = 100;
+}
+
+template<typename T>
+void Map<T>::addPoint(ofVec2f position)
+{
+	T point;
+	point.setValues(_parameters);
+	point.setPosition(position);
+	_points.push_back(point);
+	_positionChanged = true;
+}
+
+template<typename T>
+void Map<T>::removePoint(int index)
+{
+	if (index < _points.size())
+	{
+		_points.erase(_points.begin() + index);
+		_positionChanged = true;
+	}
+}
+
+template<typename T>
+void Map<T>::removePoint(ofVec2f pos)
+{
+	removePoint((int)getClosest(pos)[0]);
+}
+
+template<typename T>
+void Map<T>::clearPoints()
+{
+	_points.clear();
+	_positionChanged = true;
+}
+
+template<typename T>
+void Map<T>::movePoint(int index, ofVec2f pos)
+{
+	_points[index].setPosition(pos);
+	_positionChanged = true;
+	_lastSelected = index;
+	_lastSelectedMs = ofGetElapsedTimeMillis();
+}
+
+template<typename T>
+T Map<T>::getPoint(int index)
+{
+	return _points[index];
+}
+
+template<typename T>
+vector<T> Map<T>::getPoints()
+{
+	return _points;
+}
+
+template<typename T>
+void Map<T>::setRandomize(float randomSpeed)
+{
+	_randomSpeed = randomSpeed;
+}
+
+template<typename T>
+void Map<T>::randomize()
+{
+	for (int i = 0; i < _points.size(); i++)
+	{
+		ofVec2f curPosition = _points[i].getPosition();
+		curPosition.x += .01 * (0.5 - ofNoise(ofGetElapsedTimef() * _randomSpeed, (i * 2) * 1000));
+		curPosition.y += .01 * (0.5 - ofNoise(ofGetElapsedTimef() * _randomSpeed, (i * 2 + 1) * 1000));
+		if (curPosition.x > 1) curPosition.x = 1;
+		if (curPosition.x < 0) curPosition.x = 0;
+		if (curPosition.y > 1) curPosition.y = 1;
+		if (curPosition.y < 0) curPosition.y = 0;
+		_points[i].setPosition(curPosition);
+	}
+	_positionChanged = true;
+}
+
+template<typename T>
+array<float, 2> Map<T>::getClosest(ofVec2f pos, bool select)
+{
+	int closest = -1;
+	float minDist = NULL;
+	for (int i = 0; i < _points.size(); i++)
+	{
+		float curDist = pos.distance(_points[i].getPosition());
+		if (minDist == NULL || curDist < minDist)
+		{
+			closest = i;
+			minDist = curDist;
+		}
+	}
+	if (select)
+	{
+		_lastSelected = closest;
+		_lastSelectedMs = ofGetElapsedTimeMillis();
+	}
+	return array<float, 2>({ (float)closest, minDist });
+}
+
+template<typename T>
+void Map<T>::addParameter(string parameter, float value)
+{
+	if (_parameters.find(parameter) == _parameters.end())
+	{
+		_parameters[parameter] = value;
+		for (auto& point : _points)
+		{
+			if (!point.hasValue(parameter)) point.setValue(parameter, value);
+		}
+	}
+}
+
+template <typename T>
+void Map<T>::setParameter(string parameter, float value)
+{
+	if (_parameters.find(parameter) != _parameters.end()) _parameters[parameter] = value;
+}
+
+template<typename T>
+void Map<T>::setParameter(int index, string parameter, float value)
+{
+	if (_points[index].hasValue(parameter)) _points[index].setValue(parameter, value);
+}
+
+template<typename T>
+void Map<T>::removeParameter(string parameter)
+{
+	if (_parameters.find(parameter) != _parameters.end()) _parameters.erase(parameter);
+	for (auto& point : _points) point.deleteValue(parameter);
+
+}
+
+template<typename T>
+map<string, float> Map<T>::getParameters()
+{
+	return _parameters;
+}
+
+template<typename T>
+void Map<T>::setActive(bool active)
+{
+	_active = active;
+}
+
+template<typename T>
+bool Map<T>::getActive()
+{
+	return _active;
+}
+
+template<typename T>
+int Map<T>::getWidth()
+{
+	return _width;
+}
+
+template<typename T>
+int Map<T>::getHeight()
+{
+	return _height;
+}
+
+template<typename T>
+inline void Map<T>::setLastSelected(int index, int time)
+{
+	_lastSelected = index;
+	_lastSelectedMs = time;
+}
+
+template<typename T>
+int Map<T>::getLastSelected()
+{
+	return _lastSelected;
+}
+
+template<typename T>
+void Map<T>::setDrawSelected(bool drawSelected)
+{
+	_drawSelected = drawSelected;
+}
+
+template<typename T>
+void Map<T>::drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font)
+{
+	ofPushStyle();
+	ofVec2f position = _points[_lastSelected].getPosition();
+	ofVec2f drawPos = position * ofVec2f(w, h);
+	drawPos += ofVec2f(x, y);
+	position *= 100.;
+	position.x = int(position.x);
+	position.y = int(position.y);
+	position /= 100.;
+	drawPos.x += 10;
+	drawPos.y -= 10;
+	string sPosition = ofToString(position.x) + ", " + ofToString(position.y);
+	ofSetColor(0, 100);
+	ofDrawRectangle(font.getStringBoundingBox(sPosition, drawPos.x, drawPos.y));
+	ofSetColor(180);
+	font.drawString(sPosition, drawPos.x, drawPos.y);
+	ofPopStyle();
+}
+
 #endif

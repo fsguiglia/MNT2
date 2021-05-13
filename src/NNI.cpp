@@ -9,7 +9,6 @@ void NNI::setup(int width, int height)
 {
 	_width = width;
 	_height = height;
-	_updateIdMap = false;
 
 	_colorFbo.allocate(_width, _height);
 	_colorFbo.begin();
@@ -48,131 +47,27 @@ void NNI::setup(int width, int height)
 	_mesh.getVbo().setAttributeDivisor(ofShader::COLOR_ATTRIBUTE, 1);
 }
 
-void NNI::add(ofVec2f position)
+void NNI::update()
 {
-	if (_sites.size() < maxSize)
+	if (_randomSpeed != 0) randomize();
+	if (_positionChanged)
 	{
-		Map::addElement(_sites, _parameters, position);
-		update(_colorFbo, 1, -1, _sites);
-		_updateIdMap = true;
+		_updateIdFbo = true;
+		update(_colorFbo, 1, -1, _points);
+		_positionChanged = false;
+	}
+	if (_active)
+	{
+		_weights = interpolate(_cursor, _drawInterpolation);
 	}
 }
 
-void NNI::addParameter(string parameter, float value)
+void NNI::draw(int x, int y, ofTrueTypeFont& font)
 {
-	Map::addParameter(_sites, _parameters, parameter, value);
+	draw(x, y, _width, _height, font);
 }
 
-void NNI::setParameter(string parameter, float value)
-{
-	Map::setParameter(_parameters, parameter, value);
-}
-
-void NNI::setParameter(int site, string parameter, float value)
-{
-	Map::setParameter(_sites, site, parameter, value);
-}
-
-void NNI::removeParameter(string parameter)
-{
-	Map::removeParameter(_sites, _parameters, parameter);
-}
-
-void NNI::move(int index, ofVec2f pos)
-{
-	if (index < _sites.size())
-	{
-		_sites[index].setPosition(pos);
-		update(_colorFbo, 1, -1, _sites);
-		_updateIdMap = true;
-	}
-}
-
-void NNI::randomize(float speed)
-{
-	for (int i = 0; i < _sites.size(); i++)
-	{
-		ofVec2f curPosition = _sites[i].getPosition();
-		curPosition.x += .01 * (0.5 - ofNoise(ofGetElapsedTimef() * speed, (i * 2) * 1000));
-		curPosition.y += .01 * (0.5 - ofNoise(ofGetElapsedTimef() * speed, (i * 2 + 1) * 1000));
-		if(curPosition.x > 1) curPosition.x = 1;
-		if (curPosition.x < 0) curPosition.x = 0;
-		if (curPosition.y > 1) curPosition.y = 1;
-		if (curPosition.y < 0) curPosition.y = 0;
-		_sites[i].setPosition(curPosition);
-	}
-	update(_colorFbo, 1, -1, _sites);
-	_updateIdMap = true;
-}
-
-void NNI::remove(int index)
-{
-	_sites.erase(_sites.begin() + index);
-	update(_colorFbo, 1, -1, _sites);
-	_updateIdMap = true;
-}
-
-void NNI::remove(ofVec2f pos)
-{
-	_sites.erase(_sites.begin() + (int)getClosest(pos)[0]);
-	update(_colorFbo, 1, -1, _sites);
-	_updateIdMap = true;
-}
-
-void NNI::clear()
-{
-	_sites.clear();
-	update(_colorFbo, 1, -1, _sites);
-	_updateIdMap = true;
-}
-
-array<float, 2> NNI::getClosest(ofVec2f pos)
-{
-	int closest = -1;
-	float minDist = -1;
-	for (int i = 0; i < _sites.size(); i++)
-	{
-		float curDist = pos.distance(_sites[i].getPosition());
-		if (minDist == -1 || curDist < minDist)
-		{
-			closest = i;
-			minDist = curDist;
-		}
-	}
-	return array<float, 2>({ (float)closest, minDist });
-}
-
-vector<Point> NNI::getSites()
-{
-	return _sites;
-}
-
-Point NNI::getSite(int index)
-{
-	return _sites[index];
-}
-
-int NNI::getWidth()
-{
-	return _width;
-}
-
-int NNI::getHeight()
-{
-	return _height;
-}
-
-map<string, float> NNI::getParameters()
-{
-	return _parameters;
-}
-
-void NNI::draw(int x, int y)
-{
-	draw(x, y, _width, _height);
-}
-
-void NNI::draw(int x, int y, int w, int h)
+void NNI::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 {
 	ofPushStyle();
 	ofSetColor(255);
@@ -180,15 +75,22 @@ void NNI::draw(int x, int y, int w, int h)
 	ofSetColor(255);
 
 
-	for (int i = 0; i < _sites.size(); i++)
+	for (int i = 0; i < _points.size(); i++)
 	{
-		ofVec2f pos = _sites[i].getPosition() * ofVec2f(w, h);
+		ofVec2f pos = _points[i].getPosition() * ofVec2f(w, h);
 		ofDrawBitmapString(ofToString(i), pos + ofVec2f(x, y));
+	}
+	if (_lastSelected >= 0 && _lastSelected < _points.size() && _drawSelected)
+	{
+		if (ofGetElapsedTimeMillis() - _lastSelectedMs < 1000)
+		{
+			drawSelected(x, y, w, h, font);
+		}
 	}
 	ofPopStyle();
 }
 
-void NNI::drawId(int x, int y)
+void NNI::drawIdFbo(int x, int y)
 {
 	updateIdMap();
 	ofPushStyle();
@@ -197,13 +99,33 @@ void NNI::drawId(int x, int y)
 	ofPopStyle();
 }
 
-void NNI::drawInterpolation(int x, int y)
+void NNI::drawInterpolationFbo(int x, int y)
 {
 	ofPushStyle();
 	ofSetColor(255);
 	_interpolateFbo.draw(x, y);
 	ofPopStyle();
 	ofSetColor(255);
+}
+
+void NNI::setCursor(ofVec2f cursor)
+{
+	_cursor = cursor;
+}
+
+ofVec2f NNI::getCursor()
+{
+	return _cursor;
+}
+
+void NNI::setDrawInterpolation(bool drawInterpolation)
+{
+	_drawInterpolation = drawInterpolation;
+}
+
+map<string, float> NNI::getWeights()
+{
+	return _weights;
 }
 
 void NNI::update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites)
@@ -221,7 +143,7 @@ void NNI::update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites)
 	
 	fbo.begin();
 	ofClear(255);
-	if (_sites.size() > 0)
+	if (_points.size() > 0)
 	{
 		ofEnableDepthTest();
 		ofSetColor(0);	
@@ -238,22 +160,19 @@ void NNI::update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites)
 
 void NNI::updateIdMap()
 {
-	if (_updateIdMap)
-	{
-		update(_idFbo, 0, -1, _sites);
-		_updateIdMap = false;
-		_idFbo.readToPixels(_curState);
-	}
+	update(_idFbo, 0, -1, _points);
+	_positionChanged = false;
+	_idFbo.readToPixels(_curState);
 }
 
 map<string, float> NNI::interpolate(ofVec2f pos, bool renderNewZone)
 {
-	updateIdMap();
+	if(_updateIdFbo) updateIdMap();
 
-	vector<Point> curSites = _sites;
+	vector<Point> curSites = _points;
 	curSites.push_back(Point(pos));
 	vector<float> weights;
-	weights.assign(_sites.size(), 0);
+	weights.assign(_points.size(), 0);
 
 	update(_interpolateFbo, 0, curSites.size() - 1, curSites);
 	if(renderNewZone) update(_colorFbo, 1, curSites.size() - 1, curSites);
@@ -273,9 +192,9 @@ map<string, float> NNI::interpolate(ofVec2f pos, bool renderNewZone)
 	for (auto parameter : _parameters)
 	{
 		float value = 0;
-		for (int i = 0; i < _sites.size(); i++)
+		for (int i = 0; i < _points.size(); i++)
 		{
-			if(_sites[i].hasValue(parameter.first)) value += _sites[i].getValue(parameter.first) * weights[i];
+			if(_points[i].hasValue(parameter.first)) value += _points[i].getValue(parameter.first) * weights[i];
 		}
 		values[parameter.first] = value;
 	}

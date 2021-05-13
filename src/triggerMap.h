@@ -5,9 +5,11 @@
 #include "trigger.h"
 #include "map.h"
 
-class TriggerMap : private Map{
+class TriggerMap : public Map<Trigger>{
+
 public:
 	TriggerMap();
+	/*
 	void addTrigger(map<string, float> parameters, ofVec2f position);
 	void removeTrigger(int index);
 	void setColor(ofColor color);
@@ -18,5 +20,6 @@ private:
 	vector<Trigger> _triggers;
 	ofColor _color;
 	set<string> _parameters;
+	*/
 };
 #endif

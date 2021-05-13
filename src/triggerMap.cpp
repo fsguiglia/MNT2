@@ -3,7 +3,7 @@
 TriggerMap::TriggerMap()
 {
 }
-
+/*
 void TriggerMap::addTrigger(map<string, float> values, ofVec2f position)
 {
 	Map::addElement(_triggers, values, position);
@@ -34,5 +34,4 @@ void TriggerMap::updateParameters(int index, map<string, float> values)
 {
 	Map::updateParameters(_triggers[index], values);
 }
-
-
+*/
