@@ -14,8 +14,11 @@ public:
 	Trigger();
 	Trigger(ofVec2f position, float radius, float threshold);
 	void setRadius(float radius);
+	float getRadius();
 	void setThreshold(float threshold);
+	float getThreshold();
 	void setState(bool state);
+	bool setState(vector<ofVec2f> cursors);
 	void setColor(ofColor color);
 	void setOutValue(string key, float value);
 	void setOutValues(map<string, float> parameters);

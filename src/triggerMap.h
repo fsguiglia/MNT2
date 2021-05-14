@@ -9,17 +9,19 @@ class TriggerMap : public Map<Trigger>{
 
 public:
 	TriggerMap();
-	/*
-	void addTrigger(map<string, float> parameters, ofVec2f position);
-	void removeTrigger(int index);
-	void setColor(ofColor color);
-	void addParameter(string parameter, float value);
-	void removeParameter(string parameter);
-	void updateParameters(int index, map<string, float> values);
+	void setup(int width, int height);
+	void update();
+	void draw(int x, int y, ofTrueTypeFont& font);
+	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
+
+	void addTrigger(ofVec2f position, float radius, float threshold, ofColor color);
+	void addTrigger(ofVec2f position, float radius, float threshold);
+	void setRadius(int index, float radius);
+	void setThreshold(int index, float threshold);
+	vector<map<string, float>> getTriggeredValues();
 private:
-	vector<Trigger> _triggers;
 	ofColor _color;
-	set<string> _parameters;
-	*/
+	vector<ofVec2f> _cursors;
+	vector<int> _triggered;
 };
 #endif

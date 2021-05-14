@@ -1,24 +1,5 @@
 #include "mntUtils.h"
 
-ofRectangle centerSquarePosition(int w, int h)
-{
-	ofRectangle rect;
-	int max = w;
-	int min = h;
-
-	if (w < h)
-	{
-		max = w;
-		min = h;
-	}
-	rect.setWidth(min);
-	rect.setHeight(min);
-	rect.setX((w - min) * 0.5);
-	rect.setY((h - min) * 0.5);
-
-	return rect;
-}
-
 float normalize(float value, float min, float max)
 {
 	value = (value - min) / (max - min);

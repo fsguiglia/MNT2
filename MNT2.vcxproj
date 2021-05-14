@@ -185,10 +185,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\map.cpp" />
     <ClCompile Include="src\midiHandler.cpp" />
     <ClCompile Include="src\mntUtils.cpp" />
     <ClCompile Include="src\NNI.cpp" />
+    <ClCompile Include="src\NNIPage.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\core\ofxDatGuiComponent.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont\ofxSmartFont.cpp" />
@@ -234,6 +234,7 @@
     <ClInclude Include="src\midiHandler.h" />
     <ClInclude Include="src\mntUtils.h" />
     <ClInclude Include="src\NNI.h" />
+    <ClInclude Include="src\NNIpage.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGui2dPad.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGuiButton.h" />
@@ -298,6 +299,7 @@
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h" />
     <ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h" />
     <ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h" />
+    <ClInclude Include="src\page.h" />
     <ClInclude Include="src\point.h" />
     <ClInclude Include="src\scrollGui.h" />
     <ClInclude Include="src\trigger.h" />

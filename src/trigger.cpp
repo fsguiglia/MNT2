@@ -21,14 +21,42 @@ void Trigger::setRadius(float radius)
 	_radius = radius;
 }
 
+float Trigger::getRadius()
+{
+	return _radius;
+}
+
 void Trigger::setThreshold(float threshold)
 {
 	_threshold = threshold;
 }
 
+float Trigger::getThreshold()
+{
+	return _threshold;
+}
+
 void Trigger::setState(bool state)
 {
 	_state = state;
+}
+
+bool Trigger::setState(vector<ofVec2f> cursors)
+{
+	bool curState = false;
+	float threshold = _radius;
+	if (!_state) threshold = _radius * _threshold;
+	
+	for (auto cursor : cursors)
+	{
+		if (cursor.distance(_position) < _threshold)
+		{
+			curState = true;
+			break;
+		}
+	}
+	_state = curState;
+	return _state;
 }
 
 void Trigger::setColor(ofColor color)

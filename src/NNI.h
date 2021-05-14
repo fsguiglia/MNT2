@@ -22,6 +22,7 @@ public:
 	void drawIdFbo(int x, int y);
 	void drawInterpolationFbo(int x, int y);
 	
+	void addSite(ofVec2f pos);
 	void setCursor(ofVec2f cursor);
 	ofVec2f getCursor();
 	void setDrawInterpolation(bool drawInterpolation);

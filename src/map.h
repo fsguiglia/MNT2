@@ -1,7 +1,6 @@
 #ifndef _MAP
 #define _MAP
 #include "ofMain.h"
-#include "point.h"
 
 template<typename T> class Map {
 public:
@@ -11,7 +10,6 @@ public:
 	virtual void update() = 0;
 	virtual void draw(int x, int y, int w, int h, ofTrueTypeFont& font) = 0;
 
-	void addPoint(ofVec2f position);
 	void removePoint(int index);
 	void removePoint(ofVec2f pos);
 	void clearPoints();
@@ -35,6 +33,7 @@ public:
 	void setDrawSelected(bool drawSelected);
 
 protected:
+	int addPoint(T point);
 	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font);
 
 	typename vector<T> _points;
@@ -54,13 +53,12 @@ Map<T>::Map()
 }
 
 template<typename T>
-void Map<T>::addPoint(ofVec2f position)
+int Map<T>::addPoint(T point)
 {
-	T point;
-	point.setValues(_parameters);
-	point.setPosition(position);
 	_points.push_back(point);
 	_positionChanged = true;
+	int index = _points.size() - 1;
+	return index;
 }
 
 template<typename T>

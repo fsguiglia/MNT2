@@ -1,8 +1,6 @@
 #pragma once
 #include "ofMain.h"
 
-ofRectangle centerSquarePosition(int w, int h);
-
 float normalize(float value, float min, float max);
 
 ofVec2f normalize(ofVec2f pos, ofRectangle rect);

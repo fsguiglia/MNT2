@@ -108,6 +108,14 @@ void NNI::drawInterpolationFbo(int x, int y)
 	ofSetColor(255);
 }
 
+void NNI::addSite(ofVec2f pos)
+{
+	Point point;
+	point.setPosition(pos);
+	point.setValues(_parameters);
+	addPoint(point);
+}
+
 void NNI::setCursor(ofVec2f cursor)
 {
 	_cursor = cursor;

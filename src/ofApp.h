@@ -6,18 +6,14 @@
 #include "ofxNetwork.h"
 #include "ofxOsc.h"
 #include "ofxMidi.h"
-#include "NNI.h"
+#include "NNIPage.h"
+#include "triggerMap.h"
 #include "mntUtils.h"
-#include "scrollGui.h"
+#include "page.h"
 
 /*
 conflictos con MIDI: cuando interpola mandar solo si cambiaron los valores,
 quilombo cuando varios puertos le dan al mismo cc
-
-deberia hacer una subclase que se llame page? -> puedo primero escribir trigger y ahi veo
-
-en nni los parametros se podrian mapear todos a partir de un diccionario, no los agrego con learn
-sino con un + y después los mapeo
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -25,25 +21,16 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 	public:
 		void setup();
 		void update();
-		void updateGuis();
 		void draw();
 		void exit();
 		//--------------------------------------------------------------
-		void setupNNI();
-		void setupNNIGui(map<string, float> parameters, bool toggleState);
-		void NNIToggle(ofxDatGuiToggleEvent e);
-		void NNISlider(ofxDatGuiSliderEvent e);
-		void updateNNISite(int selected, map<string, float> parameters);
-		void drawNNI();
-		void NNIMIDIIn(ofxMidiMessage& msg);
-		void NNIMIDIOut(map<string, float> weights);
-		//--------------------------------------------------------------
 		void setupMIDI();
 		void setupMIDIGui();
+		void updateMIDIGui(bool visible);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
-		void sendMIDICC(map<string, float> parameters, ofxMidiOut port);
+		void sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports);
 		void drawMIDI();
 		//--------------------------------------------------------------
 		void load();
@@ -64,18 +51,24 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void gotMessage(ofMessage msg);
 
 		//NNI
-		NNI _nni;
+		NNIPage _nni;
+		
+
+		//Trigger
+		/*
+		TriggerMap _trigger;
 		bool _nniMouseControl, _nniInside;
+		string _triggerLastSelected;
 		string _nniCCXY[2];
-		string _nniLastSelected;
 		ofRectangle _nniPosition;
 		bool _nniControlLearn, _nniParameterLearn;
+		ScrollGui* _gTrigger;
+		*/
 
 		//GUI
-		const size_t _maxPages = 1;
+		const size_t _maxPages = 2;
 		const size_t _guiWidth = 300;
 		int _page;
-		ScrollGui* _gNNI;
 		ofxDatGui* _gMIDIIn;
 		ofxDatGui* _gMIDIOut;
 		ofTrueTypeFont verdana;
