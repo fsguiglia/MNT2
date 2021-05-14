@@ -8,17 +8,25 @@ void TriggerMap::setup(int width, int height)
 {
 	_width = width;
 	_height = height;
+	_fbo.allocate(_width, _height);
+	ofPushStyle();
+	_fbo.begin();
+	ofClear(255);
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, _width, _height);
+	_fbo.end();
+	ofPopStyle();
+}
+
+void TriggerMap::setColor(ofColor color)
+{
+	_color = color;
 }
 
 void TriggerMap::update()
 {
-	_triggered.clear();
-	for (int i = 0; i < _points.size(); i++)
-	{
-		bool curState = _points[i].getState();
-		_points[i].setState(_cursors);
-		if (!curState && _points[i].getState()) _triggered.push_back(i);
-	}
+	if (_active) updateTriggers();
+	updateFbo();
 }
 
 void TriggerMap::draw(int x, int y, ofTrueTypeFont & font)
@@ -29,47 +37,39 @@ void TriggerMap::draw(int x, int y, ofTrueTypeFont & font)
 void TriggerMap::draw(int x, int y, int w, int h, ofTrueTypeFont & font)
 {
 	ofPushStyle();
-	for (auto point : _points)
+	ofSetColor(255);
+	_fbo.draw(x, y, w, h);
+	
+	for (int i = 0; i < _points.size(); i++)
 	{
-		ofColor inColor, outColor;
-		ofVec2f position = point.getPosition();
-		float radius = point.getRadius();
-		float threshold = point.getThreshold();
-		
-		if (point.getState()) inColor = ofColor(180, 0, 0);
-		else inColor = _color;
-		outColor = inColor;
-		outColor.a = 100;
-		
-		ofSetColor(outColor);
-		ofDrawCircle(position, point.getRadius());
-		ofSetColor(inColor);
-		ofDrawCircle(position, point.getRadius() * threshold);
+		ofVec2f pos = _points[i].getPosition() * ofVec2f(w, h);
+		ofDrawBitmapString(ofToString(i), pos + ofVec2f(x, y));
+	}
 
-		if (_lastSelected >= 0 && _lastSelected < _points.size() && _drawSelected)
+	if (_lastSelected >= 0 && _lastSelected < _points.size() && _drawSelected)
+	{
+		if (ofGetElapsedTimeMillis() - _lastSelectedMs < 1000)
 		{
-			if (ofGetElapsedTimeMillis() - _lastSelectedMs < 1000)
-			{
-				drawSelected(x, y, w, h, font);
-			}
+			drawSelected(x, y, w, h, font, 200);
 		}
 	}
 	ofPopStyle();
 }
 
-void TriggerMap::addTrigger(ofVec2f position, float radius, float threshold, ofColor color)
+void TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColor color)
 {
 	Trigger trigger;
 	trigger.setPosition(position);
 	trigger.setRadius(radius);
 	trigger.setThreshold(threshold);
 	trigger.setColor(color);
-	addPoint(trigger);
+	Map::addPoint(trigger);
 }
 
-void TriggerMap::addTrigger(ofVec2f position, float radius, float threshold)
+void TriggerMap::addPoint(ofVec2f position, float radius, float threshold)
 {
-	addTrigger(position, radius, threshold, _color);
+	float colorIndex = _points.size() * 255 / 16;
+	addPoint(position, radius, threshold, ofColor(colorIndex, 50, 50));
 }
 
 void TriggerMap::setRadius(int index, float radius)
@@ -82,9 +82,71 @@ void TriggerMap::setThreshold(int index, float threshold)
 	_points[index].setThreshold(threshold);
 }
 
-vector<map<string, float>> TriggerMap::getTriggeredValues()
+void TriggerMap::setCursors(vector<ofVec2f> cursors)
+{
+	_cursors = cursors;
+}
+
+void TriggerMap::setCursor(ofVec2f cursor, int index)
+{
+	if (index >= 0 && index < _cursors.size()) _cursors[index] = cursor;
+}
+
+vector<ofVec2f> TriggerMap::getCursors()
+{
+	return _cursors;
+}
+
+vector<map<string, float>> TriggerMap::getOutput()
 {
 	vector<map<string, float>> triggeredValues;
 	for (auto index : _triggered) triggeredValues.push_back(_points[index].getValues());
 	return triggeredValues;
+}
+
+void TriggerMap::updateFbo()
+{
+	ofPushStyle();
+	_fbo.begin();
+	ofClear(255);
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, _width, _height);
+	for (auto point : _points)
+	{
+		ofColor inColor, outColor;
+		ofVec2f position = point.getPosition() * ofVec2f(_width, _height);
+		float radius = point.getRadius() * _width;
+		float threshold = point.getThreshold();
+
+		if (point.getState()) inColor.set(255, 50, 50, 0);
+		else inColor = point.getColor();
+		outColor = inColor;
+		outColor.a = 100;
+
+		ofSetColor(outColor);
+		ofDrawCircle(position, radius);
+		ofSetColor(inColor);
+		ofDrawCircle(position, radius * threshold);
+	}
+
+	for (auto cursor : _cursors)
+	{
+		cursor *= ofVec2f(_width, _height);
+		ofSetColor(0);
+		ofDrawLine(0, cursor.y, _width, cursor.y);
+		ofDrawLine(cursor.x, 0, cursor.x, _height);
+	}
+	_fbo.end();
+	ofPopStyle();
+}
+
+void TriggerMap::updateTriggers()
+{
+	_triggered.clear();
+	for (int i = 0; i < _points.size(); i++)
+	{
+		bool curState = _points[i].getState();
+		_points[i].setState(_cursors);
+		if (!curState && _points[i].getState()) _triggered.push_back(i);
+	}
 }

@@ -6,6 +6,8 @@ void ofApp::setup(){
 	_settings = ofLoadJson("mnt.ini");
 	//NNI
 	_nni.setup(1024, 1024, _guiWidth);
+	//Trigger
+	_trigger.setup(1024, 1024, _guiWidth);
 	//MIDI
 	setupMIDI();
 	//GUI
@@ -21,8 +23,11 @@ void ofApp::update() {
 	for (auto message : nniOut) sendMIDICC(message, _MIDIOutputs);
 	vector<map<string, float>> nniDump = _nni.getMidiDump();
 	for (auto message : nniDump) sendMIDICC(message, _MIDIOutputs);
+	//Trigger
+	_trigger.setVisible(_page == 1);
+	_trigger.update();
 	//MIDI
-	updateMIDIGui(_page == 1);
+	updateMIDIGui(_page == 2);
 }
 
 void ofApp::draw(){
@@ -34,6 +39,9 @@ void ofApp::draw(){
 		_nni.draw(verdana);
 		break;
 	case 1:
+		_trigger.draw(verdana);
+		break;
+	case 2:
 		drawMIDI();
 		break;
 	}
@@ -148,6 +156,9 @@ void ofApp::newMidiMessage(ofxMidiMessage & msg)
 {
 	//NNI
 	_nni.MIDIIn(msg.portName, msg.control, msg.channel, msg.value / 127.);
+	//Trigger
+	_trigger.MIDIIn(msg.portName, msg.control, msg.channel, msg.value / 127.);
+
 	for (auto port : _MIDIOutputs)
 	{
 		string in, out;
@@ -289,26 +300,31 @@ void ofApp::keyReleased(int key){
 void ofApp::mouseMoved(int x, int y ){
 	//NNI
 	if (_page == 0) _nni.mouseMoved(x, y);
+	if (_page == 1) _trigger.mouseMoved(x, y);
 }
 
 void ofApp::mouseDragged(int x, int y, int button){
 	//NNI
 	if (_page == 0) _nni.mouseDragged(x, y, button);
+	if (_page == 1) _trigger.mouseDragged(x, y, button);
 }
 
 void ofApp::mousePressed(int x, int y, int button){
 	//NNI
 	if (_page == 0) _nni.mousePressed(x, y, button);
+	if (_page == 1) _trigger.mousePressed(x, y, button);
 }
 
 void ofApp::mouseReleased(int x, int y, int button){
 	//NNI
 	if (_page == 0) _nni.mouseReleased(x, y, button);
+	if (_page == 1) _trigger.mouseReleased(x, y, button);
 }
 
 void ofApp::mouseScrolled(ofMouseEventArgs& mouse)
 {
 	if (_page == 0) _nni.mouseScrolled(mouse.scrollY * 5);
+	if (_page == 1) _trigger.mouseScrolled(mouse.scrollY * 5);
 }
 
 void ofApp::mouseEntered(int x, int y){
@@ -321,6 +337,7 @@ void ofApp::mouseExited(int x, int y){
 
 void ofApp::windowResized(int w, int h){
 	_nni.resize(w, h);
+	_trigger.resize(w, h);
 }
 
 void ofApp::gotMessage(ofMessage msg){

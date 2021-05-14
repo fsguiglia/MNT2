@@ -12,6 +12,7 @@ public:
 	ofRectangle centerSquarePosition(int w, int h);
 	vector<map<string, float>> getMidiDump(bool clear = true);
 	vector<map<string, float>> getMidiOut(bool clear = true);
+	void setVisible(bool visible);
 
 protected:
 	void addMidiMessages(map<string, float> messages, vector <map<string, float>>& queue);
@@ -21,7 +22,7 @@ protected:
 	ScrollGui *_gui;
 	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible;
 	int _guiWidth, _maxMessages;
-	string _lastSelected;
+	string _lastSelectedControl;
 	string _CCXY[2];
 	ofRectangle _position;
 	vector<map<string, float>> _MIDIOutMessages, _MIDIDumpMessages;
@@ -67,6 +68,13 @@ inline vector<map<string, float>> PageBase<T>::getMidiOut(bool clearMessages)
 	vector<map<string, float>> out = _MIDIOutMessages;
 	if (clearMessages) clearMIDIMessages(_MIDIOutMessages);
 	return out;
+}
+
+template<typename T>
+inline void PageBase<T>::setVisible(bool visible)
+{
+	_visible = visible;
+	_inside = visible;
 }
 
 template<typename T>

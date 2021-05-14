@@ -20,12 +20,12 @@ public:
 	void setState(bool state);
 	bool setState(vector<ofVec2f> cursors);
 	void setColor(ofColor color);
+	ofColor getColor();
 	void setOutValue(string key, float value);
 	void setOutValues(map<string, float> parameters);
 	void update(ofVec2f position);
 	void update(vector<ofVec2f>& positions);
 	bool getState();
-	void draw();
 private:
 	map<string, float> _outParameters;
 	float _radius;

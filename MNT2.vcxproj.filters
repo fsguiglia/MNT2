@@ -133,6 +133,9 @@
     <ClCompile Include="src\NNIPage.cpp">
       <Filter>src\pages</Filter>
     </ClCompile>
+    <ClCompile Include="src\triggerPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -456,6 +459,9 @@
       <Filter>src\pages</Filter>
     </ClInclude>
     <ClInclude Include="src\NNIpage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\triggerPage.h">
       <Filter>src\pages</Filter>
     </ClInclude>
   </ItemGroup>

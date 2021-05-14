@@ -72,8 +72,6 @@ void NNI::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 	ofPushStyle();
 	ofSetColor(255);
 	_colorFbo.draw(x, y, w, h);
-	ofSetColor(255);
-
 
 	for (int i = 0; i < _points.size(); i++)
 	{
@@ -108,12 +106,12 @@ void NNI::drawInterpolationFbo(int x, int y)
 	ofSetColor(255);
 }
 
-void NNI::addSite(ofVec2f pos)
+void NNI::addPoint(ofVec2f pos)
 {
 	Point point;
 	point.setPosition(pos);
 	point.setValues(_parameters);
-	addPoint(point);
+	Map::addPoint(point);
 }
 
 void NNI::setCursor(ofVec2f cursor)
@@ -131,7 +129,7 @@ void NNI::setDrawInterpolation(bool drawInterpolation)
 	_drawInterpolation = drawInterpolation;
 }
 
-map<string, float> NNI::getWeights()
+map<string, float> NNI::getOutput()
 {
 	return _weights;
 }

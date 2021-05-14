@@ -34,7 +34,7 @@ public:
 
 protected:
 	int addPoint(T point);
-	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font);
+	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity=100);
 
 	typename vector<T> _points;
 	map<string, float> _parameters;
@@ -233,7 +233,7 @@ void Map<T>::setDrawSelected(bool drawSelected)
 }
 
 template<typename T>
-void Map<T>::drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font)
+void Map<T>::drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity)
 {
 	ofPushStyle();
 	ofVec2f position = _points[_lastSelected].getPosition();
@@ -246,8 +246,13 @@ void Map<T>::drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font)
 	drawPos.x += 10;
 	drawPos.y -= 10;
 	string sPosition = ofToString(position.x) + ", " + ofToString(position.y);
-	ofSetColor(0, 100);
-	ofDrawRectangle(font.getStringBoundingBox(sPosition, drawPos.x, drawPos.y));
+	ofSetColor(0, opacity);
+	ofRectangle bounding = font.getStringBoundingBox(sPosition, drawPos.x, drawPos.y);
+	bounding.x -= 1;
+	bounding.width += 2;
+	bounding.y -= 1;
+	bounding.height += 2;
+	ofDrawRectangle(bounding);
 	ofSetColor(180);
 	font.drawString(sPosition, drawPos.x, drawPos.y);
 	ofPopStyle();

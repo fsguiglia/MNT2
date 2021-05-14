@@ -46,10 +46,9 @@ bool Trigger::setState(vector<ofVec2f> cursors)
 	bool curState = false;
 	float threshold = _radius;
 	if (!_state) threshold = _radius * _threshold;
-	
 	for (auto cursor : cursors)
 	{
-		if (cursor.distance(_position) < _threshold)
+		if (cursor.distance(_position) < threshold)
 		{
 			curState = true;
 			break;
@@ -62,6 +61,11 @@ bool Trigger::setState(vector<ofVec2f> cursors)
 void Trigger::setColor(ofColor color)
 {
 	_color = color;
+}
+
+ofColor Trigger::getColor()
+{
+	return _color;
 }
 
 void Trigger::setOutValue(string key, float value)
@@ -113,12 +117,4 @@ void Trigger::update(vector<ofVec2f>& positions)
 bool Trigger::getState()
 {
 	return _state;
-}
-
-void Trigger::draw()
-{
-	ofPushStyle();
-	ofSetColor(_color);
-	ofDrawCircle(getPosition(), _radius);
-	ofPopStyle();
 }

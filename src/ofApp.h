@@ -6,14 +6,20 @@
 #include "ofxNetwork.h"
 #include "ofxOsc.h"
 #include "ofxMidi.h"
+#include "page.h"
 #include "NNIPage.h"
+#include "triggerPage.h"
 #include "triggerMap.h"
 #include "mntUtils.h"
-#include "page.h"
+
 
 /*
 conflictos con MIDI: cuando interpola mandar solo si cambiaron los valores,
 quilombo cuando varios puertos le dan al mismo cc
+
+ver que hacer cuando el draw se pasa del borde
+
+se podrian estandarizar los mapas para que page sea una sola clase en lugar de tener varios child: esperemos a tener algun otro modulo para ver
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -53,17 +59,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		//NNI
 		NNIPage _nni;
 		
-
 		//Trigger
-		/*
-		TriggerMap _trigger;
-		bool _nniMouseControl, _nniInside;
-		string _triggerLastSelected;
-		string _nniCCXY[2];
-		ofRectangle _nniPosition;
-		bool _nniControlLearn, _nniParameterLearn;
-		ScrollGui* _gTrigger;
-		*/
+		TriggerPage _trigger;
 
 		//GUI
 		const size_t _maxPages = 2;

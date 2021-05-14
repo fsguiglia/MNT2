@@ -22,11 +22,11 @@ public:
 	void drawIdFbo(int x, int y);
 	void drawInterpolationFbo(int x, int y);
 	
-	void addSite(ofVec2f pos);
+	void addPoint(ofVec2f pos);
 	void setCursor(ofVec2f cursor);
 	ofVec2f getCursor();
 	void setDrawInterpolation(bool drawInterpolation);
-	map<string, float> getWeights();
+	map<string, float> getOutput();
 private:
 	map<string, float> interpolate(ofVec2f pos, bool renderNewZone = false);
 	void update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites);
