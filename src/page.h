@@ -10,13 +10,13 @@ template<typename T> class PageBase {
 public:
 	PageBase();
 	ofRectangle centerSquarePosition(int w, int h);
-	vector<map<string, float>> getMidiDump(bool clear = true);
-	vector<map<string, float>> getMidiOut(bool clear = true);
+	map<string, float> getMidiDump(bool clear = true);
+	map<string, float> getMidiOut(bool clear = true);
 	void setVisible(bool visible);
 
 protected:
-	void addMidiMessages(map<string, float> messages, vector <map<string, float>>& queue);
-	void clearMIDIMessages(vector<map<string, float>>& queue);
+	void addMidiMessages(map<string, float> messages, map<string, float>& queue);
+	void clearMIDIMessages(map<string, float>& queue);
 
 	T _map;
 	ScrollGui *_gui;
@@ -25,7 +25,7 @@ protected:
 	string _lastSelectedControl;
 	string _CCXY[2];
 	ofRectangle _position;
-	vector<map<string, float>> _MIDIOutMessages, _MIDIDumpMessages;
+	map<string, float> _MIDIOutMessages, _MIDIDumpMessages;
 };
 #endif
 
@@ -55,17 +55,17 @@ inline ofRectangle PageBase<T>::centerSquarePosition(int w, int h)
 }
 
 template<typename T>
-inline vector<map<string, float>> PageBase<T>::getMidiDump(bool clearMessages)
+inline map<string, float> PageBase<T>::getMidiDump(bool clearMessages)
 {
-	vector<map<string, float>> out = _MIDIDumpMessages;
+	map<string, float> out = _MIDIDumpMessages;
 	if (clearMessages) clearMIDIMessages(_MIDIDumpMessages);
 	return out;
 }
 
 template<typename T>
-inline vector<map<string, float>> PageBase<T>::getMidiOut(bool clearMessages)
+inline map<string, float> PageBase<T>::getMidiOut(bool clearMessages)
 {
-	vector<map<string, float>> out = _MIDIOutMessages;
+	map<string, float> out = _MIDIOutMessages;
 	if (clearMessages) clearMIDIMessages(_MIDIOutMessages);
 	return out;
 }
@@ -78,14 +78,14 @@ inline void PageBase<T>::setVisible(bool visible)
 }
 
 template<typename T>
-inline void PageBase<T>::addMidiMessages(map<string, float> messages, vector<map<string, float>>& queue)
+inline void PageBase<T>::addMidiMessages(map<string, float> messages, map<string, float>& queue)
 {
-	queue.push_back(messages);
+	queue.insert(messages.begin(), messages.end());
 	while (queue.size() > _maxMessages) queue.erase(queue.begin());;
 }
 
 template<typename T>
-inline void PageBase<T>::clearMIDIMessages(vector<map<string, float>>& queue)
+inline void PageBase<T>::clearMIDIMessages(map<string, float>& queue)
 {
 	queue.clear();
 }

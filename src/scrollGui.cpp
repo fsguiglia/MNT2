@@ -61,6 +61,7 @@ void ScrollGui::updatePositions()
 
 void ScrollGui::clearRemovableSliders()
 {
-	for (auto removableSlider : _removableSliders) removeSlider(removableSlider.first);
-	_removableSliders.clear();
+	vector<string> curSliders;
+	for (auto removableSlider : _removableSliders) curSliders.push_back(removableSlider.first);
+	for (auto removableSlider : curSliders) removeSlider(removableSlider);
 }

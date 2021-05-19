@@ -16,6 +16,7 @@ void TriggerMap::setup(int width, int height)
 	ofDrawRectangle(0, 0, _width, _height);
 	_fbo.end();
 	ofPopStyle();
+	_triggered.assign(_points.size(), 0);
 }
 
 void TriggerMap::setColor(ofColor color)
@@ -25,8 +26,10 @@ void TriggerMap::setColor(ofColor color)
 
 void TriggerMap::update()
 {
+	if (_randomSpeed != 0) randomize();
 	if (_active) updateTriggers();
 	updateFbo();
+	for (auto trigger : _points) cout << trigger.getState() << endl;
 }
 
 void TriggerMap::draw(int x, int y, ofTrueTypeFont & font)
@@ -82,6 +85,11 @@ void TriggerMap::setThreshold(int index, float threshold)
 	_points[index].setThreshold(threshold);
 }
 
+void TriggerMap::setSwitch(int index, bool isSwitch)
+{
+	_points[index].setSwitch(isSwitch);
+}
+
 void TriggerMap::setCursors(vector<ofVec2f> cursors)
 {
 	_cursors = cursors;
@@ -97,11 +105,14 @@ vector<ofVec2f> TriggerMap::getCursors()
 	return _cursors;
 }
 
-vector<map<string, float>> TriggerMap::getOutput()
+vector<int> TriggerMap::getTriggered()
 {
-	vector<map<string, float>> triggeredValues;
-	for (auto index : _triggered) triggeredValues.push_back(_points[index].getValues());
-	return triggeredValues;
+	return _triggered;
+}
+
+map<string, float> TriggerMap::getOutput()
+{
+	return _output;
 }
 
 void TriggerMap::updateFbo()
@@ -110,6 +121,7 @@ void TriggerMap::updateFbo()
 	_fbo.begin();
 	ofClear(255);
 	ofSetColor(255);
+	ofSetCircleResolution(100);
 	ofDrawRectangle(0, 0, _width, _height);
 	for (auto point : _points)
 	{
@@ -143,10 +155,31 @@ void TriggerMap::updateFbo()
 void TriggerMap::updateTriggers()
 {
 	_triggered.clear();
+	_triggered.assign(_points.size(), 0);
 	for (int i = 0; i < _points.size(); i++)
 	{
 		bool curState = _points[i].getState();
 		_points[i].setState(_cursors);
-		if (!curState && _points[i].getState()) _triggered.push_back(i);
+		if (curState != _points[i].getState())
+		{
+			if(curState) _triggered[i] = 1;
+			else _triggered[i] = -1;
+		}
+	}
+
+	_output.clear();
+	for (int i = 0; i < _triggered.size(); i++)
+	{
+		if (_triggered[i] != 0)
+		{
+			if (_triggered[i] == 1)
+			{
+				for (auto value : _points[i].getValues()) _output[value.first] = value.second;
+			}
+			if (_triggered[i] == -1 || _points[i].getSwitch())
+			{
+				for (auto value : _points[i].getValues()) _output[value.first] = 0;
+			}
+		}
 	}
 }

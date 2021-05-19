@@ -2,18 +2,20 @@
 
 Trigger::Trigger()
 {
-	setPosition(-1, -1);
+	setPosition(ofVec2f(-1,-1));
 	setRadius(0);
 	setThreshold(0);
 	setState(false);
+	setSwitch(false);
 }
 
-Trigger::Trigger(ofVec2f position, float radius, float threshold)
+Trigger::Trigger(ofVec2f position, float radius, float threshold, bool isSwitch)
 {
 	setPosition(position);
 	setRadius(radius);
 	setThreshold(threshold);
 	setState(false);
+	setSwitch(isSwitch);
 }
 
 void Trigger::setRadius(float radius)
@@ -34,6 +36,16 @@ void Trigger::setThreshold(float threshold)
 float Trigger::getThreshold()
 {
 	return _threshold;
+}
+
+void Trigger::setSwitch(bool isSwitch)
+{
+	_switch = isSwitch;
+}
+
+bool Trigger::getSwitch()
+{
+	return _switch;
 }
 
 void Trigger::setState(bool state)

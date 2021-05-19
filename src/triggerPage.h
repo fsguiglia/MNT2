@@ -7,7 +7,7 @@
 class TriggerPage : public PageBase<TriggerMap> {
 public:
 	TriggerPage();
-	void setup(int width, int height, int guiWidth, int maxMessages = 1);
+	void setup(int width, int height, int guiWidth, int maxMessages = 20);
 	void setupGui(map<string, float> parameters, bool toggleState);
 	void update();
 	void draw(ofTrueTypeFont& font);
@@ -28,7 +28,7 @@ public:
 	void load(ofJson& json);
 	ofJson save();
 private:
-	vector<map<string, float>> _previousOutput;
+	map<string, float> _previousOutput;
 	float _radius, _threshold;
 };
 

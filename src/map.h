@@ -19,10 +19,12 @@ public:
 	void setRandomize(float randomize);
 	void randomize();
 	array<float, 2> getClosest(ofVec2f pos, bool select=false);
-	void addParameter(string parameter, float value);
-	void setParameter(string parameter, float value);
-	void setParameter(int index, string parameter, float value);
-	void removeParameter(string parameter);
+	void addGlobalParameter(string parameter, float value);
+	void setGlobalParameter(string parameter, float value);
+	void removeGlobalParameter(string parameter);
+	void addPointParameter(int index, string parameter, float value);
+	void setPointParameter(int index, string parameter, float value);
+	void removePointParameter(int index, string parameter);
 	map<string, float> getParameters();
 	void setActive(bool active);
 	bool getActive();
@@ -151,7 +153,7 @@ array<float, 2> Map<T>::getClosest(ofVec2f pos, bool select)
 }
 
 template<typename T>
-void Map<T>::addParameter(string parameter, float value)
+void Map<T>::addGlobalParameter(string parameter, float value)
 {
 	if (_parameters.find(parameter) == _parameters.end())
 	{
@@ -164,23 +166,35 @@ void Map<T>::addParameter(string parameter, float value)
 }
 
 template <typename T>
-void Map<T>::setParameter(string parameter, float value)
+void Map<T>::setGlobalParameter(string parameter, float value)
 {
 	if (_parameters.find(parameter) != _parameters.end()) _parameters[parameter] = value;
 }
 
 template<typename T>
-void Map<T>::setParameter(int index, string parameter, float value)
+void Map<T>::removeGlobalParameter(string parameter)
+{
+	if (_parameters.find(parameter) != _parameters.end()) _parameters.erase(parameter);
+	for (auto& point : _points) point.deleteValue(parameter);
+}
+
+template<typename T>
+void Map<T>::addPointParameter(int index, string parameter, float value)
+{
+	if (!_points[index].hasValue(parameter)) _points[index].setValue(parameter, index);
+}
+
+
+template<typename T>
+void Map<T>::setPointParameter(int index, string parameter, float value)
 {
 	if (_points[index].hasValue(parameter)) _points[index].setValue(parameter, value);
 }
 
 template<typename T>
-void Map<T>::removeParameter(string parameter)
+void Map<T>::removePointParameter(int index, string parameter)
 {
-	if (_parameters.find(parameter) != _parameters.end()) _parameters.erase(parameter);
-	for (auto& point : _points) point.deleteValue(parameter);
-
+	_points[index].deleteValue(parameter);
 }
 
 template<typename T>

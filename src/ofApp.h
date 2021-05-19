@@ -36,6 +36,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
+		map<string, float> removePortFromMessages(map<string, float> messages);
 		void sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports);
 		void drawMIDI();
 		//--------------------------------------------------------------

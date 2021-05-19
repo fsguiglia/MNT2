@@ -19,10 +19,12 @@ public:
 	void addPoint(ofVec2f position, float radius, float threshold);
 	void setRadius(int index, float radius);
 	void setThreshold(int index, float threshold);
+	void setSwitch(int index, bool isSwitch);
 	void setCursors(vector<ofVec2f> cursors);
 	void setCursor(ofVec2f cursor, int index);
 	vector<ofVec2f> getCursors();
-	vector<map<string, float>> getOutput();
+	vector<int> getTriggered();
+	map<string, float> getOutput();
 private:
 	void updateFbo();
 	void updateTriggers();
@@ -30,6 +32,7 @@ private:
 	ofColor _color;
 	vector<ofVec2f> _cursors;
 	vector<int> _triggered;
+	map<string, float> _output;
 	ofFbo _fbo;
 };
 #endif

@@ -91,7 +91,7 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 		int channel = ofToInt(ofSplitString(name, "/")[1]);
 		int control = ofToInt(ofSplitString(name, "/")[2]);
 		float value = e.value;
-		_map.setParameter(name, value);
+		_map.setGlobalParameter(name, value);
 		map<string, float> message;
 		message[name] = value;
 		addMidiMessages(message, _MIDIDumpMessages);
@@ -199,7 +199,7 @@ void NNIPage::mouseReleased(int x, int y, int button)
 			string removableSlider = _gui->inside(x, y);
 			if (removableSlider != "")
 			{
-				_map.removeParameter(removableSlider);
+				_map.removeGlobalParameter(removableSlider);
 				_gui->removeSlider(removableSlider);
 				_gui->setPosition(_gui->getPosition().x, _gui->getPosition().y);
 				_gui->update();
@@ -245,7 +245,7 @@ void NNIPage::MIDIIn(string port, int control, int channel, float value)
 	{
 		if (curParameters.find(parameter) == curParameters.end())
 		{
-			_map.addParameter(parameter, value);
+			_map.addGlobalParameter(parameter, value);
 			_gui->addSlider(sliderLabel, 0., 1.);
 			_gui->getSlider(sliderLabel)->setName(parameter);
 			_gui->setRemovableSlider(parameter);
@@ -257,8 +257,8 @@ void NNIPage::MIDIIn(string port, int control, int channel, float value)
 		else
 		{
 			_gui->getSlider(parameter)->setValue(value, false);
-			_map.setParameter(parameter, value);
-			if (_map.getLastSelected() > 0) _map.setParameter(_map.getLastSelected(), parameter, value);
+			_map.setGlobalParameter(parameter, value);
+			if (_map.getLastSelected() > 0) _map.setPointParameter(_map.getLastSelected(), parameter, value);
 		}
 	}
 	else
@@ -276,7 +276,7 @@ void NNIPage::load(ofJson& json)
 	//load parameters to NNI and GUI
 	for (auto parameter : json["parameters"])
 	{
-		_map.addParameter(parameter, 0);
+		_map.addGlobalParameter(parameter, 0);
 		//GUI
 		string sliderLabel = "cc" + ofSplitString(parameter, "/").back();
 		_gui->addSlider(sliderLabel, 0., 1.);
@@ -286,11 +286,11 @@ void NNIPage::load(ofJson& json)
 		_gui->setWidth(300, 0.3);
 		_gui->setOpacity(0.5);
 	}
-	for (ofJson site : json["sites"])
+	for (ofJson site : json["points"])
 	{
 		for (auto parameter : _map.getParameters())
 		{
-			_map.setParameter(parameter.first, site["parameters"][parameter.first]);
+			_map.setGlobalParameter(parameter.first, site["parameters"][parameter.first]);
 		}
 		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
 	}
@@ -318,7 +318,7 @@ ofJson NNIPage::save()
 		{
 			curSite["parameters"][parameter.first] = parameter.second;
 		}
-		jSave["sites"].push_back(curSite);
+		jSave["points"].push_back(curSite);
 	}
 	return jSave;
 }

@@ -38,11 +38,12 @@ void TriggerPage::setupGui(map<string, float> parameters, bool toggleState)
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
-	_gui->addToggle("learn", toggleState)->setName("parameterLearn");
-	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
+	_gui->addToggle("Switch");
 	_gui->addSlider("Radius", 0., 1., _radius);
 	_gui->addSlider("Threshold", 0., 1., _threshold);
-	for (auto parameter : parameters) _gui->addSlider(parameter.first, parameter.second, 0., 1.);
+	_gui->addToggle("learn", toggleState)->setName("parameterLearn");
+	_gui->addBreak();
+	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
 	_gui->onSliderEvent(this, &TriggerPage::sliderEvent);
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
@@ -60,8 +61,8 @@ void TriggerPage::update()
 	{
 		if (_map.getOutput() != _previousOutput)
 		{
-			//addMidiMessages(_map.getOutput(), _MIDIOutMessages);
-			//_previousOutput = _map.getOutput();
+			addMidiMessages(_map.getOutput(), _MIDIOutMessages);
+			_previousOutput = _map.getOutput();
 		}
 	}
 	_gui->setVisible(_visible);
@@ -107,10 +108,11 @@ void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else
 	{
+		int lastSelected = _map.getLastSelected();
 		int channel = ofToInt(ofSplitString(name, "/")[1]);
 		int control = ofToInt(ofSplitString(name, "/")[2]);
 		float value = e.value;
-		_map.setParameter(name, value);
+		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
 		map<string, float> message;
 		message[name] = value;
 		addMidiMessages(message, _MIDIDumpMessages);
@@ -140,14 +142,34 @@ void TriggerPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "active") _map.setActive(e.checked);
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
+	if (e.target->getName() == "Switch")
+	{
+		if (_map.getLastSelected() != -1)
+		{
+			_map.setSwitch(_map.getLastSelected(), e.checked);
+		}
+	}
 }
 
 void TriggerPage::updateSelected(int selected, map<string, float> parameters, float radius, float threshold)
 {
-	_gui->getLabel("Parameters")->setLabel("Parameters - Site: " + ofToString(selected));
-	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second);
-	_gui->getSlider("Radius")->setValue(radius);
-	_gui->getSlider("Threshold")->setValue(threshold);
+	_gui->clearRemovableSliders();
+	for (auto value : _map.getPoint(selected).getValues())
+	{
+		vector<string> split = ofSplitString(value.first, "/");
+		string sliderLabel = "cc" + split[split.size() -1];
+		_gui->addSlider(sliderLabel, 0., 1., value.second);
+		_gui->getSlider(sliderLabel)->setName(value.first);
+		_gui->setRemovableSlider(value.first);
+		_gui->getSlider(value.first)->setTheme(new ofxDatGuiThemeWireframe());
+		_gui->setWidth(300, 0.3);
+		_gui->setOpacity(0.5);
+	}
+	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
+	_gui->getToggle("Switch")->setChecked(_map.getPoint(selected).getSwitch());
+	_gui->getSlider("Radius")->setValue(radius, false);
+	_gui->getSlider("Threshold")->setValue(threshold, false);
+	_gui->update();
 	//for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
 }
 
@@ -222,7 +244,8 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 			string removableSlider = _gui->inside(x, y);
 			if (removableSlider != "")
 			{
-				_map.removeParameter(removableSlider);
+				int lastSelected = _map.getLastSelected();
+				if(lastSelected != -1) _map.removePointParameter(lastSelected, removableSlider);
 				_gui->removeSlider(removableSlider);
 				_gui->setPosition(_gui->getPosition().x, _gui->getPosition().y);
 				_gui->update();
@@ -266,22 +289,25 @@ void TriggerPage::MIDIIn(string port, int control, int channel, float value)
 	}
 	if (_parameterLearn)
 	{
-		if (curParameters.find(parameter) == curParameters.end())
+		int lastSelected = _map.getLastSelected();
+		if (lastSelected != -1)
 		{
-			_map.addParameter(parameter, value);
-			_gui->addSlider(sliderLabel, 0., 1.);
-			_gui->getSlider(sliderLabel)->setName(parameter);
-			_gui->setRemovableSlider(parameter);
-			_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
-			_gui->setWidth(300, 0.3);
-			_gui->setOpacity(0.5);
-			_gui->update();
-		}
-		else
-		{
-			_gui->getSlider(parameter)->setValue(value, false);
-			_map.setParameter(parameter, value);
-			if (_map.getLastSelected() > 0) _map.setParameter(_map.getLastSelected(), parameter, value);
+			if (!_map.getPoint(lastSelected).hasValue(parameter))
+			{
+				_map.addPointParameter(lastSelected, parameter, value);
+				_gui->addSlider(sliderLabel, 0., 1.);
+				_gui->getSlider(sliderLabel)->setName(parameter);
+				_gui->setRemovableSlider(parameter);
+				_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
+				_gui->setWidth(300, 0.3);
+				_gui->setOpacity(0.5);
+				_gui->update();
+			}
+			else
+			{
+				_gui->getSlider(parameter)->setValue(value, false);
+				_map.setPointParameter(lastSelected, parameter, value);
+			}
 		}
 	}
 	else
@@ -293,29 +319,13 @@ void TriggerPage::MIDIIn(string port, int control, int channel, float value)
 
 void TriggerPage::load(ofJson& json)
 {
-	//clear current NNI
+	//clear current map
 	_map.clearPoints();
 	_gui->clearRemovableSliders();
-	//load parameters to NNI and GUI
-	for (auto parameter : json["parameters"])
+	//load parameters to map and GUI
+	for (ofJson point : json["points"])
 	{
-		_map.addParameter(parameter, 0);
-		//GUI
-		string sliderLabel = "cc" + ofSplitString(parameter, "/").back();
-		_gui->addSlider(sliderLabel, 0., 1.);
-		_gui->getSlider(sliderLabel)->setName(parameter);
-		_gui->setRemovableSlider(parameter);
-		_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
-		_gui->setWidth(300, 0.3);
-		_gui->setOpacity(0.5);
-	}
-	for (ofJson site : json["sites"])
-	{
-		for (auto parameter : _map.getParameters())
-		{
-			_map.setParameter(parameter.first, site["parameters"][parameter.first]);
-		}
-		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]), _radius, _threshold);
+		//_map.addPoint(ofVec2f(point["pos"]["x"], site["pos"]["y"]), point["radius"], point["threshold"]);
 	}
 	//update gui
 	_gui->update();
@@ -344,7 +354,7 @@ ofJson TriggerPage::save()
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}
-		jSave["sites"].push_back(curPoint);
+		jSave["points"].push_back(curPoint);
 	}
 	return jSave;
 }

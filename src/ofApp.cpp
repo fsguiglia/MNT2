@@ -16,17 +16,21 @@ void ofApp::setup(){
 }
 
 void ofApp::update() {
+
+	
+	map<string, float> nniOut, trOut, output;
 	//NNI
 	_nni.setVisible(_page == 0);
 	_nni.update();
-	vector<map<string, float>> nniOut = _nni.getMidiOut();
-	for (auto message : nniOut) sendMIDICC(message, _MIDIOutputs);
-	vector<map<string, float>> nniDump = _nni.getMidiDump();
-	for (auto message : nniDump) sendMIDICC(message, _MIDIOutputs);
+	nniOut = removePortFromMessages(_nni.getMidiOut());
 	//Trigger
 	_trigger.setVisible(_page == 1);
 	_trigger.update();
+	trOut = removePortFromMessages(_trigger.getMidiOut());
 	//MIDI
+	output.insert(nniOut.begin(), nniOut.end());
+	output.insert(trOut.begin(), trOut.end());
+	sendMIDICC(output, _MIDIOutputs);
 	updateMIDIGui(_page == 2);
 }
 
@@ -177,6 +181,19 @@ void ofApp::newMidiMessage(ofxMidiMessage & msg)
 	}
 }
 
+map<string, float> ofApp::removePortFromMessages(map<string, float> messages)
+{
+	map<string, float> newMessages;
+	for (auto message : messages)
+	{
+		vector<string> split = ofSplitString(message.first, "/");
+		string curMessage;
+		for (int i = 1; i < split.size(); i++) curMessage += split[i];
+		newMessages[curMessage] = message.second;
+	}
+	return newMessages;
+}
+
 void ofApp::sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports)
 {
 	for (auto port : ports)
@@ -185,7 +202,6 @@ void ofApp::sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> po
 		{
 			for (auto parameter : parameters)
 			{
-
 				int channel = ofToInt(ofSplitString(parameter.first, "/")[1]);
 				int control = ofToInt(ofSplitString(parameter.first, "/")[2]);
 				int value = parameter.second * 127;

@@ -147,8 +147,11 @@ void NNI::update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites)
 
 	_buffer.updateData(0, _matrices);
 	
+	ofPushStyle();
 	fbo.begin();
 	ofClear(255);
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, resolution.x, resolution.y);
 	if (_points.size() > 0)
 	{
 		ofEnableDepthTest();
@@ -162,6 +165,7 @@ void NNI::update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites)
 		ofDisableDepthTest();
 	}
 	fbo.end();
+	ofPopStyle();
 }
 
 void NNI::updateIdMap()
