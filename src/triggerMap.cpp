@@ -29,7 +29,6 @@ void TriggerMap::update()
 	if (_randomSpeed != 0) randomize();
 	if (_active) updateTriggers();
 	updateFbo();
-	for (auto trigger : _points) cout << trigger.getState() << endl;
 }
 
 void TriggerMap::draw(int x, int y, ofTrueTypeFont & font)

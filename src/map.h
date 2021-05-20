@@ -39,7 +39,7 @@ protected:
 	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity=100);
 
 	typename vector<T> _points;
-	map<string, float> _parameters;
+	map<string, float> _parameters, _output;
 	bool _positionChanged, _drawSelected, _active;
 	float _randomSpeed;
 	int _width, _height, _lastSelectedMs , _lastSelected;

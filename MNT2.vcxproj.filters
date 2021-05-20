@@ -136,6 +136,15 @@
     <ClCompile Include="src\triggerPage.cpp">
       <Filter>src\pages</Filter>
     </ClCompile>
+    <ClCompile Include="src\rgbPoint.cpp">
+      <Filter>src\points</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RGBMap.cpp">
+      <Filter>src\maps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rgbPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -462,6 +471,15 @@
       <Filter>src\pages</Filter>
     </ClInclude>
     <ClInclude Include="src\triggerPage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rgbPoint.h">
+      <Filter>src\points</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RGBMap.h">
+      <Filter>src\maps</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rgbPage.h">
       <Filter>src\pages</Filter>
     </ClInclude>
   </ItemGroup>

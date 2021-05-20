@@ -80,16 +80,6 @@ ofColor Trigger::getColor()
 	return _color;
 }
 
-void Trigger::setOutValue(string key, float value)
-{
-	_outParameters[key] = value;
-}
-
-void Trigger::setOutValues(map<string, float> parameters)
-{
-	_outParameters = parameters;
-}
-
 void Trigger::update(ofVec2f position)
 {
 	vector<ofVec2f> positions = { position };

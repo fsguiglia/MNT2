@@ -32,7 +32,6 @@ private:
 	ofColor _color;
 	vector<ofVec2f> _cursors;
 	vector<int> _triggered;
-	map<string, float> _output;
 	ofFbo _fbo;
 };
 #endif

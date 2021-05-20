@@ -9,17 +9,14 @@
 #include "page.h"
 #include "NNIPage.h"
 #include "triggerPage.h"
-#include "triggerMap.h"
+#include "rgbPage.h"
 #include "mntUtils.h"
 
 
 /*
-conflictos con MIDI: cuando interpola mandar solo si cambiaron los valores,
-quilombo cuando varios puertos le dan al mismo cc
-
 ver que hacer cuando el draw se pasa del borde
 
-se podrian estandarizar los mapas para que page sea una sola clase en lugar de tener varios child: esperemos a tener algun otro modulo para ver
+se podrian estandarizar las paginas para que page sea una sola clase en lugar de tener varios child o menos funciones en el child
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -63,8 +60,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		//Trigger
 		TriggerPage _trigger;
 
+		//RGB
+		RGBPage _rgb;
+
 		//GUI
-		const size_t _maxPages = 2;
+		const size_t _maxPages = 3;
 		const size_t _guiWidth = 300;
 		int _page;
 		ofxDatGui* _gMIDIIn;

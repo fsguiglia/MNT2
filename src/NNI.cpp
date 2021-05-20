@@ -58,7 +58,7 @@ void NNI::update()
 	}
 	if (_active)
 	{
-		_weights = interpolate(_cursor, _drawInterpolation);
+		_output = interpolate(_cursor, _drawInterpolation);
 	}
 }
 
@@ -131,7 +131,7 @@ void NNI::setDrawInterpolation(bool drawInterpolation)
 
 map<string, float> NNI::getOutput()
 {
-	return _weights;
+	return _output;
 }
 
 void NNI::update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites)
