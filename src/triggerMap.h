@@ -15,8 +15,8 @@ public:
 	void draw(int x, int y, ofTrueTypeFont& font);
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
 
-	void addPoint(ofVec2f position, float radius, float threshold, ofColor color);
-	void addPoint(ofVec2f position, float radius, float threshold);
+	int addPoint(ofVec2f position, float radius, float threshold, ofColor color);
+	int addPoint(ofVec2f position, float radius, float threshold);
 	void setRadius(int index, float radius);
 	void setThreshold(int index, float threshold);
 	void setSwitch(int index, bool isSwitch);

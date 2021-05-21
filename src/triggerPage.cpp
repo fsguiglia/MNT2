@@ -54,30 +54,6 @@ void TriggerPage::setupGui(map<string, float> parameters, bool toggleState)
 	_gui->update();
 }
 
-void TriggerPage::update()
-{
-	_map.update();
-	if (_map.getActive())
-	{
-		if (_map.getOutput() != _previousOutput)
-		{
-			addMidiMessages(_map.getOutput(), _MIDIOutMessages);
-			_previousOutput = _map.getOutput();
-		}
-	}
-	_gui->setVisible(_visible);
-	_gui->setEnabled(_visible);
-	_gui->update();
-}
-
-void TriggerPage::draw(ofTrueTypeFont & font)
-{
-	ofPushStyle();
-	_map.draw(_position.x, _position.y, _position.getWidth(), _position.getHeight(), font);
-	_gui->draw();
-	ofPopStyle();
-}
-
 void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
@@ -151,10 +127,10 @@ void TriggerPage::toggleEvent(ofxDatGuiToggleEvent e)
 	}
 }
 
-void TriggerPage::updateSelected(int selected, map<string, float> parameters, float radius, float threshold)
+void TriggerPage::updateSelected(int selected, Trigger trigger)
 {
 	_gui->clearRemovableSliders();
-	for (auto value : _map.getPoint(selected).getValues())
+	for (auto value : trigger.getValues())
 	{
 		vector<string> split = ofSplitString(value.first, "/");
 		string sliderLabel = "cc" + split[split.size() -1];
@@ -167,8 +143,8 @@ void TriggerPage::updateSelected(int selected, map<string, float> parameters, fl
 	}
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	_gui->getToggle("Switch")->setChecked(_map.getPoint(selected).getSwitch());
-	_gui->getSlider("Radius")->setValue(radius, false);
-	_gui->getSlider("Threshold")->setValue(threshold, false);
+	_gui->getSlider("Radius")->setValue(trigger.getRadius(), false);
+	_gui->getSlider("Threshold")->setValue(trigger.getThreshold(), false);
 	_gui->update();
 	//for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
 }
@@ -209,7 +185,7 @@ void TriggerPage::mousePressed(int x, int y, int button)
 			if (curSelected != lastSelected)
 			{
 				Trigger point = _map.getPoint(curSelected);
-				updateSelected(curSelected, point.getValues(), point.getRadius(), point.getThreshold());
+				updateSelected(curSelected, point);
 			}
 		}
 	}
@@ -231,7 +207,7 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 				{
 					_map.setLastSelected(curSelected);
 					Trigger point = _map.getPoint(curSelected);
-					updateSelected(curSelected, point.getValues(), point.getRadius(), point.getThreshold());
+					updateSelected(curSelected, point);
 				}
 				else _map.setLastSelected(-1);
 			}
@@ -257,14 +233,6 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 void TriggerPage::mouseScrolled(int scroll)
 {
 	_gui->scroll(scroll);
-}
-
-void TriggerPage::resize(int w, int h)
-{
-	_position = centerSquarePosition(w - _guiWidth, h);
-	_gui->setPosition(w - _guiWidth, 0);
-	_gui->setMaxHeight(h);
-	_gui->update();
 }
 
 void TriggerPage::MIDIIn(string port, int control, int channel, float value)
@@ -323,16 +291,25 @@ void TriggerPage::load(ofJson& json)
 	_map.clearPoints();
 	_gui->clearRemovableSliders();
 	//load parameters to map and GUI
-	for (ofJson point : json["points"])
+	for (ofJson curPoint : json["points"])
 	{
-		//_map.addPoint(ofVec2f(point["pos"]["x"], site["pos"]["y"]), point["radius"], point["threshold"]);
+		ofVec2f position = ofVec2f(curPoint["pos"]["x"], curPoint["pos"]["y"]);
+		float radius = curPoint["radius"];
+		float threshold = curPoint["threshold"];
+		bool isSwitch = curPoint["switch"];
+		int index = _map.addPoint(position, radius, threshold);
+		_map.setSwitch(index, isSwitch);
+		auto obj = curPoint["parameters"].get<ofJson::object_t>();
+		for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
 	}
-	//update gui
+	//gui
+	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
+	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
 	_gui->update();
 	if (_map.getPoints().size() != 0)
 	{
 		Trigger point = _map.getPoint(0);
-		updateSelected(0, point.getValues(), point.getRadius(), point.getThreshold());
+		updateSelected(0, point);
 	}
 }
 
@@ -350,12 +327,15 @@ ofJson TriggerPage::save()
 		curPoint["pos"]["y"] = points[i].getPosition().y;
 		curPoint["radius"] = points[i].getRadius();
 		curPoint["threshold"] = points[i].getThreshold();
+		curPoint["switch"] = points[i].getSwitch();
 		for (auto parameter : points[i].getValues())
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}
 		jSave["points"].push_back(curPoint);
 	}
+	jSave["MIDIMap"]["x"] = _CCXY[0];
+	jSave["MIDIMap"]["y"] = _CCXY[1];
 	return jSave;
 }
 

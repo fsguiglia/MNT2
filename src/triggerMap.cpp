@@ -58,7 +58,7 @@ void TriggerMap::draw(int x, int y, int w, int h, ofTrueTypeFont & font)
 	ofPopStyle();
 }
 
-void TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColor color)
+int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColor color)
 {
 	Trigger trigger;
 	trigger.setPosition(position);
@@ -66,12 +66,14 @@ void TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofCol
 	trigger.setThreshold(threshold);
 	trigger.setColor(color);
 	Map::addPoint(trigger);
+	return _points.size() - 1;
 }
 
-void TriggerMap::addPoint(ofVec2f position, float radius, float threshold)
+int TriggerMap::addPoint(ofVec2f position, float radius, float threshold)
 {
 	float colorIndex = _points.size() * 255 / 16;
-	addPoint(position, radius, threshold, ofColor(colorIndex, 50, 50));
+	int size = addPoint(position, radius, threshold, ofColor(colorIndex, 50, 50));
+	return size;
 }
 
 void TriggerMap::setRadius(int index, float radius)

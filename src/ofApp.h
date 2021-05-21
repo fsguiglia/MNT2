@@ -12,13 +12,6 @@
 #include "rgbPage.h"
 #include "mntUtils.h"
 
-
-/*
-ver que hacer cuando el draw se pasa del borde
-
-se podrian estandarizar las paginas para que page sea una sola clase en lugar de tener varios child o menos funciones en el child
-*/
-
 class ofApp : public ofBaseApp, public ofxMidiListener {
 
 	public:

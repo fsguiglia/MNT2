@@ -240,6 +240,12 @@ void ofApp::load()
 		//NNI
 		ofJson jNNI = jLoad["NNI"];
 		_nni.load(jNNI);
+		//Trigger
+		ofJson jTrigger = jLoad["Trigger"];
+		_trigger.load(jTrigger);
+		//RGB
+		ofJson jRGB = jLoad["RGB"];
+		_rgb.load(jRGB);
 		//MIDI
 		ofJson jMIDI = jLoad["MIDI"];
 		for (string port : jMIDI["in"])
@@ -281,6 +287,10 @@ void ofApp::save()
 		
 		//NNI
 		jSave["NNI"] = _nni.save();
+		//Trigger
+		jSave["Trigger"] = _trigger.save();
+		//RGN
+		jSave["RGB"] = _rgb.save();
 		
 		//MIDI
 		ofJson jMIDI;

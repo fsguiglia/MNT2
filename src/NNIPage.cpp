@@ -48,30 +48,6 @@ void NNIPage::setupGui(map<string, float> parameters, bool toggleState)
 	_gui->update();
 }
 
-void NNIPage::update()
-{
-	_map.update();
-	if (_map.getActive())
-	{
-		if (_map.getOutput() != _previousOutput)
-		{
-			addMidiMessages(_map.getOutput(), _MIDIOutMessages);
-			_previousOutput = _map.getOutput();
-		}
-	}
-	_gui->setVisible(_visible);
-	_gui->setEnabled(_visible);
-	_gui->update();
-}
-
-void NNIPage::draw(ofTrueTypeFont& font)
-{
-	ofPushStyle();
-	_map.draw(_position.x, _position.y, _position.getWidth(), _position.getHeight(), font);
-	_gui->draw();
-	ofPopStyle();
-}
-
 void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
@@ -123,8 +99,9 @@ void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 }
 
-void NNIPage::updateSelected(int selected, map<string, float> parameters)
+void NNIPage::updateSelected(int selected, Point point)
 {
+	map<string, float> parameters = point.getValues();
 	_gui->getLabel("Parameters")->setLabel("Parameters - Site: " + ofToString(selected));
 	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second);
 	//for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
@@ -165,7 +142,7 @@ void NNIPage::mousePressed(int x, int y, int button)
 			int curSelected = _map.getClosest(pos, true)[0];
 			if (curSelected != lastSelected)
 			{
-				updateSelected(curSelected, _map.getPoint(curSelected).getValues());
+				updateSelected(curSelected, _map.getPoint(curSelected));
 			}
 		}
 	}
@@ -183,10 +160,10 @@ void NNIPage::mouseReleased(int x, int y, int button)
 			if (_map.getPoints().size() > 0)
 			{
 				int curPoint = _map.getPoints().size() - 1;
-				if (curPoint > 0)
+				if (curPoint >= 0)
 				{
 					_map.setLastSelected(curPoint);
-					updateSelected(curPoint, _map.getPoint(curPoint).getValues());
+					updateSelected(curPoint, _map.getPoint(curPoint));
 				}
 				else _map.setLastSelected(-1);
 			}
@@ -211,14 +188,6 @@ void NNIPage::mouseReleased(int x, int y, int button)
 void NNIPage::mouseScrolled(int scroll)
 {
 	_gui->scroll(scroll);
-}
-
-void NNIPage::resize(int w, int h)
-{
-	_position = centerSquarePosition(w - _guiWidth, h);
-	_gui->setPosition(w - _guiWidth, 0);
-	_gui->setMaxHeight(h);
-	_gui->update();
 }
 
 void NNIPage::MIDIIn(string port, int control, int channel, float value)
@@ -258,7 +227,7 @@ void NNIPage::MIDIIn(string port, int control, int channel, float value)
 		{
 			_gui->getSlider(parameter)->setValue(value, false);
 			_map.setGlobalParameter(parameter, value);
-			if (_map.getLastSelected() > 0) _map.setPointParameter(_map.getLastSelected(), parameter, value);
+			if (_map.getLastSelected() >= 0) _map.setPointParameter(_map.getLastSelected(), parameter, value);
 		}
 	}
 	else
@@ -294,11 +263,13 @@ void NNIPage::load(ofJson& json)
 		}
 		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
 	}
-	//update gui
+	//gui
+	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
+	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
 	_gui->update();
 	if (_map.getPoints().size() != 0)
 	{
-		updateSelected(0, _map.getPoint(0).getValues());
+		updateSelected(0, _map.getPoint(0));
 	}
 }
 
@@ -307,18 +278,20 @@ ofJson NNIPage::save()
 	ofJson jSave;
 	map<string, float> nniParameters = _map.getParameters();
 	for (auto element : nniParameters) jSave["parameters"].push_back(element.first);
-	vector<Point> nniSites = _map.getPoints();
-	for (int i = 0; i < nniSites.size(); i++)
+	vector<Point> points = _map.getPoints();
+	for (int i = 0; i < points.size(); i++)
 	{
-		ofJson curSite;
-		curSite["id"] = i;
-		curSite["pos"]["x"] = nniSites[i].getPosition().x;
-		curSite["pos"]["y"] = nniSites[i].getPosition().y;
-		for (auto parameter : nniSites[i].getValues())
+		ofJson curPoint;
+		curPoint["id"] = i;
+		curPoint["pos"]["x"] = points[i].getPosition().x;
+		curPoint["pos"]["y"] = points[i].getPosition().y;
+		for (auto parameter : points[i].getValues())
 		{
-			curSite["parameters"][parameter.first] = parameter.second;
+			curPoint["parameters"][parameter.first] = parameter.second;
 		}
-		jSave["points"].push_back(curSite);
+		jSave["points"].push_back(curPoint);
 	}
+	jSave["MIDIMap"]["x"] = _CCXY[0];
+	jSave["MIDIMap"]["y"] = _CCXY[1];
 	return jSave;
 }

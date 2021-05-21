@@ -55,30 +55,6 @@ void RGBPage::setupGui(map<string, float> parameters, bool toggleState)
 	_gui->update();
 }
 
-void RGBPage::update()
-{
-	_map.update();
-	if (_map.getActive())
-	{
-		if (_map.getOutput() != _previousOutput)
-		{
-			addMidiMessages(_map.getOutput(), _MIDIOutMessages);
-			_previousOutput = _map.getOutput();
-		}
-	}
-	_gui->setVisible(_visible);
-	_gui->setEnabled(_visible);
-	_gui->update();
-}
-
-void RGBPage::draw(ofTrueTypeFont & font)
-{
-	ofPushStyle();
-	_map.draw(_position.x, _position.y, _position.getWidth(), _position.getHeight(), font);
-	_gui->draw();
-	ofPopStyle();
-}
-
 void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
@@ -212,7 +188,7 @@ void RGBPage::mousePressed(int x, int y, int button)
 			if (openFile.bSuccess)
 			{
 				ofImage img;
-				if(img.load(openFile.filePath)) _map.addPoint(pos, img);
+				if (img.load(openFile.filePath)) _map.addPoint(pos, img, openFile.filePath);
 			}
 		}
 		if (button < 2)
@@ -272,14 +248,6 @@ void RGBPage::mouseScrolled(int scroll)
 	_gui->scroll(scroll);
 }
 
-void RGBPage::resize(int w, int h)
-{
-	_position = centerSquarePosition(w - _guiWidth, h);
-	_gui->setPosition(w - _guiWidth, 0);
-	_gui->setMaxHeight(h);
-	_gui->update();
-}
-
 void RGBPage::MIDIIn(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
@@ -336,11 +304,30 @@ void RGBPage::load(ofJson & json)
 	_map.clearPoints();
 	_gui->clearRemovableSliders();
 	//load parameters to map and GUI
-	for (ofJson point : json["points"])
+	for (ofJson curPoint : json["points"])
 	{
-		//_map.addPoint(ofVec2f(point["pos"]["x"], site["pos"]["y"]), point["radius"], point["threshold"]);
+		
+		ofVec2f position = ofVec2f(curPoint["pos"]["x"], curPoint["pos"]["y"]);
+		bool isTrigger = curPoint["trigger"].get<bool>();
+		ofImage img;
+		bool imageLoaded = img.load(curPoint["image_path"].get<string>());
+		if (!imageLoaded)
+		{
+			img.allocate(100, 100, ofImageType::OF_IMAGE_GRAYSCALE);
+			img.setColor(200);
+		}
+		int index = _map.addPoint(position, img);
+		_map.setTrigger(index, isTrigger);
+		_map.resizePoint(index, curPoint["width"], curPoint["height"]);
+		auto obj = curPoint["parameters"].get<ofJson::object_t>();
+		for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
 	}
-	//update gui
+	_radius = json["radius"];
+	_map.setRadius(_radius);
+	//gui
+	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
+	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
+	_gui->getSlider("Radius")->setValue(_radius, false);
 	_gui->update();
 	if (_map.getPoints().size() != 0)
 	{
@@ -354,6 +341,7 @@ ofJson RGBPage::save()
 	ofJson jSave;
 	map<string, float> parameters = _map.getParameters();
 	for (auto element : parameters) jSave["parameters"].push_back(element.first);
+	jSave["radius"] = _radius;
 	vector<RGBPoint> points = _map.getPoints();
 	for (int i = 0; i < points.size(); i++)
 	{
@@ -361,11 +349,17 @@ ofJson RGBPage::save()
 		curPoint["id"] = i;
 		curPoint["pos"]["x"] = points[i].getPosition().x;
 		curPoint["pos"]["y"] = points[i].getPosition().y;
+		curPoint["width"] = points[i].getWidth();
+		curPoint["height"] = points[i].getHeight();
+		curPoint["trigger"] = points[i].getTrigger();
+		curPoint["image_path"] = points[i].getImagePath();
 		for (auto parameter : points[i].getValues())
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}
 		jSave["points"].push_back(curPoint);
 	}
+	jSave["MIDIMap"]["x"] = _CCXY[0];
+	jSave["MIDIMap"]["y"] = _CCXY[1];
 	return jSave;
 }

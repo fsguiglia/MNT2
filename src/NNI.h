@@ -14,7 +14,7 @@ public:
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
 	void drawIdFbo(int x, int y);
 	void drawInterpolationFbo(int x, int y);
-	void addPoint(ofVec2f pos);
+	int addPoint(ofVec2f pos);
 	void setCursor(ofVec2f cursor);
 	ofVec2f getCursor();
 	void setDrawInterpolation(bool drawInterpolation);

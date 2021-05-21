@@ -45,13 +45,24 @@ void RGBMap::draw(int x, int y, int w, int h, ofTrueTypeFont & font)
 	ofPopStyle();
 }
 
-void RGBMap::addPoint(ofVec2f position, ofImage img)
+int RGBMap::addPoint(ofVec2f position, ofImage img)
 {
 	RGBPoint point(img.getWidth(), img.getHeight());
 	point.setPosition(position.x, position.y);
 	point.setTrigger(false);
 	point.setImage(img);
 	Map::addPoint(point);
+	return _points.size() - 1;
+}
+
+int RGBMap::addPoint(ofVec2f position, ofImage img, string path)
+{
+	RGBPoint point(img.getWidth(), img.getHeight());
+	point.setPosition(position.x, position.y);
+	point.setTrigger(false);
+	point.setImage(img, path);
+	Map::addPoint(point);
+	return _points.size() - 1;
 }
 
 void RGBMap::resizePoint(int index, int w, int h)

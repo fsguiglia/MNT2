@@ -12,7 +12,8 @@ public:
 	void update();
 	void draw(int x, int y, ofTrueTypeFont& font);
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
-	void addPoint(ofVec2f position, ofImage img);
+	int addPoint(ofVec2f position, ofImage img);
+	int addPoint(ofVec2f position, ofImage img, string path);
 	void resizePoint(int index, int w, int h);
 	void setTrigger(int index, bool isTrigger);
 	void setRadius(float radius);

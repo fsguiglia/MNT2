@@ -185,7 +185,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\midiHandler.cpp" />
     <ClCompile Include="src\mntUtils.cpp" />
     <ClCompile Include="src\NNI.cpp" />
     <ClCompile Include="src\NNIPage.cpp" />
@@ -235,7 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\map.h" />
-    <ClInclude Include="src\midiHandler.h" />
     <ClInclude Include="src\mntUtils.h" />
     <ClInclude Include="src\NNI.h" />
     <ClInclude Include="src\NNIpage.h" />

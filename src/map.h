@@ -181,7 +181,7 @@ void Map<T>::removeGlobalParameter(string parameter)
 template<typename T>
 void Map<T>::addPointParameter(int index, string parameter, float value)
 {
-	if (!_points[index].hasValue(parameter)) _points[index].setValue(parameter, index);
+	if (!_points[index].hasValue(parameter)) _points[index].setValue(parameter, value);
 }
 
 
