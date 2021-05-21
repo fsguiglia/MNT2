@@ -11,6 +11,7 @@ public:
 	PageBase();
 
 	virtual void setup(int width, int height, int guiWidth, int maxMessages = 20) = 0;
+	void setMapColorPallete(vector<ofColor> colorPallete);
 	void update();
 	void draw(ofTrueTypeFont font);
 
@@ -27,6 +28,7 @@ protected:
 
 	T _map;
 	ScrollGui *_gui;
+	ofxDatGuiFolder* _controlFolder;
 	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible;
 	int _guiWidth, _maxMessages;
 	string _lastSelectedControl;
@@ -39,6 +41,12 @@ protected:
 template<typename T>
 inline PageBase<T>::PageBase()
 {
+}
+
+template<typename T>
+inline void PageBase<T>::setMapColorPallete(vector<ofColor> colorPallete)
+{
+	_map.setColorPallete(colorPallete);
 }
 
 template<typename T>
@@ -117,15 +125,15 @@ inline map<string, float> PageBase<T>::getMidiOut(bool clearMessages)
 template<typename T>
 inline void PageBase<T>::setVisible(bool visible)
 {
-	_visible = visible;
-	_inside = visible;
-	if (!visible)
+	if (_visible && !visible)
 	{
 		_gui->getToggle("controlLearn")->setChecked(false);
 		_gui->getToggle("parameterLearn")->setChecked(false);
 		_controlLearn = false;
 		_parameterLearn = false;
 	}
+	_visible = visible;
+	_inside = visible;
 }
 
 template<typename T>

@@ -19,11 +19,6 @@ void TriggerMap::setup(int width, int height)
 	_triggered.assign(_points.size(), 0);
 }
 
-void TriggerMap::setColor(ofColor color)
-{
-	_color = color;
-}
-
 void TriggerMap::update()
 {
 	if (_randomSpeed != 0) randomize();
@@ -71,8 +66,8 @@ int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColo
 
 int TriggerMap::addPoint(ofVec2f position, float radius, float threshold)
 {
-	float colorIndex = _points.size() * 255 / 16;
-	int size = addPoint(position, radius, threshold, ofColor(colorIndex, 50, 50));
+	int colorIndex = _points.size() % _colorPallete.size();
+	int size = addPoint(position, radius, threshold, _colorPallete[colorIndex]);
 	return size;
 }
 

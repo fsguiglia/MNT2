@@ -2,7 +2,6 @@
 
 NNI::NNI()
 {
-
 }
 
 void NNI::setup(int width, int height)
@@ -41,10 +40,21 @@ void NNI::setup(int width, int height)
 	_mesh.getColors().resize(_matrices.size());
 	for (size_t i = 0; i < _mesh.getColors().size(); i++) {
 		float colorIndex = i * 255 / 16;
-		_mesh.getColors()[i] = ofColor(colorIndex, 50, 50);
+		_mesh.getColors()[i] = _colorPallete[i % _colorPallete.size()];
 	}
 
 	_mesh.getVbo().setAttributeDivisor(ofShader::COLOR_ATTRIBUTE, 1);
+}
+
+void NNI::setColorPallete(vector<ofColor> colorPallete)
+{
+	_mesh.getColors().resize(_matrices.size());
+	for (size_t i = 0; i < _mesh.getColors().size(); i++) {
+		float colorIndex = i * 255 / 16;
+		_mesh.getColors()[i] = colorPallete[i % colorPallete.size()];
+	}
+	_mesh.getVbo().setAttributeDivisor(ofShader::COLOR_ATTRIBUTE, 1);
+	Map::setColorPallete(colorPallete);
 }
 
 void NNI::update()

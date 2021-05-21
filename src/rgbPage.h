@@ -8,7 +8,7 @@ class RGBPage : public PageBase<RGBMap> {
 public:
 	RGBPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 20);
-	void setupGui(map<string, float> parameters, bool toggleState);
+	void setupGui();
 
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);

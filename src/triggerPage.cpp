@@ -15,7 +15,7 @@ void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_mouseControl = false;
 	_inside = false;
 	_visible = false;
-	setupGui(_map.getParameters(), false);
+	setupGui();
 	_maxMessages = maxMessages;
 	vector<ofVec2f> initialCursors = { ofVec2f(0,0) };
 	_map.setCursors(initialCursors);
@@ -23,25 +23,26 @@ void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_threshold = 0.75;
 }
 
-void TriggerPage::setupGui(map<string, float> parameters, bool toggleState)
+void TriggerPage::setupGui()
 {
 	_gui = new ScrollGui();
 	_gui->addHeader("Trigger", false);
 	_gui->addToggle("active");
 	_gui->addToggle("randomize");
 	_gui->addBreak();
-	_gui->addLabel("Control")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
-	_gui->addToggle("learn", toggleState)->setName("controlLearn");
-	_gui->addToggle("Mouse Control");
-	_gui->addSlider("x", 0., 1.)->setName("x");
-	_gui->addSlider("y", 0., 1.)->setName("y");
+	_controlFolder = _gui->addFolder("Control");
+	_controlFolder->addToggle("learn")->setName("controlLearn");
+	_controlFolder->addToggle("Mouse Control");
+	_controlFolder->addSlider("x", 0., 1.)->setName("x");
+	_controlFolder->addSlider("y", 0., 1.)->setName("y");
+	_controlFolder->collapse();
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addToggle("Switch");
 	_gui->addSlider("Radius", 0., 1., _radius);
 	_gui->addSlider("Threshold", 0., 1., _threshold);
-	_gui->addToggle("learn", toggleState)->setName("parameterLearn");
+	_gui->addToggle("learn")->setName("parameterLearn");
 	_gui->addBreak();
 	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
 	_gui->onSliderEvent(this, &TriggerPage::sliderEvent);
@@ -214,7 +215,6 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 		}
 		else
 		{
-			_map.getClosest(normalized, true);
 			_gui->update();
 			_gui->updatePositions();
 			string removableSlider = _gui->inside(x, y);

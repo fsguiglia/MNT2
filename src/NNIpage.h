@@ -8,7 +8,7 @@ class NNIPage : public PageBase<NNI> {
 public:
 	NNIPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 1);
-	void setupGui(map<string, float> parameters, bool toggleState);
+	void setupGui();
 	
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);

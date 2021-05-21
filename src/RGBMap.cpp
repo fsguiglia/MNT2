@@ -107,15 +107,15 @@ void RGBMap::updateFbo()
 	ofClear(255);
 	ofSetColor(255);
 	ofDrawRectangle(0, 0, _width, _height);
-	for (auto point : _points) {
-		ofVec2f pos = point.getPosition();
+	for (int i = 0; i < _points.size(); i++) {
+		ofSetColor(_colorPallete[i % _colorPallete.size()]);
+		ofVec2f pos = _points[i].getPosition();
 		pos.x *= _width;
 		pos.y *= _height;
-		point.draw(pos.x, pos.y);
+		_points[i].draw(pos.x, pos.y);
 	}
 	if (_active)
 	{
-		ofSetCircleResolution(100);
 		for (auto cursor : _cursors)
 		{
 			int radius = _radius * _width;

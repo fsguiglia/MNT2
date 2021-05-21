@@ -4,17 +4,31 @@ void ofApp::setup(){
 	setWindowTitle("untitled");
 	_file = "";
 	_settings = ofLoadJson("mnt.ini");
+	ofJson colorPallete = ofLoadJson("color_pallete.json");
+	for (auto colors : colorPallete)
+	{
+		for (auto color : colors)
+		{
+			vector<string> rgb = ofSplitString(color.get<string>(), ",");
+			_colorPallete.push_back(ofColor(ofToInt(rgb[0]), ofToInt(rgb[1]), ofToInt(rgb[2])));
+		}
+	}
 	//NNI
 	_nni.setup(1024, 1024, _guiWidth);
+	_nni.setMapColorPallete(_colorPallete);
 	//Trigger
 	_trigger.setup(1024, 1024, _guiWidth);
+	_trigger.setMapColorPallete(_colorPallete);
 	//
 	_rgb.setup(1024, 1024, _guiWidth);
+	_rgb.setMapColorPallete(_colorPallete);
 	//MIDI
 	setupMIDI();
 	//GUI
 	_page = 0;
+	
 	verdana.load("Verdana2.ttf", 8);
+	
 }
 
 void ofApp::update() {

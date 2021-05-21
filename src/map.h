@@ -10,6 +10,7 @@ public:
 	virtual void update() = 0;
 	virtual void draw(int x, int y, int w, int h, ofTrueTypeFont& font) = 0;
 
+	void setColorPallete(vector<ofColor> colorPallete);
 	void removePoint(int index);
 	void removePoint(ofVec2f pos);
 	void clearPoints();
@@ -43,6 +44,7 @@ protected:
 	bool _positionChanged, _drawSelected, _active;
 	float _randomSpeed;
 	int _width, _height, _lastSelectedMs , _lastSelected;
+	vector<ofColor> _colorPallete;
 };
 
 template<typename T>
@@ -52,6 +54,29 @@ Map<T>::Map()
 	_lastSelected = -1;
 	_width = 100;
 	_height = 100;
+
+	_colorPallete = {
+		ofColor(207,42,42),
+		ofColor(255,77,77),
+		ofColor(231,61,61),
+		ofColor(164,35,35),
+		ofColor(116,18,18),
+		ofColor(207,117,42),
+		ofColor(255,158,77),
+		ofColor(231,138,61),
+		ofColor(164,93,35),
+		ofColor(116,63,18),
+		ofColor(25,124,124),
+		ofColor(48,157,157),
+		ofColor(37,139,139),
+		ofColor(21,98,98),
+		ofColor(11,70,70),
+		ofColor(34,165,34),
+		ofColor(62,206,62),
+		ofColor(49,185,49),
+		ofColor(28,131,28),
+		ofColor(14,93,14)
+	};
 }
 
 template<typename T>
@@ -61,6 +86,12 @@ int Map<T>::addPoint(T point)
 	_positionChanged = true;
 	int index = _points.size() - 1;
 	return index;
+}
+
+template<typename T>
+inline void Map<T>::setColorPallete(vector<ofColor> colorPallete)
+{
+	_colorPallete = colorPallete;
 }
 
 template<typename T>

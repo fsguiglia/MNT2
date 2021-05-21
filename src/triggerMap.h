@@ -10,7 +10,6 @@ class TriggerMap : public Map<Trigger>{
 public:
 	TriggerMap();
 	void setup(int width, int height);
-	void setColor(ofColor color);
 	void update();
 	void draw(int x, int y, ofTrueTypeFont& font);
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
@@ -29,7 +28,6 @@ private:
 	void updateFbo();
 	void updateTriggers();
 
-	ofColor _color;
 	vector<ofVec2f> _cursors;
 	vector<int> _triggered;
 	ofFbo _fbo;

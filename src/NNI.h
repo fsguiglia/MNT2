@@ -9,6 +9,7 @@ class NNI : public Map<Point>
 public:
 	NNI();
 	void setup(int width, int height);
+	void setColorPallete(vector<ofColor> colorPallete);
 	void update();
 	void draw(int x, int y, ofTrueTypeFont& font);
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);

@@ -62,6 +62,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		int _page;
 		ofxDatGui* _gMIDIIn;
 		ofxDatGui* _gMIDIOut;
+		vector<ofColor> _colorPallete;
 		ofTrueTypeFont verdana;
 
 		//IO
