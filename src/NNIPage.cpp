@@ -45,6 +45,8 @@ void NNIPage::setupGui()
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(ofGetWidth() - _guiWidth, 0);
 	_gui->setMaxHeight(ofGetHeight());
+	_gui->setVisible(false);
+	_gui->setEnabled(false);
 	_gui->update();
 }
 

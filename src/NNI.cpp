@@ -59,6 +59,9 @@ void NNI::setColorPallete(vector<ofColor> colorPallete)
 
 void NNI::update()
 {
+	_voronoi.begin();
+	_voronoi.setUniformTexture("tex", _tex, 0);
+	_voronoi.end();
 	if (_randomSpeed != 0) randomize();
 	if (_positionChanged)
 	{

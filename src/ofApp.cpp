@@ -42,7 +42,7 @@ void ofApp::update() {
 	//Trigger
 	_trigger.setVisible(_page == 1);
 	_trigger.update();
-	trOut = removePortFromMessages(_trigger.getMidiOut());
+	//trOut = removePortFromMessages(_trigger.getMidiOut());
 	//RGB
 	_rgb.setVisible(_page == 2);
 	_rgb.update();
@@ -64,7 +64,7 @@ void ofApp::draw(){
 		_nni.draw(verdana);
 		break;
 	case 1:
-		_trigger.draw(verdana);
+	_trigger.draw(verdana);
 		break;
 	case 2:
 		_rgb.draw(verdana);
@@ -363,7 +363,6 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 void ofApp::mousePressed(int x, int y, int button){
 	if (_page == 0) _nni.mousePressed(x, y, button);
-	if (_page == 1) _trigger.mousePressed(x, y, button);
 	if (_page == 2) _rgb.mousePressed(x, y, button);
 }
 
@@ -389,8 +388,8 @@ void ofApp::mouseExited(int x, int y){
 }
 
 void ofApp::windowResized(int w, int h){
-	_nni.resize(w, h);
-	_trigger.resize(w, h);
+	//_nni.resize(w, h);
+	//_trigger.resize(w, h);
 }
 
 void ofApp::gotMessage(ofMessage msg){
