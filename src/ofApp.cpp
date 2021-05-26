@@ -584,8 +584,6 @@ void ofApp::mousePressed(int x, int y, int button){
 						break;
 					}
 				}
-				cout << _selected << endl;
-				cout << lastSelected << endl;
 				if (_selected != "" && lastSelected == _selected && ofGetElapsedTimeMillis() - _lastClick < 500)
 				{
 					for (auto& node : _nodes)
