@@ -1,10 +1,10 @@
 #ifndef _RGBPAGES
 #define _RGBPAGES
 #include "ofMain.h"
-#include "page.h"
-#include "RGBMap.h"
+#include "basePage.h"
+#include "../maps/RGBMap.h"
 
-class RGBPage : public PageBase<RGBMap> {
+class RGBPage : public BasePage<RGBMap> {
 public:
 	RGBPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 20);

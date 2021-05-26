@@ -185,9 +185,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\mntUtils.cpp" />
-    <ClCompile Include="src\NNI.cpp" />
-    <ClCompile Include="src\NNIPage.cpp" />
+    <ClCompile Include="src\points\point.cpp" />
+    <ClCompile Include="src\points\rgbPoint.cpp" />
+    <ClCompile Include="src\points\trigger.cpp" />
+    <ClCompile Include="src\utils\mntUtils.cpp" />
+    <ClCompile Include="src\maps\NNI.cpp" />
+    <ClCompile Include="src\pages\NNIPage.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\core\ofxDatGuiComponent.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont\ofxSmartFont.cpp" />
@@ -223,20 +226,22 @@
     <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp" />
     <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp" />
     <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp" />
-    <ClCompile Include="src\point.cpp" />
-    <ClCompile Include="src\RGBMap.cpp" />
-    <ClCompile Include="src\rgbPage.cpp" />
-    <ClCompile Include="src\rgbPoint.cpp" />
-    <ClCompile Include="src\scrollGui.cpp" />
-    <ClCompile Include="src\trigger.cpp" />
-    <ClCompile Include="src\triggerMap.cpp" />
-    <ClCompile Include="src\triggerPage.cpp" />
+    <ClCompile Include="src\maps\RGBMap.cpp" />
+    <ClCompile Include="src\pages\rgbPage.cpp" />
+    <ClCompile Include="src\gui\scrollGui.cpp" />
+    <ClCompile Include="src\maps\triggerMap.cpp" />
+    <ClCompile Include="src\pages\triggerPage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\map.h" />
-    <ClInclude Include="src\mntUtils.h" />
-    <ClInclude Include="src\NNI.h" />
-    <ClInclude Include="src\NNIpage.h" />
+    <ClInclude Include="src\gui\connection.h" />
+    <ClInclude Include="src\gui\node.h" />
+    <ClInclude Include="src\maps\baseMap.h" />
+    <ClInclude Include="src\points\point.h" />
+    <ClInclude Include="src\points\rgbPoint.h" />
+    <ClInclude Include="src\points\trigger.h" />
+    <ClInclude Include="src\utils\mntUtils.h" />
+    <ClInclude Include="src\maps\NNI.h" />
+    <ClInclude Include="src\pages\NNIpage.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGui2dPad.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGuiButton.h" />
@@ -301,15 +306,12 @@
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h" />
     <ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h" />
     <ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h" />
-    <ClInclude Include="src\page.h" />
-    <ClInclude Include="src\point.h" />
-    <ClInclude Include="src\RGBMap.h" />
-    <ClInclude Include="src\rgbPage.h" />
-    <ClInclude Include="src\rgbPoint.h" />
-    <ClInclude Include="src\scrollGui.h" />
-    <ClInclude Include="src\trigger.h" />
-    <ClInclude Include="src\triggerMap.h" />
-    <ClInclude Include="src\triggerPage.h" />
+    <ClInclude Include="src\pages\basePage.h" />
+    <ClInclude Include="src\maps\RGBMap.h" />
+    <ClInclude Include="src\pages\rgbPage.h" />
+    <ClInclude Include="src\gui\scrollGui.h" />
+    <ClInclude Include="src\maps\triggerMap.h" />
+    <ClInclude Include="src\pages\triggerPage.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

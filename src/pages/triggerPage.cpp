@@ -338,4 +338,3 @@ ofJson TriggerPage::save()
 	jSave["MIDIMap"]["y"] = _CCXY[1];
 	return jSave;
 }
-

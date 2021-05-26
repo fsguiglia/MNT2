@@ -118,6 +118,7 @@ void NNIPage::mouseMoved(int x, int y)
 
 void NNIPage::mouseDragged(int x, int y, int button)
 {
+	cout << x << ", " << y << ", " << button << endl;
 	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
 	bool insideGui = guiPosition.inside(x, y);
 	_inside = _position.inside(x, y);

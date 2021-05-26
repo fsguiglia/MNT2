@@ -1,14 +1,14 @@
 #pragma once
-#ifndef _PAGEBASE
-#define _PAGEBASE
+#ifndef _BASEPAGE
+#define _BASEPAGE
 #include "ofMain.h"
-#include "scrollGui.h"
+#include "../gui/scrollGui.h"
+#include "../utils/mntUtils.h"
 #include "ofxDatGui.h"
-#include "mntUtils.h"
 
-template<typename T> class PageBase {
+template<typename T> class BasePage {
 public:
-	PageBase();
+	BasePage();
 
 	virtual void setup(int width, int height, int guiWidth, int maxMessages = 20) = 0;
 	void setMapColorPallete(vector<ofColor> colorPallete);
@@ -39,18 +39,18 @@ protected:
 #endif
 
 template<typename T>
-inline PageBase<T>::PageBase()
+inline BasePage<T>::BasePage()
 {
 }
 
 template<typename T>
-inline void PageBase<T>::setMapColorPallete(vector<ofColor> colorPallete)
+inline void BasePage<T>::setMapColorPallete(vector<ofColor> colorPallete)
 {
 	_map.setColorPallete(colorPallete);
 }
 
 template<typename T>
-inline void PageBase<T>::update()
+inline void BasePage<T>::update()
 {
 	_map.update();
 	if (_map.getActive())
@@ -67,7 +67,7 @@ inline void PageBase<T>::update()
 }
 
 template<typename T>
-inline void PageBase<T>::draw(ofTrueTypeFont font)
+inline void BasePage<T>::draw(ofTrueTypeFont font)
 {
 	ofPushStyle();
 	_map.draw(_position.x, _position.y, _position.getWidth(), _position.getHeight(), font);
@@ -78,7 +78,7 @@ inline void PageBase<T>::draw(ofTrueTypeFont font)
 }
 
 template<typename T>
-inline void PageBase<T>::resize(int w, int h)
+inline void BasePage<T>::resize(int w, int h)
 {
 	_position = centerSquarePosition(w - _guiWidth, h);
 	_gui->setPosition(_position.x + _position.getWidth(), 0);
@@ -87,7 +87,7 @@ inline void PageBase<T>::resize(int w, int h)
 }
 
 template<typename T>
-inline ofRectangle PageBase<T>::centerSquarePosition(int w, int h)
+inline ofRectangle BasePage<T>::centerSquarePosition(int w, int h)
 {
 	ofRectangle rect;
 	int max = w;
@@ -107,7 +107,7 @@ inline ofRectangle PageBase<T>::centerSquarePosition(int w, int h)
 }
 
 template<typename T>
-inline map<string, float> PageBase<T>::getMidiDump(bool clearMessages)
+inline map<string, float> BasePage<T>::getMidiDump(bool clearMessages)
 {
 	map<string, float> out = _MIDIDumpMessages;
 	if (clearMessages) clearMIDIMessages(_MIDIDumpMessages);
@@ -115,7 +115,7 @@ inline map<string, float> PageBase<T>::getMidiDump(bool clearMessages)
 }
 
 template<typename T>
-inline map<string, float> PageBase<T>::getMidiOut(bool clearMessages)
+inline map<string, float> BasePage<T>::getMidiOut(bool clearMessages)
 {
 	map<string, float> out = _MIDIOutMessages;
 	if (clearMessages) clearMIDIMessages(_MIDIOutMessages);
@@ -123,7 +123,7 @@ inline map<string, float> PageBase<T>::getMidiOut(bool clearMessages)
 }
 
 template<typename T>
-inline void PageBase<T>::setVisible(bool visible)
+inline void BasePage<T>::setVisible(bool visible)
 {
 	if (_visible && !visible)
 	{
@@ -137,14 +137,14 @@ inline void PageBase<T>::setVisible(bool visible)
 }
 
 template<typename T>
-inline void PageBase<T>::addMidiMessages(map<string, float> messages, map<string, float>& queue)
+inline void BasePage<T>::addMidiMessages(map<string, float> messages, map<string, float>& queue)
 {
 	queue.insert(messages.begin(), messages.end());
 	while (queue.size() > _maxMessages) queue.erase(queue.begin());;
 }
 
 template<typename T>
-inline void PageBase<T>::clearMIDIMessages(map<string, float>& queue)
+inline void BasePage<T>::clearMIDIMessages(map<string, float>& queue)
 {
 	queue.clear();
 }

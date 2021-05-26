@@ -6,11 +6,12 @@
 #include "ofxNetwork.h"
 #include "ofxOsc.h"
 #include "ofxMidi.h"
-#include "page.h"
-#include "NNIPage.h"
-#include "triggerPage.h"
-#include "rgbPage.h"
-#include "mntUtils.h"
+#include "gui/node.h"
+#include "gui/connection.h"
+#include "pages/NNIpage.h"
+#include "pages/triggerPage.h"
+#include "pages/rgbPage.h"
+#include "utils/mntUtils.h"
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
 
@@ -47,14 +48,22 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+		//Nodes
+		vector<Node<NNIPage>> _nodes;
+		vector<Connection> _connections;
+		int _selected;
+		int _lastClick = 0;
+		int _shiftSelected[2];
+		bool _shift;
+		bool _mode;
 		//NNI
-		NNIPage _nni;
+		//NNIPage _nni;
 		
 		//Trigger
-		TriggerPage _trigger;
+		//TriggerPage _trigger;
 
 		//RGB
-		RGBPage _rgb;
+		//RGBPage _rgb;
 
 		//GUI
 		const size_t _maxPages = 3;
@@ -75,4 +84,5 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		map<string, ofxMidiOut> _MIDIOutputs;
 		vector<ofxMidiMessage> _MIDIMessages;
 		size_t _maxMidiMessages;
+
 };

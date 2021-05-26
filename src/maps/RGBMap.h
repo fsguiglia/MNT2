@@ -1,10 +1,10 @@
 #ifndef _RGBMAP
 #define _RGBMAP
 #include "ofMain.h"
-#include "rgbPoint.h"
-#include "map.h"
+#include "../points/rgbPoint.h"
+#include "BaseMap.h"
 
-class RGBMap : public Map<RGBPoint>
+class RGBMap : public BaseMap<RGBPoint>
 {
 public:
 	RGBMap();

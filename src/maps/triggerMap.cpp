@@ -60,7 +60,7 @@ int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColo
 	trigger.setRadius(radius);
 	trigger.setThreshold(threshold);
 	trigger.setColor(color);
-	Map::addPoint(trigger);
+	BaseMap::addPoint(trigger);
 	return _points.size() - 1;
 }
 

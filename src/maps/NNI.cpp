@@ -54,7 +54,7 @@ void NNI::setColorPallete(vector<ofColor> colorPallete)
 		_mesh.getColors()[i] = colorPallete[i % colorPallete.size()];
 	}
 	_mesh.getVbo().setAttributeDivisor(ofShader::COLOR_ATTRIBUTE, 1);
-	Map::setColorPallete(colorPallete);
+	BaseMap::setColorPallete(colorPallete);
 }
 
 void NNI::update()
@@ -121,7 +121,7 @@ int NNI::addPoint(ofVec2f pos)
 	Point point;
 	point.setPosition(pos);
 	point.setValues(_parameters);
-	Map::addPoint(point);
+	BaseMap::addPoint(point);
 	return _points.size();
 }
 

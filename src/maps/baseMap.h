@@ -1,10 +1,10 @@
-#ifndef _MAP
-#define _MAP
+#ifndef _BASEMAP
+#define _BASEMAP
 #include "ofMain.h"
 
-template<typename T> class Map {
+template<typename T> class BaseMap {
 public:
-	Map();
+	BaseMap();
 
 	virtual void setup(int width, int height) = 0;
 	virtual void update() = 0;
@@ -48,7 +48,7 @@ protected:
 };
 
 template<typename T>
-Map<T>::Map()
+BaseMap<T>::BaseMap()
 {
 	_positionChanged = false;
 	_lastSelected = -1;
@@ -80,7 +80,7 @@ Map<T>::Map()
 }
 
 template<typename T>
-int Map<T>::addPoint(T point)
+int BaseMap<T>::addPoint(T point)
 {
 	_points.push_back(point);
 	_positionChanged = true;
@@ -89,13 +89,13 @@ int Map<T>::addPoint(T point)
 }
 
 template<typename T>
-inline void Map<T>::setColorPallete(vector<ofColor> colorPallete)
+inline void BaseMap<T>::setColorPallete(vector<ofColor> colorPallete)
 {
 	_colorPallete = colorPallete;
 }
 
 template<typename T>
-void Map<T>::removePoint(int index)
+void BaseMap<T>::removePoint(int index)
 {
 	if (index < _points.size())
 	{
@@ -105,20 +105,20 @@ void Map<T>::removePoint(int index)
 }
 
 template<typename T>
-void Map<T>::removePoint(ofVec2f pos)
+void BaseMap<T>::removePoint(ofVec2f pos)
 {
 	removePoint((int)getClosest(pos)[0]);
 }
 
 template<typename T>
-void Map<T>::clearPoints()
+void BaseMap<T>::clearPoints()
 {
 	_points.clear();
 	_positionChanged = true;
 }
 
 template<typename T>
-void Map<T>::movePoint(int index, ofVec2f pos)
+void BaseMap<T>::movePoint(int index, ofVec2f pos)
 {
 	_points[index].setPosition(pos);
 	_positionChanged = true;
@@ -127,25 +127,25 @@ void Map<T>::movePoint(int index, ofVec2f pos)
 }
 
 template<typename T>
-T Map<T>::getPoint(int index)
+T BaseMap<T>::getPoint(int index)
 {
 	return _points[index];
 }
 
 template<typename T>
-vector<T> Map<T>::getPoints()
+vector<T> BaseMap<T>::getPoints()
 {
 	return _points;
 }
 
 template<typename T>
-void Map<T>::setRandomize(float randomSpeed)
+void BaseMap<T>::setRandomize(float randomSpeed)
 {
 	_randomSpeed = randomSpeed;
 }
 
 template<typename T>
-void Map<T>::randomize()
+void BaseMap<T>::randomize()
 {
 	for (int i = 0; i < _points.size(); i++)
 	{
@@ -162,7 +162,7 @@ void Map<T>::randomize()
 }
 
 template<typename T>
-array<float, 2> Map<T>::getClosest(ofVec2f pos, bool select)
+array<float, 2> BaseMap<T>::getClosest(ofVec2f pos, bool select)
 {
 	int closest = -1;
 	float minDist = NULL;
@@ -184,7 +184,7 @@ array<float, 2> Map<T>::getClosest(ofVec2f pos, bool select)
 }
 
 template<typename T>
-void Map<T>::addGlobalParameter(string parameter, float value)
+void BaseMap<T>::addGlobalParameter(string parameter, float value)
 {
 	if (_parameters.find(parameter) == _parameters.end())
 	{
@@ -197,88 +197,88 @@ void Map<T>::addGlobalParameter(string parameter, float value)
 }
 
 template <typename T>
-void Map<T>::setGlobalParameter(string parameter, float value)
+void BaseMap<T>::setGlobalParameter(string parameter, float value)
 {
 	if (_parameters.find(parameter) != _parameters.end()) _parameters[parameter] = value;
 }
 
 template<typename T>
-void Map<T>::removeGlobalParameter(string parameter)
+void BaseMap<T>::removeGlobalParameter(string parameter)
 {
 	if (_parameters.find(parameter) != _parameters.end()) _parameters.erase(parameter);
 	for (auto& point : _points) point.deleteValue(parameter);
 }
 
 template<typename T>
-void Map<T>::addPointParameter(int index, string parameter, float value)
+void BaseMap<T>::addPointParameter(int index, string parameter, float value)
 {
 	if (!_points[index].hasValue(parameter)) _points[index].setValue(parameter, value);
 }
 
 
 template<typename T>
-void Map<T>::setPointParameter(int index, string parameter, float value)
+void BaseMap<T>::setPointParameter(int index, string parameter, float value)
 {
 	if (_points[index].hasValue(parameter)) _points[index].setValue(parameter, value);
 }
 
 template<typename T>
-void Map<T>::removePointParameter(int index, string parameter)
+void BaseMap<T>::removePointParameter(int index, string parameter)
 {
 	_points[index].deleteValue(parameter);
 }
 
 template<typename T>
-map<string, float> Map<T>::getParameters()
+map<string, float> BaseMap<T>::getParameters()
 {
 	return _parameters;
 }
 
 template<typename T>
-void Map<T>::setActive(bool active)
+void BaseMap<T>::setActive(bool active)
 {
 	_active = active;
 }
 
 template<typename T>
-bool Map<T>::getActive()
+bool BaseMap<T>::getActive()
 {
 	return _active;
 }
 
 template<typename T>
-int Map<T>::getWidth()
+int BaseMap<T>::getWidth()
 {
 	return _width;
 }
 
 template<typename T>
-int Map<T>::getHeight()
+int BaseMap<T>::getHeight()
 {
 	return _height;
 }
 
 template<typename T>
-inline void Map<T>::setLastSelected(int index, int time)
+inline void BaseMap<T>::setLastSelected(int index, int time)
 {
 	_lastSelected = index;
 	_lastSelectedMs = time;
 }
 
 template<typename T>
-int Map<T>::getLastSelected()
+int BaseMap<T>::getLastSelected()
 {
 	return _lastSelected;
 }
 
 template<typename T>
-void Map<T>::setDrawSelected(bool drawSelected)
+void BaseMap<T>::setDrawSelected(bool drawSelected)
 {
 	_drawSelected = drawSelected;
 }
 
 template<typename T>
-void Map<T>::drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity)
+void BaseMap<T>::drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity)
 {
 	ofPushStyle();
 	ofVec2f position = _points[_lastSelected].getPosition();

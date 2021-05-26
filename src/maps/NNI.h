@@ -1,10 +1,10 @@
 #ifndef _NNI
 #define _NNI
 #include "ofMain.h"
-#include "point.h"
-#include "map.h"
+#include "BaseMap.h"
+#include "../points/point.h"
 
-class NNI : public Map<Point>
+class NNI : public BaseMap<Point>
 {
 public:
 	NNI();

@@ -1,11 +1,10 @@
 #ifndef _TRIGGERMAP
 #define _TRIGGERMAP
 #include "ofMain.h"
-#include "point.h"
-#include "trigger.h"
-#include "map.h"
+#include "../points/trigger.h"
+#include "BaseMap.h"
 
-class TriggerMap : public Map<Trigger>{
+class TriggerMap : public BaseMap<Trigger>{
 
 public:
 	TriggerMap();

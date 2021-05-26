@@ -1,10 +1,10 @@
 #ifndef _TRIGGERPAGE
 #define _TRIGGERPAGE
 #include "ofMain.h"
-#include "page.h"
-#include "triggerMap.h"
+#include "basePage.h"
+#include "../maps/triggerMap.h"
 
-class TriggerPage : public PageBase<TriggerMap> {
+class TriggerPage : public BasePage<TriggerMap> {
 public:
 	TriggerPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 20);
