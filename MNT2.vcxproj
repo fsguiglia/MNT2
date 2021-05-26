@@ -184,10 +184,12 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\gui\nodeInterface.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\points\point.cpp" />
     <ClCompile Include="src\points\rgbPoint.cpp" />
     <ClCompile Include="src\points\trigger.cpp" />
+    <ClCompile Include="src\test.cpp" />
     <ClCompile Include="src\utils\mntUtils.cpp" />
     <ClCompile Include="src\maps\NNI.cpp" />
     <ClCompile Include="src\pages\NNIPage.cpp" />
@@ -235,10 +237,12 @@
   <ItemGroup>
     <ClInclude Include="src\gui\connection.h" />
     <ClInclude Include="src\gui\node.h" />
+    <ClInclude Include="src\gui\nodeInterface.h" />
     <ClInclude Include="src\maps\baseMap.h" />
     <ClInclude Include="src\points\point.h" />
     <ClInclude Include="src\points\rgbPoint.h" />
     <ClInclude Include="src\points\trigger.h" />
+    <ClInclude Include="src\test.h" />
     <ClInclude Include="src\utils\mntUtils.h" />
     <ClInclude Include="src\maps\NNI.h" />
     <ClInclude Include="src\pages\NNIpage.h" />
