@@ -142,10 +142,7 @@
     <ClCompile Include="src\points\trigger.cpp">
       <Filter>src\points</Filter>
     </ClCompile>
-    <ClCompile Include="src\test.cpp">
-      <Filter>src\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\gui\nodeInterface.cpp">
+    <ClCompile Include="src\gui\node.cpp">
       <Filter>src\gui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -479,16 +476,16 @@
     <ClInclude Include="src\pages\basePage.h">
       <Filter>src\pages</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\node.h">
-      <Filter>src\gui</Filter>
-    </ClInclude>
     <ClInclude Include="src\gui\connection.h">
       <Filter>src\gui</Filter>
     </ClInclude>
-    <ClInclude Include="src\test.h">
+    <ClInclude Include="src\gui\moduleNode.h">
       <Filter>src\gui</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\nodeInterface.h">
+    <ClInclude Include="src\gui\node.h">
+      <Filter>src\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\moduleInterface.h">
       <Filter>src\gui</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,11 +3,17 @@
 struct Connection {
 	Connection()
 	{
-		_fromId = "";
-		_fromOutput = NULL;
-		_toId = "";
-		_toInput = NULL;
+		fromId = "";
+		fromOutput = NULL;
+		toId = "";
+		toInput = NULL;
+		fromOutputNode = false;
+		toOutputNode = false;
+		fromInputNode = false;
+		toInputNode = false;
 	}
-	string _fromId, _toId;
-	int _fromOutput, _toInput;
+	string fromId, toId;
+	bool fromOutputNode, toOutputNode;
+	bool fromInputNode, toInputNode;
+	int fromOutput, toInput;
 };

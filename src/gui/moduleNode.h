@@ -1,0 +1,109 @@
+#ifndef _MODULENODE
+#define _MODULENODE
+#include "ofMain.h"
+#include "moduleInterface.h"
+
+template<typename T> class ModuleNode : public ModuleInterface {
+public:
+	ModuleNode();
+	~ModuleNode();
+
+	void setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette);
+	void update();
+	void drawPage(ofTrueTypeFont& font);
+
+	void mouseMoved(int x, int y);
+	void mouseDragged(int x, int y, int button);
+	void mousePressed(int x, int y, int button);
+	void mouseReleased(int x, int y, int button);
+	void mouseScrolled(int scroll);
+
+	void setVisible(bool visible);
+	bool getVisible();
+	
+private:
+	T* _page;
+	bool _visible;
+	static int ID;
+};
+#endif
+
+template<typename T>
+int ModuleNode<T>::ID = 0;
+
+template<typename T>
+inline ModuleNode<T>::ModuleNode()
+{
+	_page = new T();
+	_visible = false;
+	setId(++ID);
+}
+
+template<typename T>
+inline ModuleNode<T>::~ModuleNode()
+{
+	delete _page;
+}
+
+template<typename T>
+inline void ModuleNode<T>::setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette)
+{
+	_page->setup(w, h, guiWidth);
+	_page->setMapColorPallete(colorPalette);
+	_page->setVisible(false);
+}
+
+template<typename T>
+inline void ModuleNode<T>::update()
+{
+	_page->setVisible(_visible);
+	_page->update();
+}
+
+template<typename T>
+inline void ModuleNode<T>::drawPage(ofTrueTypeFont & font)
+{
+	_page->draw(font);
+}
+
+template<typename T>
+inline void ModuleNode<T>::mouseMoved(int x, int y)
+{
+	_page->mouseMoved(x, y);
+}
+
+template<typename T>
+inline void ModuleNode<T>::mouseDragged(int x, int y, int button)
+{
+	_page->mouseDragged(x, y, button);
+}
+
+template<typename T>
+inline void ModuleNode<T>::mousePressed(int x, int y, int button)
+{
+	_page->mousePressed(x, y, button);
+}
+
+template<typename T>
+inline void ModuleNode<T>::mouseReleased(int x, int y, int button)
+{
+	_page->mouseReleased(x, y, button);
+}
+
+template<typename T>
+inline void ModuleNode<T>::mouseScrolled(int scroll)
+{
+	_page->mouseScrolled(scroll);
+}
+
+template<typename T>
+inline void ModuleNode<T>::setVisible(bool visible)
+{
+	_visible = visible;
+}
+
+template<typename T>
+inline bool ModuleNode<T>::getVisible()
+{
+	return _visible;
+}

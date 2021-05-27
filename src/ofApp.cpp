@@ -5,34 +5,23 @@ void ofApp::setup(){
 	ofSetEscapeQuitsApp(false);
 	_file = "";
 	_settings = ofLoadJson("mnt.ini");
-	ofJson colorPallete = ofLoadJson("color_pallete.json");
-	for (auto colors : colorPallete)
-	{
-		for (auto color : colors)
-		{
-			vector<string> rgb = ofSplitString(color.get<string>(), ",");
-			_colorPallete.push_back(ofColor(ofToInt(rgb[0]), ofToInt(rgb[1]), ofToInt(rgb[2])));
-		}
-	}
-	
+	setupColor();
 	//MIDI
 	setupMIDI();
+	
 	//GUI
 	_page = 0;
 	setupGui();
-
-	//setupMIDI();
 	_verdana.load("Verdana2.ttf", 8);
 
 	_shift = false;
 	_mode = false;
 	_selected = "";
-	_shiftSelected = "";
-	_id = 0;
+	_shiftSelected = { "",-1,-1 };
 }
 
 void ofApp::update() {
-	for (auto& node : _nodes) node->update();
+	for (auto& node : _moduleNodes) node->update();
 	_gui->update();
 	//_node[0].page->setVisible(_page == 0);
 	//_node[0].page->update();
@@ -88,7 +77,7 @@ void ofApp::draw(){
 
 	if (_mode)
 	{
-		for (auto& node : _nodes)
+		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible())
 			{
@@ -100,7 +89,9 @@ void ofApp::draw(){
 	else
 	{
 		for (auto connection : _connections) drawConnection(connection);
-		for (auto& node : _nodes) node->draw(_verdana);
+		for (auto& node : _moduleNodes) node->draw(_verdana);
+		for (auto& node : _inputNodes) node.draw(_verdana);
+		for (auto& node : _outputNodes) node.draw(_verdana);
 		_gui->draw();
 	}
 }
@@ -108,18 +99,52 @@ void ofApp::draw(){
 void ofApp::drawConnection(Connection& connection)
 {
 	ofVec2f in, out;
-	for (auto& node : _nodes)
+	for (auto& node : _moduleNodes)
 	{
-		if (connection._fromId == node->getName())
+		if (connection.fromId == node->getName())
 		{
-			ofRectangle rect = node->getOutput(connection._fromOutput);
+			ofRectangle rect = node->getOutputConnector(connection.fromOutput);
 			in = rect.getPosition();
 			in.x += rect.getWidth() * 0.5;
 			in.y += rect.getHeight() * 0.5;
 		}
-		if (connection._toId == node->getName())
+		if (connection.toId == node->getName())
 		{
-			ofRectangle rect = node->getInput(connection._toInput);
+			ofRectangle rect = node->getInputConnector(connection.toInput);
+			out = rect.getPosition();
+			out.x += rect.getWidth() * 0.5;
+			out.y += rect.getHeight() * 0.5;
+		}
+	}
+	for (auto& node : _inputNodes)
+	{
+		if (connection.fromId == node.getName())
+		{
+			ofRectangle rect = node.getOutputConnector(connection.fromOutput);
+			in = rect.getPosition();
+			in.x += rect.getWidth() * 0.5;
+			in.y += rect.getHeight() * 0.5;
+		}
+		if (connection.toId == node.getName())
+		{
+			ofRectangle rect = node.getInputConnector(connection.toInput);
+			out = rect.getPosition();
+			out.x += rect.getWidth() * 0.5;
+			out.y += rect.getHeight() * 0.5;
+		}
+	}
+	for (auto& node : _outputNodes)
+	{
+		if (connection.fromId == node.getName())
+		{
+			ofRectangle rect = node.getOutputConnector(connection.fromOutput);
+			in = rect.getPosition();
+			in.x += rect.getWidth() * 0.5;
+			in.y += rect.getHeight() * 0.5;
+		}
+		if (connection.toId == node.getName())
+		{
+			ofRectangle rect = node.getInputConnector(connection.toInput);
 			out = rect.getPosition();
 			out.x += rect.getWidth() * 0.5;
 			out.y += rect.getHeight() * 0.5;
@@ -146,6 +171,19 @@ void ofApp::exit()
 	ofSavePrettyJson("mnt.ini", _settings);
 }
 
+void ofApp::setupColor()
+{
+	ofJson colorPallete = ofLoadJson("color_pallete.json");
+	for (auto colors : colorPallete)
+	{
+		for (auto color : colors)
+		{
+			vector<string> rgb = ofSplitString(color.get<string>(), ",");
+			_colorPallete.push_back(ofColor(ofToInt(rgb[0]), ofToInt(rgb[1]), ofToInt(rgb[2])));
+		}
+	}
+}
+
 //--------------------------------------------------------------
 void ofApp::setupGui()
 {
@@ -156,7 +194,14 @@ void ofApp::setupGui()
 	_gui->addButton("Draw");
 	_gui->addBreak();
 	_gui->addButton("Midi Setup");
-	_gui->addBreak();
+	_midiInFolder = _gui->addFolder("Midi In");
+	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port);
+	_midiInFolder->onToggleEvent(this, &ofApp::MIDIInToggle);
+	_midiInFolder->collapse();
+	_midiOutFolder = _gui->addFolder("Midi Out");
+	for (auto port : _MIDIOutPorts) _midiOutFolder->addToggle(port);
+	_midiOutFolder->onToggleEvent(this, &ofApp::MIDIOutToggle);
+	_midiOutFolder->collapse();
 	_gui->addButton("Load");
 	_gui->addButton("Save");
 	_gui->addFooter();
@@ -171,35 +216,36 @@ void ofApp::setupGui()
 
 void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 {
-	NodeInterface *x = new Node<NNIPage>();
-
 	string label = e.target->getLabel();
 	if (label == "NNI")
 	{
-		Node<NNIPage>* node = new Node<NNIPage>();
-		node->setup(50, 50, 80, 30, 1, 1);
+		ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("NNI (" + ofToString(_id) + ")");
-		_nodes.push_back(unique_ptr<NodeInterface>(node));
-		_id++;
+		node->setName("NNI", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Trigger")
 	{
-		Node<TriggerPage>* node = new Node<TriggerPage>();
-		node->setup(50, 50, 80, 30, 1, 1);
+		ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Trigger (" + ofToString(_id) + ")");
-		_nodes.push_back(unique_ptr<NodeInterface>(node));
-		_id++;
+		node->setName("Trigger", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Draw")
 	{
-		Node<RGBPage>* node = new Node<RGBPage>();
-		node->setup(50, 50, 80, 30, 1, 1);
+		ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Draw (" + ofToString(_id) + ")");
-		_nodes.push_back(unique_ptr<NodeInterface>(node));
-		_id++;
+		node->setName("Draw", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 }
 
@@ -210,39 +256,6 @@ void ofApp::setupMIDI()
 	_MIDIInPorts = midiIn.getInPortList();
 	ofxMidiOut midiOut;
 	_MIDIOutPorts = midiOut.getOutPortList();
-	setupMIDIGui();
-}
-
-void ofApp::setupMIDIGui()
-{
-	_gMIDIIn = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
-	_gMIDIIn->addLabel("MIDI In");
-	for (auto port : _MIDIInPorts) _gMIDIIn->addToggle(port);
-	_gMIDIIn->onToggleEvent(this, &ofApp::MIDIInToggle);
-	_gMIDIIn->setAutoDraw(false);
-	_gMIDIIn->setWidth(100, 0.3);
-	_gMIDIIn->setPosition(20, 20);
-	_gMIDIIn->setTheme(new ofxDatGuiThemeWireframe(), true);
-
-	_gMIDIOut = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
-	_gMIDIOut->addLabel("MIDI out");
-	for (auto port : _MIDIOutPorts) _gMIDIOut->addToggle(port);
-	_gMIDIOut->onToggleEvent(this, &ofApp::MIDIOutToggle);
-	_gMIDIOut->setAutoDraw(false);
-	_gMIDIOut->setWidth(100, 0.3);
-	_gMIDIOut->setPosition(320, 20);
-	_gMIDIOut->setTheme(new ofxDatGuiThemeWireframe(), true);
-}
-
-void ofApp::updateMIDIGui(bool visible)
-{
-	_gMIDIIn->setVisible(visible);
-	_gMIDIIn->setEnabled(visible);
-	_gMIDIIn->update();
-
-	_gMIDIOut->setVisible(visible);
-	_gMIDIOut->setEnabled(visible);
-	_gMIDIOut->update();
 }
 
 void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
@@ -252,9 +265,17 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	{
 		if (_MIDIInputs.find(port) == _MIDIInputs.end())
 		{
+			
 			_MIDIInputs[port] = ofxMidiIn();
 			_MIDIInputs[port].openPort(port);
 			_MIDIInputs[port].addListener(this);
+			
+			Node node;
+			node.setup(50, ofGetHeight() * 0.5, 80, 30);
+			node.setName(port);
+			node.setAsInput(true);
+			node.setColor(ofColor(80, 200, 80));
+			_inputNodes.push_back(node);
 		}
 	}
 	else
@@ -264,6 +285,28 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 			_MIDIInputs[port].closePort();
 			_MIDIInputs[port].removeListener(this);
 			_MIDIInputs.erase(port);
+			int curIndex = -1;
+			for (int i = 0; i < _inputNodes.size(); i++)
+			{
+				if (_inputNodes[i].getName() == port)
+				{
+					curIndex = i;
+					break;
+				}
+			}
+			if (curIndex != -1)
+			{
+				vector<int> deleteConnection;
+				_inputNodes.erase(_inputNodes.begin() + curIndex);
+				for (int i = 0; i < _connections.size(); i++)
+				{
+					if (_connections[i].fromId == port) deleteConnection.push_back(i);
+				}
+				for (int i = deleteConnection.size() - 1; i >= 0; i--)
+				{
+					_connections.erase(_connections.begin() + deleteConnection[i]);
+				}
+			}
 		}
 	}
 }
@@ -277,6 +320,13 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 		{
 			_MIDIOutputs[port] = ofxMidiOut();
 			_MIDIOutputs[port].openPort(port);
+			
+			Node node;
+			node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+			node.setName(port);
+			node.setAsOutput(true);
+			node.setColor(ofColor(80, 200, 80));
+			_outputNodes.push_back(node);
 		}
 	}
 	else
@@ -285,6 +335,28 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 		{
 			_MIDIOutputs[port].closePort();
 			_MIDIOutputs.erase(port);
+			int curIndex = -1;
+			for (int i = 0; i < _outputNodes.size(); i++)
+			{
+				if (_outputNodes[i].getName() == port)
+				{
+					curIndex = i;
+					break;
+				}
+			}
+			if (curIndex != -1)
+			{
+				vector<int> deleteConnection;
+				_outputNodes.erase(_inputNodes.begin() + curIndex);
+				for (int i = 0; i < _connections.size(); i++)
+				{
+					if (_connections[i].toId == port) deleteConnection.push_back(i);
+				}
+				for (int i = deleteConnection.size() - 1; i >= 0; i--)
+				{
+					_connections.erase(_connections.begin() + deleteConnection[i]);
+				}
+			}
 		}
 	}
 }
@@ -346,10 +418,63 @@ void ofApp::sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> po
 	}
 }
 
-void ofApp::drawMIDI()
+tuple<string, int, int> ofApp::selectNode(int x, int y)
 {
-	_gMIDIIn->draw();
-	_gMIDIOut->draw();
+	tuple<string, int, int> parameters = { "", -1, -1 };
+	for (auto &node : _moduleNodes)
+	{
+		if (node->inside(x, y))
+		{
+			get<0>(parameters) = node->getName();
+			get<1>(parameters) = node->getInputs();
+			get<2>(parameters) = node->getOutputs();
+			break;
+		}
+	}
+	for (auto &node : _inputNodes)
+	{
+		if (node.inside(x, y))
+		{
+			get<0>(parameters) = node.getName();
+			get<1>(parameters) = node.getInputs();
+			get<2>(parameters) = node.getOutputs();
+			break;
+		}
+	}
+	for (auto &node : _outputNodes)
+	{
+		if (node.inside(x, y))
+		{
+			get<0>(parameters) = node.getName();
+			get<1>(parameters) = node.getInputs();
+			get<2>(parameters) = node.getOutputs();
+			break;
+		}
+	}
+	return parameters;
+}
+
+void ofApp::updateConnection(tuple<string, int, int> out, tuple<string, int, int> in)
+{
+	bool connectionExists = false;
+	for (int i = 0; i < _connections.size(); i++)
+	{
+		if (_connections[i].fromId == get<0>(out) && _connections[i].toId == get<0>(in))
+		{
+			connectionExists = true;
+			_connections.erase(_connections.begin() + i);
+			break;
+		}
+	}
+	if (!connectionExists)
+	{
+		Connection connection;
+		connection.fromId = get<0>(out);
+		connection.toId = get<0>(in);
+		connection.fromInputNode = get<1>(out) > 0;
+		connection.fromOutputNode = get<2>(in) > 0;
+		_connections.push_back(connection);
+	}
 }
 
 void ofApp::load()
@@ -461,132 +586,83 @@ void ofApp::keyReleased(int key){
 		break;
 	case(OF_KEY_SHIFT):
 		_shift = false;
-		_shiftSelected = "";
+		_shiftSelected = { "",-1,-1 };
 		break;
 	case(OF_KEY_ESC):
 		_mode = false;
-		for (auto& node : _nodes) node->setVisible(false);
+		for (auto& node : _moduleNodes) node->setVisible(false);
 		break;
 	}
 }
 
 void ofApp::mouseMoved(int x, int y ){
-	
 	if (_mode)
 	{
-		for (auto& node : _nodes)
+		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mouseMoved(x, y);
 		}
 	}
-	
-	/*
-	if (_page == 0) _nni.mouseMoved(x, y);
-	if (_page == 1) _trigger.mouseMoved(x, y);
-	if (_page == 2) _rgb.mouseMoved(x, y);
-	*/
-	/*
-	if (_page == 0) _node[0].page->mouseMoved(x, y);
-	if (_page == 1) _node[1].page->mouseMoved(x, y);
-	*/
 }
 
 void ofApp::mouseDragged(int x, int y, int button){
 	
 	if (_mode)
 	{
-		for (auto& node : _nodes)
+		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mouseDragged(x, y, button);
 		}
 	}
 	else
 	{
-		for (auto& node : _nodes)
+		for (auto& node : _moduleNodes)
 		{
 			if (node->getName() == _selected) node->setPosition(x, y);
 		}
+		for (auto& node : _inputNodes)
+		{
+			if (node.getName() == _selected) node.setPosition(x, y);
+		}
+		for (auto& node : _outputNodes)
+		{
+			if (node.getName() == _selected) node.setPosition(x, y);
+		}
 	}
-	/*
-	if (_page == 0) _node[0].page->mouseDragged(x, y, button);
-	if (_page == 1) _node[1].page->mouseDragged(x, y, button);
-	*/
 }
 
 void ofApp::mousePressed(int x, int y, int button){
-	/*
-	if (_page == 0) _node[0].page->mousePressed(x, y, button);
-	if (_page == 1) _node[1].page->mousePressed(x, y, button);
-	*/
-
 	if (!_mode)
 	{
 		if (button == 0)
 		{
 			if (_shift)
 			{
-				if (_shiftSelected == "")
+				_selected = "";
+				if (get<0>(_shiftSelected) == "")
 				{
-					for (auto &node : _nodes)
-					{
-						if (node->inside(x, y))
-						{
-							if (node->getOutputs() > 0) _shiftSelected = node->getName();
-							break;
-						}
-					}
+					tuple<string, int, int> curSelected = selectNode(x, y);
+					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
+					else _shiftSelected = { "", -1 , -1 };
 				}
 				else
 				{
-					string curSelected = _shiftSelected;
-					for (auto &node : _nodes)
-					{
-						if (node->inside(x, y))
-						{
-							curSelected = node->getName();
-							break;
-						}
-					}
-					if (_shiftSelected != "" && curSelected != "" && curSelected != _shiftSelected)
-					{
-						bool connectionExists = false;
-						for (int i = 0; i < _connections.size(); i++)
-						{
-							if (_connections[i]._fromId == _shiftSelected && _connections[i]._toId == curSelected)
-							{
-								connectionExists = true;
-								_connections.erase(_connections.begin() + i);
-								break;
-							}
-						}
-						if (!connectionExists)
-						{
-							Connection connection;
-							connection._fromId = _shiftSelected;
-							connection._toId = curSelected;
-							connection._fromOutput = 0;
-							connection._toInput = 0;
-							_connections.push_back(connection);
-						}
-					}
-					_shiftSelected = curSelected;
+					tuple<string, int, int> curSelected = selectNode(x, y);
+					bool keep = get<0>(curSelected) != get<0>(_shiftSelected) && get<1>(curSelected) > 0;
+					if (keep) updateConnection(_shiftSelected, curSelected);
+					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
+					else _shiftSelected = { "", -1 , -1 };
 				}
 			}
 			else
 			{
 				string lastSelected = _selected;
-				_selected = "";
-				for (auto& node : _nodes)
+				_selected = get<0>(selectNode(x,y));
+				bool doubleClick = _selected != "" && lastSelected == _selected;
+				doubleClick = doubleClick && ofGetElapsedTimeMillis() - _lastClick < 500;
+				if (doubleClick)
 				{
-					if (node->inside(x, y))
-					{
-						_selected = node->getName();
-						break;
-					}
-				}
-				if (_selected != "" && lastSelected == _selected && ofGetElapsedTimeMillis() - _lastClick < 500)
-				{
-					for (auto& node : _nodes)
+					for (auto& node : _moduleNodes)
 					{
 						if (node->getName() == _selected)
 						{
@@ -602,7 +678,7 @@ void ofApp::mousePressed(int x, int y, int button){
 	}
 	else
 	{
-		for (auto& node : _nodes)
+		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mousePressed(x, y, button);
 		}
@@ -610,12 +686,9 @@ void ofApp::mousePressed(int x, int y, int button){
 }
 
 void ofApp::mouseReleased(int x, int y, int button){
-	//if (_page == 0) _node[0].page->mouseReleased(x, y, button);
-	//if (_page == 1) _node[1].page->mouseReleased(x, y, button);
-	
 	if (_mode)
 	{
-		for (auto& node : _nodes)
+		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mouseReleased(x, y, button);
 		}
@@ -626,11 +699,11 @@ void ofApp::mouseReleased(int x, int y, int button){
 		{
 			string curSelected = "";
 			int curIndex = -1;
-			for (int i = 0; i < _nodes.size(); i++)
+			for (int i = 0; i < _moduleNodes.size(); i++)
 			{
-				if (_nodes[i]->inside(x, y))
+				if (_moduleNodes[i]->inside(x, y))
 				{
-					curSelected = _nodes[i]->getName();
+					curSelected = _moduleNodes[i]->getName();
 					curIndex = i;
 					break;
 				}
@@ -638,10 +711,10 @@ void ofApp::mouseReleased(int x, int y, int button){
 			if (curIndex != -1)
 			{
 				vector<int> deleteConnection;
-				_nodes.erase(_nodes.begin() + curIndex);
+				_moduleNodes.erase(_moduleNodes.begin() + curIndex);
 				for (int i = 0; i < _connections.size(); i++)
 				{
-					if (_connections[i]._fromId == curSelected || _connections[i]._toId == curSelected)
+					if (_connections[i].fromId == curSelected || _connections[i].toId == curSelected)
 					{
 						deleteConnection.push_back(i);
 					}
@@ -658,13 +731,9 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 void ofApp::mouseScrolled(ofMouseEventArgs& mouse)
 {
-	/*
-	if (_page == 0) _node[0].page->mouseScrolled(mouse.scrollY * 5);
-	if (_page == 1) _node[1].page->mouseScrolled(mouse.scrollY * 5);
-	*/
 	if (_mode)
 	{
-		for (auto& node : _nodes)
+		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mouseScrolled(mouse.scrollY * 5);
 		}
@@ -680,10 +749,7 @@ void ofApp::mouseExited(int x, int y){
 }
 
 void ofApp::windowResized(int w, int h){
-	/*
-	_nni.resize(w, h);
-	_trigger.resize(w, h);
-	*/
+
 }
 
 void ofApp::gotMessage(ofMessage msg){

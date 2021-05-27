@@ -7,12 +7,13 @@
 #include "ofxOsc.h"
 #include "ofxMidi.h"
 #include "gui/node.h"
+#include "gui/moduleInterface.h"
+#include "gui/moduleNode.h"
 #include "gui/connection.h"
 #include "pages/NNIpage.h"
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
 #include "utils/mntUtils.h"
-#include "test.h"
 
 /*
 No logro hacer un vector con los distintos tipos de nodo: vector de unique_ptr no funciona, 
@@ -28,18 +29,19 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void drawConnection(Connection& connection);
 		void exit();
 		//--------------------------------------------------------------
+		void setupColor();
 		void setupGui();
 		void buttonEvent(ofxDatGuiButtonEvent e);
 		//--------------------------------------------------------------
 		void setupMIDI();
-		void setupMIDIGui();
-		void updateMIDIGui(bool visible);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
 		map<string, float> removePortFromMessages(map<string, float> messages);
 		void sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports);
-		void drawMIDI();
+		//--------------------------------------------------------------
+		tuple<string, int, int> selectNode(int x, int y);
+		void updateConnection(tuple<string, int, int> out, tuple<string, int, int> in);
 		//--------------------------------------------------------------
 		void load();
 		void save();
@@ -59,13 +61,14 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void gotMessage(ofMessage msg);
 
 		//Nodes
-		vector<unique_ptr<NodeInterface>> _nodes;
+		vector<unique_ptr<ModuleInterface>> _moduleNodes;
+		vector<Node> _inputNodes;
+		vector<Node> _outputNodes;
 		vector<Connection> _connections;
 		string _selected;
 		int _lastClick = 0;
-		string _shiftSelected;
+		tuple<string, int, int> _shiftSelected;
 		bool _shift;
-		int _id;
 		
 		//GUI
 		const size_t _maxPages = 1;
@@ -75,6 +78,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		vector<ofColor> _colorPallete;
 		ofTrueTypeFont _verdana;
 		ofxDatGui* _gui;
+		ofxDatGuiFolder* _midiInFolder;
+		ofxDatGuiFolder*_midiOutFolder;
 
 		//IO
 		ofJson _settings;
@@ -86,7 +91,4 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		map<string, ofxMidiOut> _MIDIOutputs;
 		vector<ofxMidiMessage> _MIDIMessages;
 		size_t _maxMidiMessages;
-		ofxDatGui* _gMIDIIn;
-		ofxDatGui* _gMIDIOut;
-
 };
