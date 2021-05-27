@@ -21,5 +21,8 @@ public:
 
 	virtual void setVisible(bool visible) = 0;
 	virtual bool getVisible() = 0;
+
+	virtual void load(ofJson& json) = 0;
+	virtual ofJson save() = 0;
 };
 #endif

@@ -36,7 +36,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
-		map<string, float> removePortFromMessages(map<string, float> messages);
 		//--------------------------------------------------------------
 		tuple<string, int, int> selectNode(int x, int y);
 		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in);

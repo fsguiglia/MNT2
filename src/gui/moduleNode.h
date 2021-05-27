@@ -25,6 +25,9 @@ public:
 	void setVisible(bool visible);
 	bool getVisible();
 	
+	void load(ofJson& json);
+	ofJson save();
+
 private:
 	T* _page;
 	bool _visible;
@@ -128,4 +131,16 @@ template<typename T>
 inline bool ModuleNode<T>::getVisible()
 {
 	return _visible;
+}
+
+template<typename T>
+inline void ModuleNode<T>::load(ofJson & json)
+{
+	_page->load(json);
+}
+
+template<typename T>
+inline ofJson ModuleNode<T>::save()
+{
+	return _page->save();
 }
