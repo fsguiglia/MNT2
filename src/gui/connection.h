@@ -7,13 +7,11 @@ struct Connection {
 		fromOutput = NULL;
 		toId = "";
 		toInput = NULL;
-		fromOutputNode = false;
 		toOutputNode = false;
 		fromInputNode = false;
-		toInputNode = false;
 	}
 	string fromId, toId;
-	bool fromOutputNode, toOutputNode;
-	bool fromInputNode, toInputNode;
+	bool toOutputNode;
+	bool fromInputNode;
 	int fromOutput, toInput;
 };

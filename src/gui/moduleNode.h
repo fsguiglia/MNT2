@@ -18,6 +18,10 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
+	void MIDIIn(string port, int control, int channel, float value);
+	map<string, float> getMidiout();
+	void clearMIDIMessages();
+
 	void setVisible(bool visible);
 	bool getVisible();
 	
@@ -94,6 +98,24 @@ template<typename T>
 inline void ModuleNode<T>::mouseScrolled(int scroll)
 {
 	_page->mouseScrolled(scroll);
+}
+
+template<typename T>
+inline void ModuleNode<T>::MIDIIn(string port, int control, int channel, float value)
+{
+	_page->MIDIIn(port, control, channel, value);
+}
+
+template<typename T>
+inline map<string, float> ModuleNode<T>::getMidiout()
+{
+	return _page->getMidiOut();
+}
+
+template<typename T>
+inline void ModuleNode<T>::clearMIDIMessages()
+{
+	_page->clearMIDIMessages();
 }
 
 template<typename T>

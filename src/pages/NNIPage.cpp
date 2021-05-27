@@ -14,6 +14,8 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_map.setDrawInterpolation(true);
 	_map.setDrawSelected(true);
 	_mouseControl = false;
+	_controlLearn = false;
+	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
 	setupGui();
@@ -193,7 +195,7 @@ void NNIPage::mouseScrolled(int scroll)
 	_gui->scroll(scroll);
 }
 
-void NNIPage::MIDIIn(string port, int control, int channel, float value)
+void NNIPage::MIDIIn(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);

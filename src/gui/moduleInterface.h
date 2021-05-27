@@ -15,6 +15,10 @@ public:
 	virtual void mouseReleased(int x, int y, int button) = 0;
 	virtual void mouseScrolled(int scroll) = 0;
 
+	virtual void MIDIIn(string port, int control, int channel, float value) = 0;
+	virtual map<string, float> getMidiout() = 0;
+	virtual void clearMIDIMessages() = 0;
+
 	virtual void setVisible(bool visible) = 0;
 	virtual bool getVisible() = 0;
 };

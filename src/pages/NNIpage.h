@@ -7,7 +7,7 @@
 class NNIPage : public BasePage<NNI> {
 public:
 	NNIPage();
-	void setup(int width, int height, int guiWidth, int maxMessages = 1);
+	void setup(int width, int height, int guiWidth, int maxMessages = 20);
 	void setupGui();
 	
 	void sliderEvent(ofxDatGuiSliderEvent e);
@@ -20,7 +20,7 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
-	void MIDIIn(string port, int control, int channel, float value);
+	void MIDIIn(string port, int channel, int control, float value);
 	
 	void load(ofJson& json);
 	ofJson save();

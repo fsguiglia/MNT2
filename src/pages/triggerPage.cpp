@@ -13,6 +13,8 @@ void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_map.setRandomize(0.);
 	_map.setDrawSelected(true);
 	_mouseControl = false;
+	_controlLearn = false;
+	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
 	setupGui();
@@ -237,7 +239,7 @@ void TriggerPage::mouseScrolled(int scroll)
 	_gui->scroll(scroll);
 }
 
-void TriggerPage::MIDIIn(string port, int control, int channel, float value)
+void TriggerPage::MIDIIn(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);

@@ -16,8 +16,7 @@
 #include "utils/mntUtils.h"
 
 /*
-No logro hacer un vector con los distintos tipos de nodo: vector de unique_ptr no funciona, 
-of no tiene std::variant ni std::any
+en vez de map<string, float> podría hacer un struct controlchange, pero ojo que ofxmidiout ya tiene
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -38,10 +37,10 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
 		map<string, float> removePortFromMessages(map<string, float> messages);
-		void sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports);
 		//--------------------------------------------------------------
 		tuple<string, int, int> selectNode(int x, int y);
-		void updateConnection(tuple<string, int, int> out, tuple<string, int, int> in);
+		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in);
+		void updateConnections();
 		//--------------------------------------------------------------
 		void load();
 		void save();

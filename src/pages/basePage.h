@@ -18,9 +18,10 @@ public:
 	void resize(int w, int h);
 	ofRectangle centerSquarePosition(int w, int h);
 
-	map<string, float> getMidiDump(bool clear = true);
-	map<string, float> getMidiOut(bool clear = true);
+	map<string, float> getMidiDump(bool clear = false);
+	map<string, float> getMidiOut(bool clear = false);
 	void setVisible(bool visible);
+	void clearMIDIMessages();
 
 protected:
 	void addMidiMessages(map<string, float> messages, map<string, float>& queue);
@@ -134,6 +135,13 @@ inline void BasePage<T>::setVisible(bool visible)
 	}
 	_visible = visible;
 	_inside = visible;
+}
+
+template<typename T>
+inline void BasePage<T>::clearMIDIMessages()
+{
+	_MIDIOutMessages.clear();
+	_MIDIDumpMessages.clear();
 }
 
 template<typename T>

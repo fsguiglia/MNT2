@@ -22,57 +22,11 @@ void ofApp::setup(){
 
 void ofApp::update() {
 	for (auto& node : _moduleNodes) node->update();
+	updateConnections();
 	_gui->update();
-	//_node[0].page->setVisible(_page == 0);
-	//_node[0].page->update();
-	//_node[1].page->setVisible(_page == 1);
-	//_node[1].page->update();
-/*
-	map<string, float> nniOut, trOut, rgbOut, output;
-	//NNI
-	_nni.setVisible(_page == 0);
-	_nni.update();
-	nniOut = removePortFromMessages(_nni.getMidiOut());
-	//Trigger
-	_trigger.setVisible(_page == 1);
-	_trigger.update();
-	trOut = removePortFromMessages(_trigger.getMidiOut());
-	//RGB
-	_rgb.setVisible(_page == 2);
-	_rgb.update();
-	rgbOut = removePortFromMessages(_rgb.getMidiOut());
-	//MIDI
-	output.insert(nniOut->begin(), nniOut->end());
-	output.insert(trOut->begin(), trOut->end());
-	//output.insert(rgbOut->begin(), rgbOut->end());
-	sendMIDICC(output, _MIDIOutputs);
-	*/
-	//updateMIDIGui(true);
 }
 
 void ofApp::draw(){
-	/*
-	ofClear(50);
-	ofSetColor(0);
-	switch (_page)
-	{
-	case 0:
-		_node[0].page->draw(verdana);
-		break;
-	case 1:
-		_node[1].page->draw(verdana);
-		break;;
-	}
-	*/
-	/*
-	_gMIDIIn->setEnabled(true);
-	_gMIDIIn->setVisible(true);
-	_gMIDIIn->setEnabled(true);
-	_gMIDIOut->setVisible(true);
-	_gMIDIIn->draw();
-	_gMIDIOut->draw();
-	*/
-
 	ofClear(255);
 
 	if (_mode)
@@ -347,7 +301,7 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 			if (curIndex != -1)
 			{
 				vector<int> deleteConnection;
-				_outputNodes.erase(_inputNodes.begin() + curIndex);
+				_outputNodes.erase(_outputNodes.begin() + curIndex);
 				for (int i = 0; i < _connections.size(); i++)
 				{
 					if (_connections[i].toId == port) deleteConnection.push_back(i);
@@ -363,6 +317,11 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 
 void ofApp::newMidiMessage(ofxMidiMessage & msg)
 {
+	_MIDIMessages.push_back(msg);
+	while (_MIDIMessages.size() > _maxMidiMessages) {
+		_MIDIMessages.erase(_MIDIMessages.begin());
+	}
+	/*
 	//NNI
 //	_nni.MIDIIn(msg.portName, msg.control, msg.channel, msg.value / 127.);
 	//Trigger
@@ -386,6 +345,7 @@ void ofApp::newMidiMessage(ofxMidiMessage & msg)
 			port.second.sendMidiBytes(msg.bytes);
 		}
 	}
+	*/
 }
 
 map<string, float> ofApp::removePortFromMessages(map<string, float> messages)
@@ -399,23 +359,6 @@ map<string, float> ofApp::removePortFromMessages(map<string, float> messages)
 		newMessages[curMessage] = message.second;
 	}
 	return newMessages;
-}
-
-void ofApp::sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports)
-{
-	for (auto port : ports)
-	{
-		if (port.second.isOpen())
-		{
-			for (auto parameter : parameters)
-			{
-				int channel = ofToInt(ofSplitString(parameter.first, "/")[1]);
-				int control = ofToInt(ofSplitString(parameter.first, "/")[2]);
-				int value = parameter.second * 127;
-				port.second.sendControlChange(channel, control, value);
-			}
-		}
-	}
 }
 
 tuple<string, int, int> ofApp::selectNode(int x, int y)
@@ -454,7 +397,7 @@ tuple<string, int, int> ofApp::selectNode(int x, int y)
 	return parameters;
 }
 
-void ofApp::updateConnection(tuple<string, int, int> out, tuple<string, int, int> in)
+void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in)
 {
 	bool connectionExists = false;
 	for (int i = 0; i < _connections.size(); i++)
@@ -471,10 +414,79 @@ void ofApp::updateConnection(tuple<string, int, int> out, tuple<string, int, int
 		Connection connection;
 		connection.fromId = get<0>(out);
 		connection.toId = get<0>(in);
-		connection.fromInputNode = get<1>(out) > 0;
-		connection.fromOutputNode = get<2>(in) > 0;
+		connection.fromInputNode = get<1>(out) == 0;
+		connection.toOutputNode = get<2>(in) == 0;
 		_connections.push_back(connection);
 	}
+}
+
+void ofApp::updateConnections()
+{
+	for (auto& connection : _connections)
+	{
+		map<string, float> messages;
+		if (connection.fromInputNode)
+		{
+			for (auto msg : _MIDIMessages)
+			{
+				if (msg.portName == connection.fromId)
+				{
+					string sPort = msg.portName;
+					string sChannel = ofToString(msg.channel);
+					string sControl = ofToString(msg.control);
+					string key = sPort + "/" + sChannel + "/" + sControl;
+					float value = msg.value / 127.;
+					messages[key] = value;
+				}
+			}
+		}
+		else
+		{
+			for (auto& node : _moduleNodes)
+			{
+				if (node->getName() == connection.fromId)
+				{
+					messages = node->getMidiout();
+					break;
+				}
+			}
+		}
+		if (connection.toOutputNode)
+		{
+			cout << messages.size() << endl;
+			for (auto& element : messages)
+			{
+				int channel = ofToInt(ofSplitString(element.first, "/")[1]);
+				int control = ofToInt(ofSplitString(element.first, "/")[2]);
+				int value = element.second * 127;
+				if (_MIDIOutputs[connection.toId].isOpen())
+				{
+					cout << channel << "," << control << "," << value << endl;
+					_MIDIOutputs[connection.toId].sendControlChange(channel, control, value);
+				}
+				cout << "--------" << endl;
+			}
+		}
+		else
+		{
+			for (auto& node : _moduleNodes)
+			{
+				if (node->getName() == connection.toId)
+				{
+					for (auto element : messages)
+					{
+ 						string port = ofSplitString(element.first, "/")[0];
+						int channel = ofToInt(ofSplitString(element.first, "/")[1]);
+						int control = ofToInt(ofSplitString(element.first, "/")[2]);
+						float value = element.second;
+						node->MIDIIn(port, channel, control, value);
+					}
+				}
+			}
+		}
+	}
+	for (auto& node : _moduleNodes) node->clearMIDIMessages();
+	_MIDIMessages.clear();
 }
 
 void ofApp::load()
@@ -649,7 +661,7 @@ void ofApp::mousePressed(int x, int y, int button){
 				{
 					tuple<string, int, int> curSelected = selectNode(x, y);
 					bool keep = get<0>(curSelected) != get<0>(_shiftSelected) && get<1>(curSelected) > 0;
-					if (keep) updateConnection(_shiftSelected, curSelected);
+					if (keep) createDeleteConnection(_shiftSelected, curSelected);
 					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
 					else _shiftSelected = { "", -1 , -1 };
 				}
