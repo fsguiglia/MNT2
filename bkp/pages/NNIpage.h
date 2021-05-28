@@ -1,10 +1,10 @@
 #ifndef _NNIPAGE
 #define _NNIPAGE
 #include "ofMain.h"
-#include "page.h"
-#include "NNI.h"
+#include "basePage.h"
+#include "../maps/NNI.h"
 
-class NNIPage : public PageBase<NNI> {
+class NNIPage : public BasePage<NNI> {
 public:
 	NNIPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 1);

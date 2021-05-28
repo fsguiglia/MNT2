@@ -15,6 +15,8 @@ void RGBPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_map.setDrawSelected(true);
 	_map.setRadius(_radius);
 	_mouseControl = false;
+	_controlLearn = false;
+	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
 	setupGui();
@@ -53,6 +55,8 @@ void RGBPage::setupGui()
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(ofGetWidth() - _guiWidth, 0);
 	_gui->setMaxHeight(ofGetHeight());
+	_gui->setVisible(false);
+	_gui->setEnabled(false);
 	_gui->update();
 }
 
@@ -248,7 +252,7 @@ void RGBPage::mouseScrolled(int scroll)
 	_gui->scroll(scroll);
 }
 
-void RGBPage::MIDIIn(string port, int control, int channel, float value)
+void RGBPage::MIDIIn(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);

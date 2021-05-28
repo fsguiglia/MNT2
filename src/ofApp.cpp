@@ -2,77 +2,117 @@
 
 void ofApp::setup(){
 	setWindowTitle("untitled");
+	ofSetEscapeQuitsApp(false);
 	_file = "";
 	_settings = ofLoadJson("mnt.ini");
-	ofJson colorPallete = ofLoadJson("color_pallete.json");
-	for (auto colors : colorPallete)
-	{
-		for (auto color : colors)
-		{
-			vector<string> rgb = ofSplitString(color.get<string>(), ",");
-			_colorPallete.push_back(ofColor(ofToInt(rgb[0]), ofToInt(rgb[1]), ofToInt(rgb[2])));
-		}
-	}
-	//NNI
-	_nni.setup(1024, 1024, _guiWidth);
-	_nni.setMapColorPallete(_colorPallete);
-	//Trigger
-	_trigger.setup(1024, 1024, _guiWidth);
-	_trigger.setMapColorPallete(_colorPallete);
-	//
-	_rgb.setup(1024, 1024, _guiWidth);
-	_rgb.setMapColorPallete(_colorPallete);
+	setupColor();
 	//MIDI
 	setupMIDI();
+	
 	//GUI
 	_page = 0;
-	
-	verdana.load("Verdana2.ttf", 8);
-	
+	setupGui();
+	_verdana.load("Verdana2.ttf", 8);
+	_lastWidth = ofGetWidth();
+	_lastHeight = ofGetHeight();
+
+	_shift = false;
+	_mode = false;
+	_selected = "";
+	_shiftSelected = { "",-1,-1 };
 }
 
 void ofApp::update() {
-
-	
-	map<string, float> nniOut, trOut, rgbOut, output;
-	//NNI
-	_nni.setVisible(_page == 0);
-	_nni.update();
-	nniOut = removePortFromMessages(_nni.getMidiOut());
-	//Trigger
-	_trigger.setVisible(_page == 1);
-	_trigger.update();
-	//trOut = removePortFromMessages(_trigger.getMidiOut());
-	//RGB
-	_rgb.setVisible(_page == 2);
-	_rgb.update();
-	rgbOut = removePortFromMessages(_rgb.getMidiOut());
-	//MIDI
-	output.insert(nniOut.begin(), nniOut.end());
-	output.insert(trOut.begin(), trOut.end());
-	//output.insert(rgbOut.begin(), rgbOut.end());
-	sendMIDICC(output, _MIDIOutputs);
-	updateMIDIGui(_page == 3);
+	for (auto& node : _moduleNodes) node->update();
+	updateConnections();
+	_gui->setVisible(!_mode);
+	_gui->setEnabled(!_mode);
+	_gui->update();
 }
 
 void ofApp::draw(){
-	ofClear(50);
-	ofSetColor(0);
-	switch (_page)
+	ofClear(255);
+
+	if (_mode)
 	{
-	case 0:
-		_nni.draw(verdana);
-		break;
-	case 1:
-	_trigger.draw(verdana);
-		break;
-	case 2:
-		_rgb.draw(verdana);
-		break;
-	case 3:
-		drawMIDI();
-		break;
+		ofSetColor(50, 50);
+		ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+		ofSetColor(0);
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible())
+			{
+				ofSetColor(0);
+				node->drawPage(_verdana);
+			}
+		}
 	}
+	else
+	{
+		for (auto connection : _connections) drawConnection(connection);
+		for (auto& node : _moduleNodes) node->draw(_verdana);
+		for (auto& node : _inputNodes) node.draw(_verdana);
+		for (auto& node : _outputNodes) node.draw(_verdana);
+		_gui->draw();
+	}
+}
+
+void ofApp::drawConnection(Connection& connection)
+{
+	ofVec2f in, out;
+	for (auto& node : _moduleNodes)
+	{
+		if (connection.fromId == node->getName())
+		{
+			ofRectangle rect = node->getOutputConnector(connection.fromOutput);
+			in = rect.getPosition();
+			in.x += rect.getWidth() * 0.5;
+			in.y += rect.getHeight() * 0.5;
+		}
+		if (connection.toId == node->getName())
+		{
+			ofRectangle rect = node->getInputConnector(connection.toInput);
+			out = rect.getPosition();
+			out.x += rect.getWidth() * 0.5;
+			out.y += rect.getHeight() * 0.5;
+		}
+	}
+	for (auto& node : _inputNodes)
+	{
+		if (connection.fromId == node.getName())
+		{
+			ofRectangle rect = node.getOutputConnector(connection.fromOutput);
+			in = rect.getPosition();
+			in.x += rect.getWidth() * 0.5;
+			in.y += rect.getHeight() * 0.5;
+		}
+		if (connection.toId == node.getName())
+		{
+			ofRectangle rect = node.getInputConnector(connection.toInput);
+			out = rect.getPosition();
+			out.x += rect.getWidth() * 0.5;
+			out.y += rect.getHeight() * 0.5;
+		}
+	}
+	for (auto& node : _outputNodes)
+	{
+		if (connection.fromId == node.getName())
+		{
+			ofRectangle rect = node.getOutputConnector(connection.fromOutput);
+			in = rect.getPosition();
+			in.x += rect.getWidth() * 0.5;
+			in.y += rect.getHeight() * 0.5;
+		}
+		if (connection.toId == node.getName())
+		{
+			ofRectangle rect = node.getInputConnector(connection.toInput);
+			out = rect.getPosition();
+			out.x += rect.getWidth() * 0.5;
+			out.y += rect.getHeight() * 0.5;
+		}
+	}
+	ofSetColor(0);
+	ofDrawLine(in, out);
 }
 
 void ofApp::exit()
@@ -92,7 +132,88 @@ void ofApp::exit()
 	ofSavePrettyJson("mnt.ini", _settings);
 }
 
+void ofApp::setupColor()
+{
+	ofJson colorPallete = ofLoadJson("color_pallete.json");
+	for (auto colors : colorPallete)
+	{
+		for (auto color : colors)
+		{
+			vector<string> rgb = ofSplitString(color.get<string>(), ",");
+			_colorPallete.push_back(ofColor(ofToInt(rgb[0]), ofToInt(rgb[1]), ofToInt(rgb[2])));
+		}
+	}
+}
+
 //--------------------------------------------------------------
+void ofApp::setupGui()
+{
+	_gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
+	_gui->addHeader("MNT");
+	_gui->addButton("NNI");
+	_gui->addButton("Trigger");
+	_gui->addButton("Draw");
+	_gui->addBreak();
+	_gui->addButton("Midi Setup");
+	_midiInFolder = _gui->addFolder("Midi In");
+	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port);
+	_midiInFolder->onToggleEvent(this, &ofApp::MIDIInToggle);
+	_midiInFolder->collapse();
+	_midiOutFolder = _gui->addFolder("Midi Out");
+	for (auto port : _MIDIOutPorts) _midiOutFolder->addToggle(port);
+	_midiOutFolder->onToggleEvent(this, &ofApp::MIDIOutToggle);
+	_midiOutFolder->collapse();
+	_gui->addButton("Load");
+	_gui->addButton("Save");
+	_gui->addFooter();
+	_gui->collapse();
+	_gui->onButtonEvent(this, &ofApp::buttonEvent);
+	_gui->setAutoDraw(false);
+	_gui->setWidth(_guiWidth, 0.3);
+	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
+	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
+	_gui->setOpacity(0.8);
+}
+
+void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
+{
+	string label = e.target->getLabel();
+	if (label == "NNI")
+	{
+		ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+		node->setName("NNI", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+	}
+	if (label == "Trigger")
+	{
+		ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+		node->setName("Trigger", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+	}
+	if (label == "Draw")
+	{
+		ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+		node->setName("Draw", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+	}
+	if (label == "Load")
+	{
+
+	}
+	if (label == "Save") save();
+}
 
 void ofApp::setupMIDI()
 {
@@ -101,39 +222,6 @@ void ofApp::setupMIDI()
 	_MIDIInPorts = midiIn.getInPortList();
 	ofxMidiOut midiOut;
 	_MIDIOutPorts = midiOut.getOutPortList();
-	setupMIDIGui();
-}
-
-void ofApp::setupMIDIGui()
-{
-	_gMIDIIn = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
-	_gMIDIIn->addLabel("MIDI In");
-	for (auto port : _MIDIInPorts) _gMIDIIn->addToggle(port);
-	_gMIDIIn->onToggleEvent(this, &ofApp::MIDIInToggle);
-	_gMIDIIn->setAutoDraw(false);
-	_gMIDIIn->setWidth(100, 0.3);
-	_gMIDIIn->setPosition(20, 20);
-	_gMIDIIn->setTheme(new ofxDatGuiThemeWireframe(), true);
-
-	_gMIDIOut = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
-	_gMIDIOut->addLabel("MIDI out");
-	for (auto port : _MIDIOutPorts) _gMIDIOut->addToggle(port);
-	_gMIDIOut->onToggleEvent(this, &ofApp::MIDIOutToggle);
-	_gMIDIOut->setAutoDraw(false);
-	_gMIDIOut->setWidth(100, 0.3);
-	_gMIDIOut->setPosition(320, 20);
-	_gMIDIOut->setTheme(new ofxDatGuiThemeWireframe(), true);
-}
-
-void ofApp::updateMIDIGui(bool visible)
-{
-	_gMIDIIn->setVisible(visible);
-	_gMIDIIn->setEnabled(visible);
-	_gMIDIIn->update();
-
-	_gMIDIOut->setVisible(visible);
-	_gMIDIOut->setEnabled(visible);
-	_gMIDIOut->update();
 }
 
 void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
@@ -143,9 +231,17 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	{
 		if (_MIDIInputs.find(port) == _MIDIInputs.end())
 		{
+			
 			_MIDIInputs[port] = ofxMidiIn();
 			_MIDIInputs[port].openPort(port);
 			_MIDIInputs[port].addListener(this);
+			
+			Node node;
+			node.setup(50, ofGetHeight() * 0.5, 80, 30);
+			node.setName(port);
+			node.setAsInput(true);
+			node.setColor(ofColor(80, 200, 80));
+			_inputNodes.push_back(node);
 		}
 	}
 	else
@@ -155,6 +251,28 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 			_MIDIInputs[port].closePort();
 			_MIDIInputs[port].removeListener(this);
 			_MIDIInputs.erase(port);
+			int curIndex = -1;
+			for (int i = 0; i < _inputNodes.size(); i++)
+			{
+				if (_inputNodes[i].getName() == port)
+				{
+					curIndex = i;
+					break;
+				}
+			}
+			if (curIndex != -1)
+			{
+				vector<int> deleteConnection;
+				_inputNodes.erase(_inputNodes.begin() + curIndex);
+				for (int i = 0; i < _connections.size(); i++)
+				{
+					if (_connections[i].fromId == port) deleteConnection.push_back(i);
+				}
+				for (int i = deleteConnection.size() - 1; i >= 0; i--)
+				{
+					_connections.erase(_connections.begin() + deleteConnection[i]);
+				}
+			}
 		}
 	}
 }
@@ -168,6 +286,13 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 		{
 			_MIDIOutputs[port] = ofxMidiOut();
 			_MIDIOutputs[port].openPort(port);
+			
+			Node node;
+			node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+			node.setName(port);
+			node.setAsOutput(true);
+			node.setColor(ofColor(80, 200, 80));
+			_outputNodes.push_back(node);
 		}
 	}
 	else
@@ -176,71 +301,164 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 		{
 			_MIDIOutputs[port].closePort();
 			_MIDIOutputs.erase(port);
+			int curIndex = -1;
+			for (int i = 0; i < _outputNodes.size(); i++)
+			{
+				if (_outputNodes[i].getName() == port)
+				{
+					curIndex = i;
+					break;
+				}
+			}
+			if (curIndex != -1)
+			{
+				vector<int> deleteConnection;
+				_outputNodes.erase(_outputNodes.begin() + curIndex);
+				for (int i = 0; i < _connections.size(); i++)
+				{
+					if (_connections[i].toId == port) deleteConnection.push_back(i);
+				}
+				for (int i = deleteConnection.size() - 1; i >= 0; i--)
+				{
+					_connections.erase(_connections.begin() + deleteConnection[i]);
+				}
+			}
 		}
 	}
 }
 
 void ofApp::newMidiMessage(ofxMidiMessage & msg)
 {
-	//NNI
-	_nni.MIDIIn(msg.portName, msg.control, msg.channel, msg.value / 127.);
-	//Trigger
-	_trigger.MIDIIn(msg.portName, msg.control, msg.channel, msg.value / 127.);
-	//RGB
-	_rgb.MIDIIn(msg.portName, msg.control, msg.channel, msg.value / 127.);
-
-	for (auto port : _MIDIOutputs)
-	{
-		string in, out;
-		for (int i = 0; i < ofSplitString(msg.portName, " ").size() - 1; i++)
-		{
-			in += ofSplitString(msg.portName, " ")[i];
-		}
-		for (int i = 0; i < ofSplitString(port.first, " ").size() - 1; i++)
-		{
-			out += ofSplitString(port.first, " ")[i];
-		}
-		if (port.second.isOpen() && in != out)
-		{
-			port.second.sendMidiBytes(msg.bytes);
-		}
+	_MIDIMessages.push_back(msg);
+	while (_MIDIMessages.size() > _maxMidiMessages) {
+		_MIDIMessages.erase(_MIDIMessages.begin());
 	}
 }
 
-map<string, float> ofApp::removePortFromMessages(map<string, float> messages)
+
+tuple<string, int, int> ofApp::selectNode(int x, int y)
 {
-	map<string, float> newMessages;
-	for (auto message : messages)
+	tuple<string, int, int> parameters = { "", -1, -1 };
+	for (auto &node : _moduleNodes)
 	{
-		vector<string> split = ofSplitString(message.first, "/");
-		string curMessage;
-		for (int i = 1; i < split.size(); i++) curMessage += split[i];
-		newMessages[curMessage] = message.second;
+		if (node->inside(x, y))
+		{
+			get<0>(parameters) = node->getName();
+			get<1>(parameters) = node->getInputs();
+			get<2>(parameters) = node->getOutputs();
+			break;
+		}
 	}
-	return newMessages;
+	for (auto &node : _inputNodes)
+	{
+		if (node.inside(x, y))
+		{
+			get<0>(parameters) = node.getName();
+			get<1>(parameters) = node.getInputs();
+			get<2>(parameters) = node.getOutputs();
+			break;
+		}
+	}
+	for (auto &node : _outputNodes)
+	{
+		if (node.inside(x, y))
+		{
+			get<0>(parameters) = node.getName();
+			get<1>(parameters) = node.getInputs();
+			get<2>(parameters) = node.getOutputs();
+			break;
+		}
+	}
+	return parameters;
 }
 
-void ofApp::sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports)
+void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in)
 {
-	for (auto port : ports)
+	bool connectionExists = false;
+	for (int i = 0; i < _connections.size(); i++)
 	{
-		if (port.second.isOpen())
+		if (_connections[i].fromId == get<0>(out) && _connections[i].toId == get<0>(in))
 		{
-			for (auto parameter : parameters)
+			connectionExists = true;
+			_connections.erase(_connections.begin() + i);
+			break;
+		}
+	}
+	if (!connectionExists)
+	{
+		Connection connection;
+		connection.fromId = get<0>(out);
+		connection.toId = get<0>(in);
+		connection.fromInputNode = get<1>(out) == 0;
+		connection.toOutputNode = get<2>(in) == 0;
+		_connections.push_back(connection);
+	}
+}
+
+void ofApp::updateConnections()
+{
+	for (auto& connection : _connections)
+	{
+		map<string, float> messages;
+		if (connection.fromInputNode)
+		{
+			for (auto msg : _MIDIMessages)
 			{
-				int channel = ofToInt(ofSplitString(parameter.first, "/")[1]);
-				int control = ofToInt(ofSplitString(parameter.first, "/")[2]);
-				int value = parameter.second * 127;
-				port.second.sendControlChange(channel, control, value);
+				if (msg.portName == connection.fromId)
+				{
+					string sPort = msg.portName;
+					string sChannel = ofToString(msg.channel);
+					string sControl = ofToString(msg.control);
+					string key = sPort + "/" + sChannel + "/" + sControl;
+					float value = msg.value / 127.;
+					messages[key] = value;
+				}
+			}
+		}
+		else
+		{
+			for (auto& node : _moduleNodes)
+			{
+				if (node->getName() == connection.fromId)
+				{
+					messages = node->getMidiout();
+					break;
+				}
+			}
+		}
+		if (connection.toOutputNode)
+		{
+			for (auto& element : messages)
+			{
+				int channel = ofToInt(ofSplitString(element.first, "/")[1]);
+				int control = ofToInt(ofSplitString(element.first, "/")[2]);
+				int value = element.second * 127;
+				if (_MIDIOutputs[connection.toId].isOpen())
+				{
+					_MIDIOutputs[connection.toId].sendControlChange(channel, control, value);
+				}
+			}
+		}
+		else
+		{
+			for (auto& node : _moduleNodes)
+			{
+				if (node->getName() == connection.toId)
+				{
+					for (auto element : messages)
+					{
+ 						string port = ofSplitString(element.first, "/")[0];
+						int channel = ofToInt(ofSplitString(element.first, "/")[1]);
+						int control = ofToInt(ofSplitString(element.first, "/")[2]);
+						float value = element.second;
+						node->MIDIIn(port, channel, control, value);
+					}
+				}
 			}
 		}
 	}
-}
-
-void ofApp::drawMIDI()
-{
-	_gMIDIIn->draw();
-	_gMIDIOut->draw();
+	for (auto& node : _moduleNodes) node->clearMIDIMessages();
+	_MIDIMessages.clear();
 }
 
 void ofApp::load()
@@ -251,37 +469,103 @@ void ofApp::load()
 	{
 		path = loadFile.getPath();
 		ofJson jLoad = ofLoadJson(path);
-		//NNI
-		ofJson jNNI = jLoad["NNI"];
-		_nni.load(jNNI);
-		//Trigger
-		ofJson jTrigger = jLoad["Trigger"];
-		_trigger.load(jTrigger);
-		//RGB
-		ofJson jRGB = jLoad["RGB"];
-		_rgb.load(jRGB);
+		map<string, string> names;
+
 		//MIDI
 		ofJson jMIDI = jLoad["MIDI"];
-		for (string port : jMIDI["in"])
+		for (auto& element : jMIDI["in"])
 		{
-			_gMIDIIn->getToggle(port)->setChecked(true);
-			if (_MIDIInputs.find(port) == _MIDIInputs.end())
+			string port = element.get<string>();
+			_gui->getToggle(port)->setChecked(true);
+			Node node;
+			node.setup(50, ofGetHeight() * 0.5, 80, 30);
+			node.setName(port);
+			node.setAsInput(true);
+			node.setColor(ofColor(80, 200, 80));
+			_inputNodes.push_back(node);
+			names[port] = port;
+		}
+		for (auto& element : jMIDI["out"])
+		{
+			string port = element.get<string>();
+			_gui->getToggle(port)->setChecked(true);
+			Node node;
+			node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+			node.setName(port);
+			node.setAsOutput(true);
+			node.setColor(ofColor(80, 200, 80));
+			_outputNodes.push_back(node);
+			names[port] = port;
+		}
+		
+		//Modules
+		ofJson jModules = jLoad["Modules"];
+		for (auto& element : jModules)
+		{
+			
+			if (element["type"].get<string>() == "NNI")
 			{
-				_MIDIInputs[port] = ofxMidiIn();
-				_MIDIInputs[port].openPort(port);
-				_MIDIInputs[port].addListener(this);
+				
+				ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
+				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+				node->setInputs(element["inputs"]);
+				node->setOutputs(element["outputs"]);
+				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+				node->setName(element["type"].get<string>(), true);
+				node->setPosition(element["x"], element["y"]);
+				ofJson data = element["data"];
+				node->load(data);
+				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+				string newName = node->getName();
+				names[oldName] = newName;
+			}
+			else if (element["type"].get<string>() == "Trigger")
+			{
+				ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
+				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+				node->setInputs(element["inputs"]);
+				node->setOutputs(element["outputs"]);
+				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+				node->setName(element["type"].get<string>(), true);
+				node->setPosition(element["x"], element["y"]);
+				ofJson data = element["data"];
+				node->load(data);
+				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+				string newName = node->getName();
+				names[oldName] = newName;
+			}
+			else if (element["type"].get<string>() == "Draw")
+			{
+				ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
+				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+				node->setInputs(element["inputs"]);
+				node->setOutputs(element["outputs"]);
+				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+				node->setName(element["type"].get<string>(), true);
+				node->setPosition(element["x"], element["y"]);
+				ofJson data = element["data"];
+				node->load(data);
+				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+				string newName = node->getName();
+				names[oldName] = newName;
 			}
 		}
-		for (string port : jMIDI["out"])
+		//CONNECTIONS
+		ofJson jConnections = jLoad["Connections"];
+		for (auto& element : jConnections)
 		{
-			_gMIDIOut->getToggle(port)->setChecked(true);
-			if (_MIDIOutputs.find(port) == _MIDIOutputs.end())
-			{
-				_MIDIOutputs[port] = ofxMidiOut();
-				_MIDIOutputs[port].openPort(port);
-			}
+			Connection connection;
+			connection.fromId = names[element["fromId"].get<string>()];
+			connection.toId = names[element["toId"].get<string>()];
+			connection.fromOutput = element["fromOutput"];
+			connection.toInput = element["toInput"];
+			connection.fromInputNode = element["fromInputNode"];
+			connection.toOutputNode= element["toOutputNode"];
+			_connections.push_back(connection);
 		}
-
 		//LOAD
 		_file = loadFile.getName();
 		_folder = ofSplitString(path, _file)[0];
@@ -296,23 +580,51 @@ void ofApp::save()
 	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.json", "Save MNT set");
 	if (saveFile.bSuccess)
 	{
-		ofJson jSave;
-		path = saveFile.getPath();
-		
-		//NNI
-		jSave["NNI"] = _nni.save();
-		//Trigger
-		jSave["Trigger"] = _trigger.save();
-		//RGN
-		jSave["RGB"] = _rgb.save();
-		
 		//MIDI
+		path = saveFile.getPath();
+		ofJson jSave;
 		ofJson jMIDI;
-		for (auto port : _MIDIInPorts) if (_gMIDIIn->getToggle(port)->getChecked()) jMIDI["in"].push_back(port);
-		for (auto port : _MIDIOutPorts) if (_gMIDIOut->getToggle(port)->getChecked()) jMIDI["out"].push_back(port);
+		for (auto port : _MIDIInPorts)
+		{
+			if(_gui->getToggle(port, "Midi In")->getChecked()) jMIDI["in"].push_back(port);
+		}
+		for (auto port : _MIDIOutPorts) {
+			if (_gui->getToggle(port, "Midi Out")->getChecked()) jMIDI["out"].push_back(port);
+		}
 		jSave["MIDI"] = jMIDI;
 
+		//Modules
+		ofJson jModules;
+		for (auto& node : _moduleNodes)
+		{
+			ofJson jModule;
+			jModule["type"] = ofSplitString(node->getName(), "(")[0];
+			jModule["id"] = node->getId();
+			jModule["x"] = node->getBox().x;
+			jModule["y"] = node->getBox().y;
+			jModule["inputs"] = node->getInputs();
+			jModule["outputs"] = node->getOutputs();
+			jModule["data"] = node->save();
+			jModules.push_back(jModule);
+		}
+		jSave["Modules"] = jModules;
+
+		//Connections
+		ofJson jConnections;
+		for (auto& connection : _connections)
+		{
+			ofJson jConnection;
+			jConnection["fromId"] = connection.fromId;
+			jConnection["toId"] = connection.toId;
+			jConnection["fromOutput"] = connection.fromOutput;
+			jConnection["toInput"] = connection.toInput;
+			jConnection["fromInputNode"] = connection.fromInputNode;
+			jConnection["toOutputNode"] = connection.toOutputNode;
+			jConnections.push_back(jConnection);
+		}
+		jSave["Connections"] = jConnections;
 		//Save
+		cout << path << endl;
 		ofSavePrettyJson(path, jSave);
 		_file = saveFile.getName();
 		_folder = ofSplitString(path, _file)[0];
@@ -328,7 +640,7 @@ void ofApp::setWindowTitle(string title)
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	
+	if (key == OF_KEY_SHIFT) _shift = true;
 }
 
 void ofApp::keyReleased(int key){
@@ -346,37 +658,160 @@ void ofApp::keyReleased(int key){
 	case('l'):
 		load();
 		break;
+	case(OF_KEY_SHIFT):
+		_shift = false;
+		_shiftSelected = { "",-1,-1 };
+		break;
+	case(OF_KEY_ESC):
+		_mode = false;
+		for (auto& node : _moduleNodes) node->setVisible(false);
+		break;
 	}
 }
 
 void ofApp::mouseMoved(int x, int y ){
-	if (_page == 0) _nni.mouseMoved(x, y);
-	if (_page == 1) _trigger.mouseMoved(x, y);
-	if (_page == 2) _rgb.mouseMoved(x, y);
+	if (_mode)
+	{
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible()) node->mouseMoved(x, y);
+		}
+	}
 }
 
 void ofApp::mouseDragged(int x, int y, int button){
-	if (_page == 0) _nni.mouseDragged(x, y, button);
-	if (_page == 1) _trigger.mouseDragged(x, y, button);
-	if (_page == 2) _rgb.mouseDragged(x, y, button);
+	
+	if (_mode)
+	{
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible()) node->mouseDragged(x, y, button);
+		}
+	}
+	else
+	{
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getName() == _selected) node->setPosition(x, y);
+		}
+		for (auto& node : _inputNodes)
+		{
+			if (node.getName() == _selected) node.setPosition(x, y);
+		}
+		for (auto& node : _outputNodes)
+		{
+			if (node.getName() == _selected) node.setPosition(x, y);
+		}
+	}
 }
 
 void ofApp::mousePressed(int x, int y, int button){
-	if (_page == 0) _nni.mousePressed(x, y, button);
-	if (_page == 2) _rgb.mousePressed(x, y, button);
+	if (!_mode)
+	{
+		if (button == 0)
+		{
+			if (_shift)
+			{
+				_selected = "";
+				if (get<0>(_shiftSelected) == "")
+				{
+					tuple<string, int, int> curSelected = selectNode(x, y);
+					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
+					else _shiftSelected = { "", -1 , -1 };
+				}
+				else
+				{
+					tuple<string, int, int> curSelected = selectNode(x, y);
+					bool keep = get<0>(curSelected) != get<0>(_shiftSelected) && get<1>(curSelected) > 0;
+					if (keep) createDeleteConnection(_shiftSelected, curSelected);
+					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
+					else _shiftSelected = { "", -1 , -1 };
+				}
+			}
+			else
+			{
+				string lastSelected = _selected;
+				_selected = get<0>(selectNode(x,y));
+				bool doubleClick = _selected != "" && lastSelected == _selected;
+				doubleClick = doubleClick && ofGetElapsedTimeMillis() - _lastClick < 500;
+				if (doubleClick)
+				{
+					for (auto& node : _moduleNodes)
+					{
+						if (node->getName() == _selected)
+						{
+							_mode = true;
+							node->setVisible(true);
+						}
+						else node->setVisible(false);
+					}
+				}
+				_lastClick = ofGetElapsedTimeMillis();
+			}
+		}
+	}
+	else
+	{
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible()) node->mousePressed(x, y, button);
+		}
+	}
 }
 
 void ofApp::mouseReleased(int x, int y, int button){
-	if (_page == 0) _nni.mouseReleased(x, y, button);
-	if (_page == 1) _trigger.mouseReleased(x, y, button);
-	if (_page == 2) _rgb.mouseReleased(x, y, button);
+	if (_mode)
+	{
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible()) node->mouseReleased(x, y, button);
+		}
+	}
+	else
+	{
+		if (button == 2)
+		{
+			string curSelected = "";
+			int curIndex = -1;
+			for (int i = 0; i < _moduleNodes.size(); i++)
+			{
+				if (_moduleNodes[i]->inside(x, y))
+				{
+					curSelected = _moduleNodes[i]->getName();
+					curIndex = i;
+					break;
+				}
+			}
+			if (curIndex != -1)
+			{
+				vector<int> deleteConnection;
+				_moduleNodes.erase(_moduleNodes.begin() + curIndex);
+				for (int i = 0; i < _connections.size(); i++)
+				{
+					if (_connections[i].fromId == curSelected || _connections[i].toId == curSelected)
+					{
+						deleteConnection.push_back(i);
+					}
+				}
+				for (int i = deleteConnection.size() - 1; i >= 0; i--)
+				{
+					_connections.erase(_connections.begin() + deleteConnection[i]);
+				}
+			}
+			_selected = "";
+		}
+	}
 }
 
 void ofApp::mouseScrolled(ofMouseEventArgs& mouse)
 {
-	if (_page == 0) _nni.mouseScrolled(mouse.scrollY * 5);
-	if (_page == 1) _trigger.mouseScrolled(mouse.scrollY * 5);
-	if (_page == 2) _rgb.mouseScrolled(mouse.scrollY * 5);
+	if (_mode)
+	{
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible()) node->mouseScrolled(mouse.scrollY * 5);
+		}
+	}
 }
 
 void ofApp::mouseEntered(int x, int y){
@@ -388,8 +823,16 @@ void ofApp::mouseExited(int x, int y){
 }
 
 void ofApp::windowResized(int w, int h){
-	//_nni.resize(w, h);
-	//_trigger.resize(w, h);
+	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
+	for (auto& node : _moduleNodes)
+	{
+		node->resizePage(w, h);
+		int x = w * float(node->getBox().x) / _lastWidth;
+		int y = h * float(node->getBox().y) / _lastHeight;
+		node->setPosition(x, y);
+	}
+	_lastWidth = w;
+	_lastHeight = h;
 }
 
 void ofApp::gotMessage(ofMessage msg){

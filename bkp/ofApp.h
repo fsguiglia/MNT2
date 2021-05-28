@@ -7,16 +7,16 @@
 #include "ofxOsc.h"
 #include "ofxMidi.h"
 #include "gui/node.h"
-#include "gui/moduleInterface.h"
-#include "gui/moduleNode.h"
 #include "gui/connection.h"
 #include "pages/NNIpage.h"
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
 #include "utils/mntUtils.h"
+#include "test.h"
 
 /*
-en vez de map<string, float> podría hacer un struct controlchange, pero ojo que ofxmidiout ya tiene
+No logro hacer un vector con los distintos tipos de nodo: vector de unique_ptr no funciona, 
+of no tiene std::variant ni std::any
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -28,18 +28,18 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void drawConnection(Connection& connection);
 		void exit();
 		//--------------------------------------------------------------
-		void setupColor();
 		void setupGui();
 		void buttonEvent(ofxDatGuiButtonEvent e);
 		//--------------------------------------------------------------
 		void setupMIDI();
+		void setupMIDIGui();
+		void updateMIDIGui(bool visible);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
-		//--------------------------------------------------------------
-		tuple<string, int, int> selectNode(int x, int y);
-		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in);
-		void updateConnections();
+		map<string, float> removePortFromMessages(map<string, float> messages);
+		void sendMIDICC(map<string, float> parameters, map<string, ofxMidiOut> ports);
+		void drawMIDI();
 		//--------------------------------------------------------------
 		void load();
 		void save();
@@ -59,26 +59,22 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void gotMessage(ofMessage msg);
 
 		//Nodes
-		vector<unique_ptr<ModuleInterface>> _moduleNodes;
-		vector<Node> _inputNodes;
-		vector<Node> _outputNodes;
+		vector<unique_ptr<NodeInterface>> _nodes;
 		vector<Connection> _connections;
 		string _selected;
 		int _lastClick = 0;
-		tuple<string, int, int> _shiftSelected;
+		string _shiftSelected;
 		bool _shift;
+		int _id;
 		
 		//GUI
 		const size_t _maxPages = 1;
 		const size_t _guiWidth = 300;
-		int _lastWidth, _lastHeight;
 		int _page;
 		bool _mode;
 		vector<ofColor> _colorPallete;
 		ofTrueTypeFont _verdana;
 		ofxDatGui* _gui;
-		ofxDatGuiFolder* _midiInFolder;
-		ofxDatGuiFolder*_midiOutFolder;
 
 		//IO
 		ofJson _settings;
@@ -90,4 +86,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		map<string, ofxMidiOut> _MIDIOutputs;
 		vector<ofxMidiMessage> _MIDIMessages;
 		size_t _maxMidiMessages;
+		ofxDatGui* _gMIDIIn;
+		ofxDatGui* _gMIDIOut;
+
 };

@@ -106,41 +106,44 @@
     <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp">
       <Filter>addons\ofxXmlSettings\libs</Filter>
     </ClCompile>
-    <ClCompile Include="src\NNI.cpp">
-      <Filter>src\maps</Filter>
-    </ClCompile>
-    <ClCompile Include="src\point.cpp">
-      <Filter>src\points</Filter>
-    </ClCompile>
-    <ClCompile Include="src\trigger.cpp">
-      <Filter>src\points</Filter>
-    </ClCompile>
-    <ClCompile Include="src\triggerMap.cpp">
-      <Filter>src\maps</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\mntUtils.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scrollGui.cpp">
-      <Filter>src\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NNIPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\triggerPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rgbPoint.cpp">
-      <Filter>src\points</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RGBMap.cpp">
+    <ClCompile Include="src\maps\NNI.cpp">
       <Filter>src\maps</Filter>
     </ClCompile>
-    <ClCompile Include="src\rgbPage.cpp">
+    <ClCompile Include="src\maps\triggerMap.cpp">
+      <Filter>src\maps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\maps\RGBMap.cpp">
+      <Filter>src\maps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\NNIPage.cpp">
       <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\rgbPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\triggerPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\scrollGui.cpp">
+      <Filter>src\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\mntUtils.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\points\point.cpp">
+      <Filter>src\points</Filter>
+    </ClCompile>
+    <ClCompile Include="src\points\rgbPoint.cpp">
+      <Filter>src\points</Filter>
+    </ClCompile>
+    <ClCompile Include="src\points\trigger.cpp">
+      <Filter>src\points</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\node.cpp">
+      <Filter>src\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -434,44 +437,56 @@
     <ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h">
       <Filter>addons\ofxXmlSettings\libs</Filter>
     </ClInclude>
-    <ClInclude Include="src\map.h">
+    <ClInclude Include="src\maps\NNI.h">
       <Filter>src\maps</Filter>
     </ClInclude>
-    <ClInclude Include="src\NNI.h">
+    <ClInclude Include="src\maps\triggerMap.h">
       <Filter>src\maps</Filter>
     </ClInclude>
-    <ClInclude Include="src\point.h">
-      <Filter>src\points</Filter>
-    </ClInclude>
-    <ClInclude Include="src\trigger.h">
-      <Filter>src\points</Filter>
-    </ClInclude>
-    <ClInclude Include="src\triggerMap.h">
+    <ClInclude Include="src\maps\RGBMap.h">
       <Filter>src\maps</Filter>
     </ClInclude>
-    <ClInclude Include="src\mntUtils.h">
-      <Filter>src\utils</Filter>
+    <ClInclude Include="src\pages\NNIpage.h">
+      <Filter>src\pages</Filter>
     </ClInclude>
-    <ClInclude Include="src\scrollGui.h">
+    <ClInclude Include="src\pages\rgbPage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\triggerPage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\scrollGui.h">
       <Filter>src\gui</Filter>
     </ClInclude>
-    <ClInclude Include="src\page.h">
-      <Filter>src\pages</Filter>
+    <ClInclude Include="src\utils\mntUtils.h">
+      <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\NNIpage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\triggerPage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rgbPoint.h">
-      <Filter>src\points</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RGBMap.h">
+    <ClInclude Include="src\maps\baseMap.h">
       <Filter>src\maps</Filter>
     </ClInclude>
-    <ClInclude Include="src\rgbPage.h">
+    <ClInclude Include="src\points\point.h">
+      <Filter>src\points</Filter>
+    </ClInclude>
+    <ClInclude Include="src\points\rgbPoint.h">
+      <Filter>src\points</Filter>
+    </ClInclude>
+    <ClInclude Include="src\points\trigger.h">
+      <Filter>src\points</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\basePage.h">
       <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\connection.h">
+      <Filter>src\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\moduleNode.h">
+      <Filter>src\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\node.h">
+      <Filter>src\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\moduleInterface.h">
+      <Filter>src\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

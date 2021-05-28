@@ -51,7 +51,7 @@ int RGBMap::addPoint(ofVec2f position, ofImage img)
 	point.setPosition(position.x, position.y);
 	point.setTrigger(false);
 	point.setImage(img);
-	Map::addPoint(point);
+	BaseMap::addPoint(point);
 	return _points.size() - 1;
 }
 
@@ -61,7 +61,7 @@ int RGBMap::addPoint(ofVec2f position, ofImage img, string path)
 	point.setPosition(position.x, position.y);
 	point.setTrigger(false);
 	point.setImage(img, path);
-	Map::addPoint(point);
+	BaseMap::addPoint(point);
 	return _points.size() - 1;
 }
 

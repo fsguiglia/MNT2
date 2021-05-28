@@ -1,10 +1,10 @@
 #ifndef _TRIGGERPAGE
 #define _TRIGGERPAGE
 #include "ofMain.h"
-#include "page.h"
-#include "triggerMap.h"
+#include "basePage.h"
+#include "../maps/triggerMap.h"
 
-class TriggerPage : public PageBase<TriggerMap> {
+class TriggerPage : public BasePage<TriggerMap> {
 public:
 	TriggerPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 20);
@@ -20,7 +20,7 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
-	void MIDIIn(string port, int control, int channel, float value);
+	void MIDIIn(string port, int channel, int control, float value);
 
 	void load(ofJson& json);
 	ofJson save();

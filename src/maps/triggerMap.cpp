@@ -60,7 +60,8 @@ int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColo
 	trigger.setRadius(radius);
 	trigger.setThreshold(threshold);
 	trigger.setColor(color);
-	Map::addPoint(trigger);
+	trigger.setSwitch(false);
+	BaseMap::addPoint(trigger);
 	return _points.size() - 1;
 }
 
@@ -158,8 +159,8 @@ void TriggerMap::updateTriggers()
 		_points[i].setState(_cursors);
 		if (curState != _points[i].getState())
 		{
-			if(curState) _triggered[i] = 1;
-			else _triggered[i] = -1;
+			if(curState) _triggered[i] = -1;
+			else _triggered[i] = 1;
 		}
 	}
 
@@ -172,7 +173,7 @@ void TriggerMap::updateTriggers()
 			{
 				for (auto value : _points[i].getValues()) _output[value.first] = value.second;
 			}
-			if (_triggered[i] == -1 || _points[i].getSwitch())
+			if (_triggered[i] == -1 && !_points[i].getSwitch())
 			{
 				for (auto value : _points[i].getValues()) _output[value.first] = 0;
 			}

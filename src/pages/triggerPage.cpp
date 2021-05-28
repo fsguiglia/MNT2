@@ -1,29 +1,34 @@
-#include "NNIpage.h"
+#include "triggerPage.h"
 
-NNIPage::NNIPage()
+TriggerPage::TriggerPage()
 {
 }
 
-void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
+void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)
 {
 	_map.setup(width, height);
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	_map.setActive(false);
 	_map.setRandomize(0.);
-	_map.setDrawInterpolation(true);
 	_map.setDrawSelected(true);
 	_mouseControl = false;
+	_controlLearn = false;
+	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
 	setupGui();
 	_maxMessages = maxMessages;
+	vector<ofVec2f> initialCursors = { ofVec2f(0,0) };
+	_map.setCursors(initialCursors);
+	_radius = 0.05;
+	_threshold = 0.75;
 }
 
-void NNIPage::setupGui()
+void TriggerPage::setupGui()
 {
 	_gui = new ScrollGui();
-	_gui->addHeader("NNI", false);
+	_gui->addHeader("Trigger", false);
 	_gui->addToggle("active");
 	_gui->addToggle("randomize");
 	_gui->addBreak();
@@ -36,9 +41,13 @@ void NNIPage::setupGui()
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+	_gui->addToggle("Switch");
+	_gui->addSlider("Radius", 0., 1., _radius);
+	_gui->addSlider("Threshold", 0., 1., _threshold);
 	_gui->addToggle("learn")->setName("parameterLearn");
-	_gui->onToggleEvent(this, &NNIPage::toggleEvent);
-	_gui->onSliderEvent(this, &NNIPage::sliderEvent);
+	_gui->addBreak();
+	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
+	_gui->onSliderEvent(this, &TriggerPage::sliderEvent);
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
@@ -50,7 +59,7 @@ void NNIPage::setupGui()
 	_gui->update();
 }
 
-void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
+void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
 	if (name == "x" || name == "y")
@@ -58,25 +67,40 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 		_lastSelectedControl = name;
 		if (!_controlLearn)
 		{
-			ofVec2f nniCursor = _map.getCursor();
+			ofVec2f nniCursor = _map.getCursors()[0];
 			if (name == "x") nniCursor.x = e.value;
 			if (name == "y") nniCursor.y = e.value;
-			_map.setCursor(nniCursor);
+			_map.setCursor(nniCursor, 0);
+
+		}
+	}
+	else if (name == "Radius" || name == "Threshold")
+	{
+		if (name == "Radius")
+		{
+			_radius = e.value;
+			_map.setRadius(_map.getLastSelected(), _radius);
+		}
+		if (name == "Threshold")
+		{
+			_threshold = e.value;
+			_map.setThreshold(_map.getLastSelected(), _threshold);
 		}
 	}
 	else
 	{
+		int lastSelected = _map.getLastSelected();
 		int channel = ofToInt(ofSplitString(name, "/")[1]);
 		int control = ofToInt(ofSplitString(name, "/")[2]);
 		float value = e.value;
-		_map.setGlobalParameter(name, value);
+		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
 		map<string, float> message;
 		message[name] = value;
 		addMidiMessages(message, _MIDIDumpMessages);
 	}
 }
 
-void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
+void TriggerPage::toggleEvent(ofxDatGuiToggleEvent e)
 {
 	if (e.target->getName() == "controlLearn")
 	{
@@ -99,26 +123,47 @@ void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "active") _map.setActive(e.checked);
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
+	if (e.target->getName() == "Switch")
+	{
+		if (_map.getLastSelected() != -1)
+		{
+			_map.setSwitch(_map.getLastSelected(), e.checked);
+		}
+	}
 }
 
-void NNIPage::updateSelected(int selected, Point point)
+void TriggerPage::updateSelected(int selected, Trigger trigger)
 {
-	map<string, float> parameters = point.getValues();
+	_gui->clearRemovableSliders();
+	for (auto value : trigger.getValues())
+	{
+		vector<string> split = ofSplitString(value.first, "/");
+		string sliderLabel = "cc" + split[split.size() -1];
+		_gui->addSlider(sliderLabel, 0., 1., value.second);
+		_gui->getSlider(sliderLabel)->setName(value.first);
+		_gui->setRemovableSlider(value.first);
+		_gui->getSlider(value.first)->setTheme(new ofxDatGuiThemeWireframe());
+		_gui->setWidth(300, 0.3);
+		_gui->setOpacity(0.5);
+	}
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
-	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second);
+	_gui->getToggle("Switch")->setChecked(_map.getPoint(selected).getSwitch());
+	_gui->getSlider("Radius")->setValue(trigger.getRadius(), false);
+	_gui->getSlider("Threshold")->setValue(trigger.getThreshold(), false);
+	_gui->update();
 	//for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
 }
 
-void NNIPage::mouseMoved(int x, int y)
+void TriggerPage::mouseMoved(int x, int y)
 {
 	if (_visible)
 	{
 		_inside = _position.inside(x, y);
-		if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position));
+		if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position), 0);
 	}
 }
 
-void NNIPage::mouseDragged(int x, int y, int button)
+void TriggerPage::mouseDragged(int x, int y, int button)
 {
 	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
 	bool insideGui = guiPosition.inside(x, y);
@@ -129,7 +174,7 @@ void NNIPage::mouseDragged(int x, int y, int button)
 	}
 }
 
-void NNIPage::mousePressed(int x, int y, int button)
+void TriggerPage::mousePressed(int x, int y, int button)
 {
 	_inside = _position.inside(x, y);
 	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
@@ -137,20 +182,21 @@ void NNIPage::mousePressed(int x, int y, int button)
 	if (_inside && !insideGui)
 	{
 		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (button == 0) _map.addPoint(pos);
+		if (button == 0) _map.addPoint(pos, _radius, _threshold);
 		if (button < 2)
 		{
 			int lastSelected = _map.getLastSelected();
 			int curSelected = _map.getClosest(pos, true)[0];
 			if (curSelected != lastSelected)
 			{
-				updateSelected(curSelected, _map.getPoint(curSelected));
+				Trigger point = _map.getPoint(curSelected);
+				updateSelected(curSelected, point);
 			}
 		}
 	}
 }
 
-void NNIPage::mouseReleased(int x, int y, int button)
+void TriggerPage::mouseReleased(int x, int y, int button)
 {
 	ofVec2f normalized = normalize(ofVec2f(x, y), _position);
 	_inside = _position.inside(x, y);
@@ -161,25 +207,25 @@ void NNIPage::mouseReleased(int x, int y, int button)
 			_map.removePoint(normalized);
 			if (_map.getPoints().size() > 0)
 			{
-				int curPoint = _map.getPoints().size() - 1;
-				if (curPoint >= 0)
+				int curSelected = _map.getPoints().size() - 1;
+				if (curSelected > 0)
 				{
-					_map.setLastSelected(curPoint);
-					updateSelected(curPoint, _map.getPoint(curPoint));
+					_map.setLastSelected(curSelected);
+					Trigger point = _map.getPoint(curSelected);
+					updateSelected(curSelected, point);
 				}
 				else _map.setLastSelected(-1);
 			}
 		}
 		else
 		{
-			//_map.getClosest(normalized, true);
 			_gui->update();
 			_gui->updatePositions();
 			string removableSlider = _gui->inside(x, y);
-			cout << removableSlider << endl;
 			if (removableSlider != "")
 			{
-				_map.removeGlobalParameter(removableSlider);
+				int lastSelected = _map.getLastSelected();
+				if(lastSelected != -1) _map.removePointParameter(lastSelected, removableSlider);
 				_gui->removeSlider(removableSlider);
 				_gui->setPosition(_gui->getPosition().x, _gui->getPosition().y);
 				_gui->update();
@@ -188,12 +234,12 @@ void NNIPage::mouseReleased(int x, int y, int button)
 	}
 }
 
-void NNIPage::mouseScrolled(int scroll)
+void TriggerPage::mouseScrolled(int scroll)
 {
 	_gui->scroll(scroll);
 }
 
-void NNIPage::MIDIIn(string port, int control, int channel, float value)
+void TriggerPage::MIDIIn(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -215,22 +261,25 @@ void NNIPage::MIDIIn(string port, int control, int channel, float value)
 	}
 	if (_parameterLearn)
 	{
-		if (curParameters.find(parameter) == curParameters.end())
+		int lastSelected = _map.getLastSelected();
+		if (lastSelected != -1)
 		{
-			_map.addGlobalParameter(parameter, value);
-			_gui->addSlider(sliderLabel, 0., 1.);
-			_gui->getSlider(sliderLabel)->setName(parameter);
-			_gui->setRemovableSlider(parameter);
-			_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
-			_gui->setWidth(300, 0.3);
-			_gui->setOpacity(0.5);
-			_gui->update();
-		}
-		else
-		{
-			_gui->getSlider(parameter)->setValue(value, false);
-			_map.setGlobalParameter(parameter, value);
-			if (_map.getLastSelected() >= 0) _map.setPointParameter(_map.getLastSelected(), parameter, value);
+			if (!_map.getPoint(lastSelected).hasValue(parameter))
+			{
+				_map.addPointParameter(lastSelected, parameter, value);
+				_gui->addSlider(sliderLabel, 0., 1.);
+				_gui->getSlider(sliderLabel)->setName(parameter);
+				_gui->setRemovableSlider(parameter);
+				_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
+				_gui->setWidth(300, 0.3);
+				_gui->setOpacity(0.5);
+				_gui->update();
+			}
+			else
+			{
+				_gui->getSlider(parameter)->setValue(value, false);
+				_map.setPointParameter(lastSelected, parameter, value);
+			}
 		}
 	}
 	else
@@ -240,31 +289,22 @@ void NNIPage::MIDIIn(string port, int control, int channel, float value)
 	}
 }
 
-void NNIPage::load(ofJson& json)
+void TriggerPage::load(ofJson& json)
 {
-	//clear current NNI
+	//clear current map
 	_map.clearPoints();
 	_gui->clearRemovableSliders();
-	//load parameters to NNI and GUI
-	for (auto parameter : json["parameters"])
+	//load parameters to map and GUI
+	for (ofJson curPoint : json["points"])
 	{
-		_map.addGlobalParameter(parameter, 0);
-		//GUI
-		string sliderLabel = "cc" + ofSplitString(parameter, "/").back();
-		_gui->addSlider(sliderLabel, 0., 1.);
-		_gui->getSlider(sliderLabel)->setName(parameter);
-		_gui->setRemovableSlider(parameter);
-		_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
-		_gui->setWidth(300, 0.3);
-		_gui->setOpacity(0.5);
-	}
-	for (ofJson site : json["points"])
-	{
-		for (auto parameter : _map.getParameters())
-		{
-			_map.setGlobalParameter(parameter.first, site["parameters"][parameter.first]);
-		}
-		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
+		ofVec2f position = ofVec2f(curPoint["pos"]["x"], curPoint["pos"]["y"]);
+		float radius = curPoint["radius"];
+		float threshold = curPoint["threshold"];
+		bool isSwitch = curPoint["switch"];
+		int index = _map.addPoint(position, radius, threshold);
+		_map.setSwitch(index, isSwitch);
+		auto obj = curPoint["parameters"].get<ofJson::object_t>();
+		for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
 	}
 	//gui
 	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
@@ -272,22 +312,26 @@ void NNIPage::load(ofJson& json)
 	_gui->update();
 	if (_map.getPoints().size() != 0)
 	{
-		updateSelected(0, _map.getPoint(0));
+		Trigger point = _map.getPoint(0);
+		updateSelected(0, point);
 	}
 }
 
-ofJson NNIPage::save()
+ofJson TriggerPage::save()
 {
 	ofJson jSave;
-	map<string, float> nniParameters = _map.getParameters();
-	for (auto element : nniParameters) jSave["parameters"].push_back(element.first);
-	vector<Point> points = _map.getPoints();
+	map<string, float> parameters = _map.getParameters();
+	for (auto element : parameters) jSave["parameters"].push_back(element.first);
+	vector<Trigger> points = _map.getPoints();
 	for (int i = 0; i < points.size(); i++)
 	{
 		ofJson curPoint;
 		curPoint["id"] = i;
 		curPoint["pos"]["x"] = points[i].getPosition().x;
 		curPoint["pos"]["y"] = points[i].getPosition().y;
+		curPoint["radius"] = points[i].getRadius();
+		curPoint["threshold"] = points[i].getThreshold();
+		curPoint["switch"] = points[i].getSwitch();
 		for (auto parameter : points[i].getValues())
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
