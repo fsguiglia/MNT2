@@ -11,6 +11,7 @@ public:
 	void setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette);
 	void update();
 	void drawPage(ofTrueTypeFont& font);
+	void resizePage(int w, int h);
 
 	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);
@@ -71,6 +72,12 @@ template<typename T>
 inline void ModuleNode<T>::drawPage(ofTrueTypeFont & font)
 {
 	_page->draw(font);
+}
+
+template<typename T>
+inline void ModuleNode<T>::resizePage(int w, int h)
+{
+	_page->resize(w, h);
 }
 
 template<typename T>

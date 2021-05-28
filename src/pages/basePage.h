@@ -94,15 +94,15 @@ inline ofRectangle BasePage<T>::centerSquarePosition(int w, int h)
 	int max = w;
 	int min = h;
 
-	if (w < h)
+	if (h > w)
 	{
-		max = w;
-		min = h;
+		min = w;
+		max = h;
 	}
 	rect.setWidth(min);
 	rect.setHeight(min);
-	rect.setX((w - min) * 0.5);
-	rect.setY((h - min) * 0.5);
+	rect.setX(float(w - min) * 0.5);
+	rect.setY(float(h - min) * 0.5);
 
 	return rect;
 }

@@ -8,6 +8,7 @@ public:
 	virtual void setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette) = 0;
 	virtual void update() = 0;
 	virtual void drawPage(ofTrueTypeFont& font) = 0;
+	virtual void resizePage(int w, int h) = 0;
 
 	virtual void mouseMoved(int x, int y) = 0;
 	virtual void mouseDragged(int x, int y, int button) = 0;

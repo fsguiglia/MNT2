@@ -13,6 +13,8 @@ void ofApp::setup(){
 	_page = 0;
 	setupGui();
 	_verdana.load("Verdana2.ttf", 8);
+	_lastWidth = ofGetWidth();
+	_lastHeight = ofGetHeight();
 
 	_shift = false;
 	_mode = false;
@@ -23,6 +25,8 @@ void ofApp::setup(){
 void ofApp::update() {
 	for (auto& node : _moduleNodes) node->update();
 	updateConnections();
+	_gui->setVisible(!_mode);
+	_gui->setEnabled(!_mode);
 	_gui->update();
 }
 
@@ -31,6 +35,9 @@ void ofApp::draw(){
 
 	if (_mode)
 	{
+		ofSetColor(50, 50);
+		ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+		ofSetColor(0);
 		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible())
@@ -816,7 +823,16 @@ void ofApp::mouseExited(int x, int y){
 }
 
 void ofApp::windowResized(int w, int h){
-
+	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
+	for (auto& node : _moduleNodes)
+	{
+		node->resizePage(w, h);
+		int x = w * float(node->getBox().x) / _lastWidth;
+		int y = h * float(node->getBox().y) / _lastHeight;
+		node->setPosition(x, y);
+	}
+	_lastWidth = w;
+	_lastHeight = h;
 }
 
 void ofApp::gotMessage(ofMessage msg){

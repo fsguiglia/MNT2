@@ -70,6 +70,8 @@ void RGBMap::resizePoint(int index, int w, int h)
 	_points[index].setSize(w, h);
 }
 
+
+
 void RGBMap::setTrigger(int index, bool isTrigger)
 {
 	_points[index].setTrigger(isTrigger);
