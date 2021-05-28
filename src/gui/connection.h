@@ -9,9 +9,11 @@ struct Connection {
 		toInput = NULL;
 		toOutputNode = false;
 		fromInputNode = false;
+		isDump = false;
 	}
 	string fromId, toId;
 	bool toOutputNode;
 	bool fromInputNode;
+	bool isDump;
 	int fromOutput, toInput;
 };

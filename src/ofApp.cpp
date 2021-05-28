@@ -111,7 +111,8 @@ void ofApp::drawConnection(Connection& connection)
 			out.y += rect.getHeight() * 0.5;
 		}
 	}
-	ofSetColor(0);
+	if (connection.isDump) ofSetColor(255, 0, 0);
+	else ofSetColor(0);
 	ofDrawLine(in, out);
 }
 
@@ -372,7 +373,7 @@ tuple<string, int, int> ofApp::selectNode(int x, int y)
 	return parameters;
 }
 
-void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in)
+void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in, bool dump)
 {
 	bool connectionExists = false;
 	for (int i = 0; i < _connections.size(); i++)
@@ -391,6 +392,7 @@ void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, in
 		connection.toId = get<0>(in);
 		connection.fromInputNode = get<1>(out) == 0;
 		connection.toOutputNode = get<2>(in) == 0;
+		if(connection.toOutputNode) connection.isDump = dump;
 		_connections.push_back(connection);
 	}
 }
@@ -421,7 +423,9 @@ void ofApp::updateConnections()
 			{
 				if (node->getName() == connection.fromId)
 				{
-					messages = node->getMidiout();
+					
+					if (connection.isDump) messages = node->getMidiDump();
+					else messages = node->getMidiOut();
 					break;
 				}
 			}
@@ -458,7 +462,7 @@ void ofApp::updateConnections()
 		}
 	}
 	for (auto& node : _moduleNodes) node->clearMIDIMessages();
-	_MIDIMessages.clear();
+	if(_MIDIMessages.size() > 0) _MIDIMessages.clear();
 }
 
 void ofApp::load()
@@ -472,30 +476,64 @@ void ofApp::load()
 		map<string, string> names;
 
 		//MIDI
-		ofJson jMIDI = jLoad["MIDI"];
-		for (auto& element : jMIDI["in"])
+		ofJson jMIDIIn = jLoad["MIDIIn"];
+		cout << "----------" << endl;
+		for (auto key : _MIDIInputs) cout << key.first << endl;
+		for (auto& element : jMIDIIn)
 		{
-			string port = element.get<string>();
-			_gui->getToggle(port)->setChecked(true);
-			Node node;
-			node.setup(50, ofGetHeight() * 0.5, 80, 30);
-			node.setName(port);
-			node.setAsInput(true);
-			node.setColor(ofColor(80, 200, 80));
-			_inputNodes.push_back(node);
-			names[port] = port;
+			string curPort = element["port"].get<string>();
+			bool portAvailable = false;
+			for (auto port : _MIDIInPorts) {
+				if (port == curPort)
+				{
+					portAvailable = true;
+					break;
+				}
+			}
+			if (portAvailable)
+			{
+				_MIDIInputs[curPort] = ofxMidiIn();
+				_MIDIInputs[curPort].openPort(curPort);
+				_MIDIInputs[curPort].addListener(this);
+
+				Node node;
+				node.setup(element["x"].get<int>(), element["y"].get<int>(), 80, 30);
+				node.setName(curPort);
+				node.setAsInput(true);
+				node.setColor(ofColor(80, 200, 80));
+				_inputNodes.push_back(node);
+				names[curPort] = curPort;
+
+				_gui->getToggle(curPort)->setChecked(true);
+			}
 		}
-		for (auto& element : jMIDI["out"])
+		ofJson jMIDIOut = jLoad["MIDIOut"];
+		for (auto& element : jMIDIOut)
 		{
-			string port = element.get<string>();
-			_gui->getToggle(port)->setChecked(true);
-			Node node;
-			node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
-			node.setName(port);
-			node.setAsOutput(true);
-			node.setColor(ofColor(80, 200, 80));
-			_outputNodes.push_back(node);
-			names[port] = port;
+			string curPort = element["port"].get<string>();
+			bool portAvailable = false;
+			for (auto port : _MIDIOutPorts) {
+				if (port == curPort)
+				{
+					portAvailable = true;
+					break;
+				}
+			}
+			if (portAvailable)
+			{
+				_MIDIOutputs[curPort] = ofxMidiOut();
+				_MIDIOutputs[curPort].openPort(curPort);
+				
+				Node node;
+				node.setup(element["x"], element["y"], 80, 30);
+				node.setName(curPort);
+				node.setAsOutput(true);
+				node.setColor(ofColor(80, 200, 80));
+				_outputNodes.push_back(node);
+				names[curPort] = curPort;
+
+				_gui->getToggle(curPort)->setChecked(true);
+			}
 		}
 		
 		//Modules
@@ -564,6 +602,7 @@ void ofApp::load()
 			connection.toInput = element["toInput"];
 			connection.fromInputNode = element["fromInputNode"];
 			connection.toOutputNode= element["toOutputNode"];
+			connection.isDump = element["isDump"];
 			_connections.push_back(connection);
 		}
 		//LOAD
@@ -583,15 +622,24 @@ void ofApp::save()
 		//MIDI
 		path = saveFile.getPath();
 		ofJson jSave;
-		ofJson jMIDI;
-		for (auto port : _MIDIInPorts)
+		ofJson jMIDIIn, jMIDIOut;
+		for (auto& node : _inputNodes)
 		{
-			if(_gui->getToggle(port, "Midi In")->getChecked()) jMIDI["in"].push_back(port);
+			ofJson input;
+			input["port"] = node.getName();
+			input["x"] = node.getBox().x;
+			input["y"] = node.getBox().y;
+			jMIDIIn.push_back(input);
 		}
-		for (auto port : _MIDIOutPorts) {
-			if (_gui->getToggle(port, "Midi Out")->getChecked()) jMIDI["out"].push_back(port);
+		for (auto& node : _outputNodes) {
+			ofJson output;
+			output["port"] = node.getName();
+			output["x"] = node.getBox().x;
+			output["y"] = node.getBox().y;
+			jMIDIOut.push_back(output);
 		}
-		jSave["MIDI"] = jMIDI;
+		jSave["MIDIIn"] = jMIDIIn;
+		jSave["MIDIOut"] = jMIDIOut;
 
 		//Modules
 		ofJson jModules;
@@ -620,6 +668,7 @@ void ofApp::save()
 			jConnection["toInput"] = connection.toInput;
 			jConnection["fromInputNode"] = connection.fromInputNode;
 			jConnection["toOutputNode"] = connection.toOutputNode;
+			jConnection["isDump"] = connection.isDump;
 			jConnections.push_back(jConnection);
 		}
 		jSave["Connections"] = jConnections;
@@ -640,7 +689,15 @@ void ofApp::setWindowTitle(string title)
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	if (key == OF_KEY_SHIFT) _shift = true;
+	switch (key)
+	{
+	case(OF_KEY_SHIFT):
+		_shift = true;
+		break;
+	case(OF_KEY_CONTROL):
+		_control = true;
+		break;
+	}
 }
 
 void ofApp::keyReleased(int key){
@@ -661,6 +718,9 @@ void ofApp::keyReleased(int key){
 	case(OF_KEY_SHIFT):
 		_shift = false;
 		_shiftSelected = { "",-1,-1 };
+		break;
+	case(OF_KEY_CONTROL):
+		_control = false;
 		break;
 	case(OF_KEY_ESC):
 		_mode = false;
@@ -723,7 +783,7 @@ void ofApp::mousePressed(int x, int y, int button){
 				{
 					tuple<string, int, int> curSelected = selectNode(x, y);
 					bool keep = get<0>(curSelected) != get<0>(_shiftSelected) && get<1>(curSelected) > 0;
-					if (keep) createDeleteConnection(_shiftSelected, curSelected);
+					if (keep) createDeleteConnection(_shiftSelected, curSelected, _control);
 					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
 					else _shiftSelected = { "", -1 , -1 };
 				}

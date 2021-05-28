@@ -38,7 +38,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void newMidiMessage(ofxMidiMessage& msg);
 		//--------------------------------------------------------------
 		tuple<string, int, int> selectNode(int x, int y);
-		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in);
+		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in, bool dump);
 		void updateConnections();
 		//--------------------------------------------------------------
 		void load();
@@ -66,7 +66,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		string _selected;
 		int _lastClick = 0;
 		tuple<string, int, int> _shiftSelected;
-		bool _shift;
+		bool _shift, _control;
 		
 		//GUI
 		const size_t _maxPages = 1;

@@ -75,6 +75,7 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 		map<string, float> message;
 		message[name] = value;
 		addMidiMessages(message, _MIDIDumpMessages);
+		addMidiMessages(message, _MIDIOutMessages);
 	}
 }
 
@@ -108,7 +109,9 @@ void NNIPage::updateSelected(int selected, Point point)
 	map<string, float> parameters = point.getValues();
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second);
-	//for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
+	map<string, float> curMessage;
+	addMidiMessages(parameters, _MIDIOutMessages);
+	addMidiMessages(parameters, _MIDIDumpMessages);
 }
 
 void NNIPage::mouseMoved(int x, int y)
@@ -207,15 +210,15 @@ void NNIPage::MIDIIn(string port, int channel, int control, float value)
 		if (_lastSelectedControl == "x")
 		{
 			_CCXY[0] = parameter;
-			_gui->getSlider("x")->setLabel("x:cc" + control);
+			_gui->getSlider("x")->setLabel(sliderLabel);
 		}
 		if (_lastSelectedControl == "y")
 		{
 			_CCXY[1] = parameter;
-			_gui->getSlider("y")->setLabel("y:cc" + control);
+			_gui->getSlider("y")->setLabel(sliderLabel);
 		}
 	}
-	if (_parameterLearn)
+	else if (_parameterLearn)
 	{
 		if (curParameters.find(parameter) == curParameters.end())
 		{
@@ -240,6 +243,9 @@ void NNIPage::MIDIIn(string port, int channel, int control, float value)
 		if (parameter == _CCXY[0]) _gui->getSlider("x")->setValue(value);
 		if (parameter == _CCXY[1]) _gui->getSlider("y")->setValue(value);
 	}
+	map<string, float> curMessage;
+	curMessage[parameter] = value;
+	addMidiMessages(curMessage, _MIDIOutMessages);
 }
 
 void NNIPage::load(ofJson& json)

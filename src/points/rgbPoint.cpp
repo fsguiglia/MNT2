@@ -121,7 +121,9 @@ void RGBPoint::draw(int x, int y, int w, int h)
 	if (_img.isAllocated())
 	{
 		ofPushStyle();
+		ofSetColor(255);
 		_img.getTexture().draw(x, y, w, h);
+		ofSetColor(255, 0, 0);
 		ofNoFill();
 		ofDrawRectangle(x, y, w, h);
 		ofFill();

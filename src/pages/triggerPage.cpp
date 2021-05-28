@@ -96,6 +96,7 @@ void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
 		map<string, float> message;
 		message[name] = value;
+		addMidiMessages(message, _MIDIOutMessages);
 		addMidiMessages(message, _MIDIDumpMessages);
 	}
 }
@@ -251,15 +252,15 @@ void TriggerPage::MIDIIn(string port, int channel, int control, float value)
 		if (_lastSelectedControl == "x")
 		{
 			_CCXY[0] = parameter;
-			_gui->getSlider("x")->setLabel("x:cc" + control);
+			_gui->getSlider("x")->setLabel(sliderLabel);
 		}
 		if (_lastSelectedControl == "y")
 		{
 			_CCXY[1] = parameter;
-			_gui->getSlider("y")->setLabel("y:cc" + control);
+			_gui->getSlider("y")->setLabel(sliderLabel);
 		}
 	}
-	if (_parameterLearn)
+	else if (_parameterLearn)
 	{
 		int lastSelected = _map.getLastSelected();
 		if (lastSelected != -1)
