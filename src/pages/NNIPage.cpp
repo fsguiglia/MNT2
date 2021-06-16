@@ -237,15 +237,15 @@ void NNIPage::MIDIIn(string port, int channel, int control, float value)
 			_map.setGlobalParameter(parameter, value);
 			if (_map.getLastSelected() >= 0) _map.setPointParameter(_map.getLastSelected(), parameter, value);
 		}
+		map<string, float> curMessage;
+		curMessage[parameter] = value;
+		addMidiMessages(curMessage, _MIDIOutMessages);
 	}
 	else
 	{
 		if (parameter == _CCXY[0]) _gui->getSlider("x")->setValue(value);
 		if (parameter == _CCXY[1]) _gui->getSlider("y")->setValue(value);
 	}
-	map<string, float> curMessage;
-	curMessage[parameter] = value;
-	addMidiMessages(curMessage, _MIDIOutMessages);
 }
 
 void NNIPage::load(ofJson& json)

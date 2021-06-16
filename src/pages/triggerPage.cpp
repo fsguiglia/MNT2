@@ -281,6 +281,9 @@ void TriggerPage::MIDIIn(string port, int channel, int control, float value)
 				_gui->getSlider(parameter)->setValue(value, false);
 				_map.setPointParameter(lastSelected, parameter, value);
 			}
+			map<string, float> curMessage;
+			curMessage[parameter] = value;
+			addMidiMessages(curMessage, _MIDIOutMessages);
 		}
 	}
 	else

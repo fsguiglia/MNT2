@@ -488,8 +488,13 @@
     <ClInclude Include="src\gui\moduleInterface.h">
       <Filter>src\gui</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bin\data\MNT.ico" />
+    <Image Include="icon.ico" />
   </ItemGroup>
 </Project>

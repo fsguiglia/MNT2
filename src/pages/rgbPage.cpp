@@ -294,12 +294,25 @@ void RGBPage::MIDIIn(string port, int channel, int control, float value)
 				_gui->getSlider(parameter)->setValue(value, false);
 				_map.setPointParameter(lastSelected, parameter, value);
 			}
+			map<string, float> curMessage;
+			curMessage[parameter] = value;
+			addMidiMessages(curMessage, _MIDIOutMessages);
 		}
 	}
-	else
+	else if (parameter == _CCXY[0] || parameter == _CCXY[1])
 	{
-		if (parameter == _CCXY[0]) _gui->getSlider("x")->setValue(value);
-		if (parameter == _CCXY[1]) _gui->getSlider("y")->setValue(value);
+		ofVec2f cursor = _map.getCursors()[0];
+		if (parameter == _CCXY[0])
+		{
+			_gui->getSlider("x")->setValue(value, false);
+			cursor.x = value;
+		}
+		if (parameter == _CCXY[1])
+		{
+			_gui->getSlider("y")->setValue(value, false);
+			cursor.y = value;
+		}
+		_map.setCursor(cursor, 0);
 	}
 }
 

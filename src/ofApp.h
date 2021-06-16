@@ -81,7 +81,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofxDatGuiFolder*_midiOutFolder;
 
 		//IO
-		ofJson _settings;
 		string _folder, _file;
 
 		//MIDI

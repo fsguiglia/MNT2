@@ -4,7 +4,6 @@ void ofApp::setup(){
 	setWindowTitle("untitled");
 	ofSetEscapeQuitsApp(false);
 	_file = "";
-	_settings = ofLoadJson("mnt.ini");
 	setupColor();
 	//MIDI
 	setupMIDI();
@@ -130,7 +129,6 @@ void ofApp::exit()
 	{
 		if (port.second.isOpen()) port.second.closePort();
 	}
-	ofSavePrettyJson("mnt.ini", _settings);
 }
 
 void ofApp::setupColor()
@@ -218,7 +216,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 
 void ofApp::setupMIDI()
 {
-	_maxMidiMessages = 10;
+	_maxMidiMessages = 4;
 	ofxMidiIn midiIn;
 	_MIDIInPorts = midiIn.getInPortList();
 	ofxMidiOut midiOut;
@@ -328,12 +326,16 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 	}
 }
 
-void ofApp::newMidiMessage(ofxMidiMessage & msg)
+void ofApp::newMidiMessage(ofxMidiMessage& msg)
 {
-	_MIDIMessages.push_back(msg);
-	while (_MIDIMessages.size() > _maxMidiMessages) {
+	if(_MIDIMessages.size() < _maxMidiMessages - 1) _MIDIMessages.push_back(msg);
+	/*
+	esto generaba un error muy cada tanto (?)
+	
+	while (_MIDIMessages.size() >= _maxMidiMessages) {
 		_MIDIMessages.erase(_MIDIMessages.begin());
 	}
+	*/
 }
 
 
@@ -608,7 +610,6 @@ void ofApp::load()
 		//LOAD
 		_file = loadFile.getName();
 		_folder = ofSplitString(path, _file)[0];
-		_settings["folder"] = _folder;
 		setWindowTitle(_file);
 	}
 }
@@ -677,7 +678,6 @@ void ofApp::save()
 		ofSavePrettyJson(path, jSave);
 		_file = saveFile.getName();
 		_folder = ofSplitString(path, _file)[0];
-		_settings["folder"] = _folder;
 		setWindowTitle(_file);
 	}
 }
