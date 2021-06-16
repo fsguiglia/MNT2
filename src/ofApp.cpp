@@ -647,63 +647,120 @@ void ofApp::load()
 		ofJson jLoad = ofLoadJson(path);
 		map<string, string> names;
 
-		//MIDI
-		ofJson jMIDIIn = jLoad["MIDIIn"];
-		cout << "----------" << endl;
+		//MIDI/OSC
+		ofJson jIn = jLoad["in"];
 		for (auto key : _MIDIInputs) cout << key.first << endl;
-		for (auto& element : jMIDIIn)
+		for (auto& element : jIn)
 		{
 			string curPort = element["port"].get<string>();
-			bool portAvailable = false;
-			for (auto port : _MIDIInPorts) {
-				if (port == curPort)
+			bool osc = false;
+			vector<string> split = ofSplitString(curPort, ":");
+			if (split.size() > 0)
+			{
+				if (split[0] == "osc") osc = true;
+			}
+			if (osc)
+			{
+				bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
+				if (isNumber)
 				{
-					portAvailable = true;
-					break;
+					if (_oscReceivers.find(split[1]) == _oscReceivers.end())
+					{
+						ofxOscReceiver receiver;
+						receiver.setup(ofToInt(split[1]));
+						_oscReceivers[split[1]] = receiver;
+
+						Node node;
+						node.setup(50, ofGetHeight() * 0.5, 80, 30);
+						node.setName("osc:" + split[1]);
+						node.setAsInput(true);
+						node.setColor(ofColor(80, 200, 80));
+						_inputNodes.push_back(node);
+					}
 				}
 			}
-			if (portAvailable)
+			else
 			{
-				_MIDIInputs[curPort] = ofxMidiIn();
-				_MIDIInputs[curPort].openPort(curPort);
-				_MIDIInputs[curPort].addListener(this);
+				bool portAvailable = false;
+				for (auto port : _MIDIInPorts) {
+					if (port == curPort)
+					{
+						portAvailable = true;
+						break;
+					}
+				}
+				if (portAvailable)
+				{
+					_MIDIInputs[curPort] = ofxMidiIn();
+					_MIDIInputs[curPort].openPort(curPort);
+					_MIDIInputs[curPort].addListener(this);
 
-				Node node;
-				node.setup(element["x"].get<int>(), element["y"].get<int>(), 80, 30);
-				node.setName(curPort);
-				node.setAsInput(true);
-				node.setColor(ofColor(80, 200, 80));
-				_inputNodes.push_back(node);
-				names[curPort] = curPort;
+					Node node;
+					node.setup(element["x"].get<int>(), element["y"].get<int>(), 80, 30);
+					node.setName(curPort);
+					node.setAsInput(true);
+					node.setColor(ofColor(80, 200, 80));
+					_inputNodes.push_back(node);
+					names[curPort] = curPort;
 
-				_gui->getToggle(curPort)->setChecked(true);
+					_gui->getToggle(curPort)->setChecked(true);
+				}
 			}
 		}
-		ofJson jMIDIOut = jLoad["MIDIOut"];
-		for (auto& element : jMIDIOut)
+		ofJson jOut = jLoad["out"];
+		for (auto& element : jOut)
 		{
 			string curPort = element["port"].get<string>();
-			bool portAvailable = false;
-			for (auto port : _MIDIOutPorts) {
-				if (port == curPort)
+			bool osc = false;
+			vector<string> split = ofSplitString(curPort, ":");
+			if (split.size() > 0)
+			{
+				if (split[0] == "osc") osc = true;
+			}
+			if (osc)
+			{
+				if (_oscSenders.find(split[1]) == _oscSenders.end())
 				{
-					portAvailable = true;
-					break;
+					ofxOscSender sender;
+					ofxOscSenderSettings settings;
+					settings.broadcast = true;
+					settings.host = "127.0.0.1";
+					settings.port = ofToInt(split[1]);
+					sender.setup(settings);
+					_oscSenders[split[1]] = sender;
+
+					Node node;
+					node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+					node.setName("osc:" + split[1]);
+					node.setAsOutput(true);
+					node.setColor(ofColor(80, 200, 80));
+					_outputNodes.push_back(node);
 				}
 			}
-			if (portAvailable)
+			else
 			{
-				_MIDIOutputs[curPort] = ofxMidiOut();
-				_MIDIOutputs[curPort].openPort(curPort);
-				
-				Node node;
-				node.setup(element["x"], element["y"], 80, 30);
-				node.setName(curPort);
-				node.setAsOutput(true);
-				node.setColor(ofColor(80, 200, 80));
-				_outputNodes.push_back(node);
-				names[curPort] = curPort;
-				_gui->getToggle(curPort)->setChecked(true);
+				bool portAvailable = false;
+				for (auto port : _MIDIOutPorts) {
+					if (port == curPort)
+					{
+						portAvailable = true;
+						break;
+					}
+				}
+				if (portAvailable)
+				{
+					_MIDIOutputs[curPort] = ofxMidiOut();
+					_MIDIOutputs[curPort].openPort(curPort);
+
+					Node node;
+					node.setup(element["x"], element["y"], 80, 30);
+					node.setName(curPort);
+					node.setAsOutput(true);
+					node.setColor(ofColor(80, 200, 80));
+					_outputNodes.push_back(node);
+					names[curPort] = curPort;
+					_gui->getToggle(curPort)->setChecked(true);
+				}
 			}
 		}
 		
@@ -792,27 +849,27 @@ void ofApp::save()
 	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.json", "Save MNT set");
 	if (saveFile.bSuccess)
 	{
-		//MIDI
+		//MIDI/OSC
 		path = saveFile.getPath();
 		ofJson jSave;
-		ofJson jMIDIIn, jMIDIOut;
+		ofJson jIn, jOut;
 		for (auto& node : _inputNodes)
 		{
 			ofJson input;
 			input["port"] = node.getName();
 			input["x"] = node.getBox().x;
 			input["y"] = node.getBox().y;
-			jMIDIIn.push_back(input);
+			jIn.push_back(input);
 		}
 		for (auto& node : _outputNodes) {
 			ofJson output;
 			output["port"] = node.getName();
 			output["x"] = node.getBox().x;
 			output["y"] = node.getBox().y;
-			jMIDIOut.push_back(output);
+			jOut.push_back(output);
 		}
-		jSave["MIDIIn"] = jMIDIIn;
-		jSave["MIDIOut"] = jMIDIOut;
+		jSave["in"] = jIn;
+		jSave["out"] = jOut;
 
 		//Modules
 		ofJson jModules;

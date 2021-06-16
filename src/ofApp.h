@@ -17,6 +17,8 @@
 
 /*
 en vez de map<string, float> podría hacer un struct controlchange, pero ojo que ofxmidiout ya tiene
+
+tendria que haber una funcion addinput y otra addoutput para ordenar load/save y los diferentes tipos de i/o
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
