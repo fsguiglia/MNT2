@@ -37,6 +37,9 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void newMidiMessage(ofxMidiMessage& msg);
 		//--------------------------------------------------------------
+		void setupOSC();
+		void oscTextInput(ofxDatGuiTextInputEvent e);
+		//--------------------------------------------------------------
 		tuple<string, int, int> selectNode(int x, int y);
 		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in, bool dump);
 		void updateConnections();
@@ -78,7 +81,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofTrueTypeFont _verdana;
 		ofxDatGui* _gui;
 		ofxDatGuiFolder* _midiInFolder;
-		ofxDatGuiFolder*_midiOutFolder;
+		ofxDatGuiFolder* _midiOutFolder;
+		ofxDatGuiFolder* _oscFolder;
 
 		//IO
 		string _folder, _file;
@@ -89,4 +93,10 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		map<string, ofxMidiOut> _MIDIOutputs;
 		vector<ofxMidiMessage> _MIDIMessages;
 		size_t _maxMidiMessages;
+
+		//OSC
+		map<string, ofxOscReceiver> _oscReceivers;
+		map<string, ofxOscSender> _oscSenders;
+		vector<ofxOscMessage> _oscMessages;
+		size_t _maxOscMessages;
 };

@@ -153,7 +153,6 @@ void ofApp::setupGui()
 	_gui->addButton("Trigger");
 	_gui->addButton("Draw");
 	_gui->addBreak();
-	_gui->addButton("Midi Setup");
 	_midiInFolder = _gui->addFolder("Midi In");
 	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port);
 	_midiInFolder->onToggleEvent(this, &ofApp::MIDIInToggle);
@@ -162,6 +161,12 @@ void ofApp::setupGui()
 	for (auto port : _MIDIOutPorts) _midiOutFolder->addToggle(port);
 	_midiOutFolder->onToggleEvent(this, &ofApp::MIDIOutToggle);
 	_midiOutFolder->collapse();
+	_oscFolder = _gui->addFolder("OSC");
+	_oscFolder->addTextInput("in", "")->setName("oscIn");
+	_oscFolder->addTextInput("out", "")->setName("oscOut");
+	_oscFolder->onTextInputEvent(this, &ofApp::oscTextInput);
+	_oscFolder->collapse();
+	_gui->addBreak();
 	_gui->addButton("Load");
 	_gui->addButton("Save");
 	_gui->addFooter();
@@ -213,7 +218,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 
 void ofApp::setupMIDI()
 {
-	_maxMidiMessages = 4;
+	_maxMidiMessages = 10;
 	ofxMidiIn midiIn;
 	_MIDIInPorts = midiIn.getInPortList();
 	ofxMidiOut midiOut;
@@ -335,6 +340,108 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg)
 	*/
 }
 
+void ofApp::setupOSC()
+{
+	_maxOscMessages = 10;
+}
+
+void ofApp::oscTextInput(ofxDatGuiTextInputEvent e)
+{
+	bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos);
+	if (isNumber)
+	{
+		if (e.target->getName() == "oscIn")
+		{
+			if (_oscReceivers.find(e.text) == _oscReceivers.end())
+			{
+				ofxOscReceiver receiver;
+				receiver.setup(ofToInt(e.text));
+				_oscReceivers[e.text] = receiver;
+
+				Node node;
+				node.setup(50, ofGetHeight() * 0.5, 80, 30);
+				node.setName("osc:" + e.text);
+				node.setAsInput(true);
+				node.setColor(ofColor(80, 200, 80));
+				_inputNodes.push_back(node);
+			}
+			else
+			{
+				_oscReceivers.erase(e.text);
+				int curIndex = -1;
+				for (int i = 0; i < _inputNodes.size(); i++)
+				{
+					if (_inputNodes[i].getName() == "osc:" + e.text)
+					{
+						curIndex = i;
+						break;
+					}
+				}
+				if (curIndex != -1)
+				{
+					vector<int> deleteConnection;
+					_inputNodes.erase(_inputNodes.begin() + curIndex);
+					for (int i = 0; i < _connections.size(); i++)
+					{
+						if (_connections[i].fromId == "osc:" + e.text) deleteConnection.push_back(i);
+					}
+					for (int i = deleteConnection.size() - 1; i >= 0; i--)
+					{
+						_connections.erase(_connections.begin() + deleteConnection[i]);
+					}
+				}
+			}
+		}
+		else if (e.target->getName() == "oscOut")
+		{
+			if (_oscSenders.find(e.text) == _oscSenders.end())
+			{
+				ofxOscSender sender;
+				ofxOscSenderSettings settings;
+				settings.broadcast = true;
+				settings.host = "127.0.0.1";
+				settings.port = ofToInt(e.text);
+				sender.setup(settings);
+				_oscSenders[e.text] = sender;
+				
+				Node node;
+				node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+				node.setName("osc:" + e.text);
+				node.setAsOutput(true);
+				node.setColor(ofColor(80, 200, 80));
+				_outputNodes.push_back(node);
+			}
+			else
+			{
+				_oscSenders.erase(e.text);
+				int curIndex = -1;
+				for (int i = 0; i < _outputNodes.size(); i++)
+				{
+					if (_outputNodes[i].getName() == "osc:" + e.text)
+					{
+						curIndex = i;
+						break;
+					}
+				}
+				if (curIndex != -1)
+				{
+					vector<int> deleteConnection;
+					_outputNodes.erase(_outputNodes.begin() + curIndex);
+					for (int i = 0; i < _connections.size(); i++)
+					{
+						if (_connections[i].toId == "osc:" + e.text) deleteConnection.push_back(i);
+					}
+					for (int i = deleteConnection.size() - 1; i >= 0; i--)
+					{
+						_connections.erase(_connections.begin() + deleteConnection[i]);
+					}
+				}
+			}
+		}
+	}
+	e.target->setText("");
+}
+
 
 tuple<string, int, int> ofApp::selectNode(int x, int y)
 {
@@ -403,16 +510,46 @@ void ofApp::updateConnections()
 		map<string, float> messages;
 		if (connection.fromInputNode)
 		{
-			for (auto msg : _MIDIMessages)
+			string input = connection.fromId;
+			vector<string> split = ofSplitString(input, ":");
+			bool osc = false;
+			if (split.size() > 0)
 			{
-				if (msg.portName == connection.fromId)
+				if (split[0] == "osc") osc = true;
+			}
+			if (osc)
+			{
+				for (auto& receiver : _oscReceivers)
 				{
-					string sPort = msg.portName;
-					string sChannel = ofToString(msg.channel);
-					string sControl = ofToString(msg.control);
-					string key = sPort + "/" + sChannel + "/" + sControl;
-					float value = msg.value / 127.;
-					messages[key] = value;
+					if (receiver.second.getPort() == ofToInt(split[1]))
+					{
+						while (receiver.second.hasWaitingMessages()) {
+							ofxOscMessage m;
+							receiver.second.getNextMessage(m);
+							string sPort = "osc/" + ofToString(receiver.second.getPort());
+							string address = m.getAddress();
+							string key = sPort + address;
+							float value = m.getArgAsFloat(0);
+							if (value < 0) value = 0;
+							if (value > 1) value = 1;
+							messages[key] = value;
+						}
+					}
+				}
+			}
+			else
+			{
+				for (auto msg : _MIDIMessages)
+				{
+					if (msg.portName == input)
+					{
+						string sPort = msg.portName;
+						string sChannel = ofToString(msg.channel);
+						string sControl = ofToString(msg.control);
+						string key = sPort + "/" + sChannel + "/" + sControl;
+						float value = msg.value / 127.;
+						messages[key] = value;
+					}
 				}
 			}
 		}
@@ -431,14 +568,50 @@ void ofApp::updateConnections()
 		}
 		if (connection.toOutputNode)
 		{
-			for (auto& element : messages)
+			string output = connection.toId;
+			vector<string> split = ofSplitString(output, ":");
+			bool osc = false;
+			if (split.size() > 0)
 			{
-				int channel = ofToInt(ofSplitString(element.first, "/")[1]);
-				int control = ofToInt(ofSplitString(element.first, "/")[2]);
-				int value = element.second * 127;
-				if (_MIDIOutputs[connection.toId].isOpen())
+				if (split[0] == "osc") osc = true;
+			}
+			if (osc)
+			{
+				for (auto& element : messages)
 				{
-					_MIDIOutputs[connection.toId].sendControlChange(channel, control, value);
+					string port = ofSplitString(element.first, "/")[0];
+					if (port == "osc")
+					{
+						string portNumber = ofSplitString(element.first, "/")[1];
+						vector<string> split = ofSplitString(element.first, "/");
+						string address = element.first;
+						address.erase(0, port.length());
+						address.erase(0, portNumber.length());
+						ofxOscMessage m;
+						m.setAddress(address);
+						m.addFloatArg(element.second);
+						if (_oscSenders.find(portNumber) != _oscSenders.end())
+						{
+							_oscSenders[portNumber].sendMessage(m);
+						}
+					}
+				}
+			}
+			else
+			{
+				for (auto& element : messages)
+				{
+					string port = ofSplitString(element.first, "/")[0];
+					if (port != "osc")
+					{
+						int channel = ofToInt(ofSplitString(element.first, "/")[1]);
+						int control = ofToInt(ofSplitString(element.first, "/")[2]);
+						int value = element.second * 127;
+						if (_MIDIOutputs[connection.toId].isOpen())
+						{
+							_MIDIOutputs[connection.toId].sendControlChange(channel, control, value);
+						}
+					}
 				}
 			}
 		}
