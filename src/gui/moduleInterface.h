@@ -12,7 +12,7 @@ public:
 
 	virtual void mouseMoved(int x, int y) = 0;
 	virtual void mouseDragged(int x, int y, int button) = 0;
-	virtual void mousePressed(int x, int y, int button) = 0;
+	virtual void mousePressed(int x, int y, int button, bool doubleClick = false) = 0;
 	virtual void mouseReleased(int x, int y, int button) = 0;
 	virtual void mouseScrolled(int scroll) = 0;
 

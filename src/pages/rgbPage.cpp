@@ -196,7 +196,7 @@ void RGBPage::mouseDragged(int x, int y, int button)
 	}
 }
 
-void RGBPage::mousePressed(int x, int y, int button)
+void RGBPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
 	_inside = _position.inside(x, y);
 	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
@@ -204,7 +204,7 @@ void RGBPage::mousePressed(int x, int y, int button)
 	if (_inside && !insideGui)
 	{
 		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (button == 0)
+		if (doubleClick)
 		{
 			ofFileDialogResult openFile = ofSystemLoadDialog("load image", false);
 			if (openFile.bSuccess)

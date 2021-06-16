@@ -175,7 +175,7 @@ void TriggerPage::mouseDragged(int x, int y, int button)
 	}
 }
 
-void TriggerPage::mousePressed(int x, int y, int button)
+void TriggerPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
 	_inside = _position.inside(x, y);
 	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
@@ -183,7 +183,7 @@ void TriggerPage::mousePressed(int x, int y, int button)
 	if (_inside && !insideGui)
 	{
 		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (button == 0) _map.addPoint(pos, _radius, _threshold);
+		if (doubleClick) _map.addPoint(pos, _radius, _threshold);
 		if (button < 2)
 		{
 			int lastSelected = _map.getLastSelected();

@@ -134,7 +134,7 @@ void NNIPage::mouseDragged(int x, int y, int button)
 	}
 }
 
-void NNIPage::mousePressed(int x, int y, int button)
+void NNIPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
 	_inside = _position.inside(x, y);
 	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
@@ -142,7 +142,7 @@ void NNIPage::mousePressed(int x, int y, int button)
 	if (_inside && !insideGui)
 	{
 		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (button == 0) _map.addPoint(pos);
+		if (doubleClick) _map.addPoint(pos);
 		if (button < 2)
 		{
 			int lastSelected = _map.getLastSelected();

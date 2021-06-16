@@ -207,10 +207,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setName("Draw", true);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
-	if (label == "Load")
-	{
-
-	}
+	if (label == "Load") load();
 	if (label == "Save") save();
 }
 
@@ -533,7 +530,6 @@ void ofApp::load()
 				node.setColor(ofColor(80, 200, 80));
 				_outputNodes.push_back(node);
 				names[curPort] = curPort;
-
 				_gui->getToggle(curPort)->setChecked(true);
 			}
 		}
@@ -616,6 +612,9 @@ void ofApp::load()
 
 void ofApp::save()
 {
+	/*
+	openframeworks has an old bug that makes default name do nothing in ofSystemSaveDialog on Windows
+	*/
 	string path;
 	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.json", "Save MNT set");
 	if (saveFile.bSuccess)
@@ -729,7 +728,7 @@ void ofApp::keyReleased(int key){
 	}
 }
 
-void ofApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y){
 	if (_mode)
 	{
 		for (auto& node : _moduleNodes)
@@ -806,7 +805,6 @@ void ofApp::mousePressed(int x, int y, int button){
 						else node->setVisible(false);
 					}
 				}
-				_lastClick = ofGetElapsedTimeMillis();
 			}
 		}
 	}
@@ -814,9 +812,15 @@ void ofApp::mousePressed(int x, int y, int button){
 	{
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getVisible()) node->mousePressed(x, y, button);
+			bool doubleClick = false;
+			if (button == 0)
+			{
+				doubleClick = ofGetElapsedTimeMillis() - _lastClick < 300;
+			}
+			if (node->getVisible()) node->mousePressed(x, y, button, doubleClick);
 		}
 	}
+	if(button == 0) _lastClick = ofGetElapsedTimeMillis();
 }
 
 void ofApp::mouseReleased(int x, int y, int button){

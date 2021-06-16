@@ -15,7 +15,7 @@ public:
 
 	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);
-	void mousePressed(int x, int y, int button);
+	void mousePressed(int x, int y, int button, bool doubleClick = false);
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
@@ -94,9 +94,9 @@ inline void ModuleNode<T>::mouseDragged(int x, int y, int button)
 }
 
 template<typename T>
-inline void ModuleNode<T>::mousePressed(int x, int y, int button)
+inline void ModuleNode<T>::mousePressed(int x, int y, int button, bool doubleClick)
 {
-	_page->mousePressed(x, y, button);
+	_page->mousePressed(x, y, button, doubleClick);
 }
 
 template<typename T>
