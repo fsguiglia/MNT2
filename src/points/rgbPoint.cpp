@@ -73,8 +73,8 @@ float RGBPoint::getAverageColor(ofVec2f position, float radius)
 		
 		if (_isTrigger)
 		{
-			if (average > 0.99) _state = true;
-			if (average > 0.01) _state = false;
+			if (!_state && average > 0.75) _state = true;
+			if (_state && average < 0.25) _state = false;
 		}
 	}
 	

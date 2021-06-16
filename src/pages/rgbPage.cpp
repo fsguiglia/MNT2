@@ -36,13 +36,15 @@ void RGBPage::setupGui()
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("learn")->setName("controlLearn");
 	_controlFolder->addToggle("Mouse Control");
-	_controlFolder->addSlider("x", 0., 1.)->setName("x");
-	_controlFolder->addSlider("y", 0., 1.)->setName("y");
+	_controlFolder->addSlider("x", 0., 1.)->setName("ctrlX");
+	_controlFolder->addSlider("y", 0., 1.)->setName("ctrlY");
 	_controlFolder->collapse();
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addToggle("Trigger");
+	_gui->addSlider("x", 0., 1.)->setName("posX");
+	_gui->addSlider("y", 0., 1.)->setName("posY");
 	_gui->addSlider("Width", 0., 1.);
 	_gui->addSlider("Height", 0., 1.);
 	_gui->addToggle("learn")->setName("parameterLearn");
@@ -63,24 +65,36 @@ void RGBPage::setupGui()
 void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
-	if (name == "x" || name == "y")
+	if (name == "ctrlX" || name == "ctrlY")
 	{
 		_lastSelectedControl = name;
 		if (!_controlLearn)
 		{
 			ofVec2f nniCursor = _map.getCursors()[0];
-			if (name == "x") nniCursor.x = e.value;
-			if (name == "y") nniCursor.y = e.value;
+			if (name == "ctrlX") nniCursor.x = e.value;
+			if (name == "ctrlY") nniCursor.y = e.value;
 			_map.setCursor(nniCursor, 0);
 
 		}
 	}
-	else if (name == "Radius" || name == "Width" || name == "Height")
+	else if (name == "Radius" || name == "posX" || name == "posY" || name == "Width" || name == "Height")
 	{
 		if (name == "Radius")
 		{
 			_radius = e.value;
 			_map.setRadius(_radius);
+		}
+		if (name == "posX")
+		{
+			float x = e.value;
+			float y = _gui->getSlider("posY")->getValue();
+			_map.movePoint(_map.getLastSelected(), ofVec2f(x, y));
+		}
+		if (name == "posY")
+		{
+			float x = _gui->getSlider("posX")->getValue();
+			float y = e.value;
+			_map.movePoint(_map.getLastSelected(), ofVec2f(x, y));
 		}
 		if (name == "Width") {
 			int w = e.value * _map.getWidth();
@@ -155,6 +169,8 @@ void RGBPage::updateSelected(int selected, RGBPoint point)
 	}
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	_gui->getToggle("Trigger")->setChecked(point.getTrigger());
+	_gui->getSlider("posX")->setValue(point.getPosition().x, false);
+	_gui->getSlider("posY")->setValue(point.getPosition().y, false);
 	_gui->getSlider("Width")->setValue((float)point.getWidth() / _map.getWidth(), false);
 	_gui->getSlider("Height")->setValue((float)point.getHeight() / _map.getHeight(), false);
 	_gui->update();
@@ -245,6 +261,11 @@ void RGBPage::mouseReleased(int x, int y, int button)
 				_gui->update();
 			}
 		}
+	}
+	else if (button == 1)
+	{
+		RGBPoint point = _map.getPoint(_map.getLastSelected());
+		updateSelected(_map.getLastSelected(), point);
 	}
 }
 

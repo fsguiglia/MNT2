@@ -8,6 +8,7 @@ void RGBMap::setup(int width, int height)
 {
 	_width = width;
 	_height = height;
+	_sizeText = "(" + ofToString(_width) + "x" + ofToString(_height) + ")";
 	_radius = 0;
 	_fbo.allocate(_width, _height);
 	ofPushStyle();
@@ -42,6 +43,8 @@ void RGBMap::draw(int x, int y, int w, int h, ofTrueTypeFont & font)
 			drawSelected(x, y, w, h, font, 200);
 		}
 	}
+	ofSetColor(150);
+	ofDrawBitmapString(_sizeText, x + w - 90, y + h - 10);
 	ofPopStyle();
 }
 
@@ -138,7 +141,7 @@ void RGBMap::updateFbo()
 void RGBMap::updateOutput()
 {
 	_output.clear();
-	for (auto point : _points)
+	for (auto& point : _points)
 	{
 		bool prevState = point.getState();
 		int radius = _radius * _width;

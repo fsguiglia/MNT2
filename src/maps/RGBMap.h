@@ -26,6 +26,7 @@ private:
 	void updateOutput();
 
 	float _radius;
+	string _sizeText;
 	vector<ofVec2f> _cursors;
 	ofFbo _fbo;
 };
