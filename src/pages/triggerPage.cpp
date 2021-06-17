@@ -67,10 +67,10 @@ void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 		_lastSelectedControl = name;
 		if (!_controlLearn)
 		{
-			ofVec2f nniCursor = _map.getCursors()[0];
-			if (name == "x") nniCursor.x = e.value;
-			if (name == "y") nniCursor.y = e.value;
-			_map.setCursor(nniCursor, 0);
+			ofVec2f cursor = _map.getCursors()[0];
+			if (name == "x") cursor.x = e.value;
+			if (name == "y") cursor.y = e.value;
+			_map.setCursor(cursor, 0);
 
 		}
 	}

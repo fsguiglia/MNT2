@@ -142,8 +142,8 @@
     <ClCompile Include="src\points\trigger.cpp">
       <Filter>src\points</Filter>
     </ClCompile>
-    <ClCompile Include="src\gui\node.cpp">
-      <Filter>src\gui</Filter>
+    <ClCompile Include="src\nodes\node.cpp">
+      <Filter>src\nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -242,6 +242,9 @@
     </Filter>
     <Filter Include="src\pages">
       <UniqueIdentifier>{0f9e38de-1d48-47c9-a52c-a25671beed55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\nodes">
+      <UniqueIdentifier>{bb7660fa-c885-4d72-a42c-9dfdc05163a1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -476,19 +479,19 @@
     <ClInclude Include="src\pages\basePage.h">
       <Filter>src\pages</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\connection.h">
-      <Filter>src\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gui\moduleNode.h">
-      <Filter>src\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gui\node.h">
-      <Filter>src\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gui\moduleInterface.h">
-      <Filter>src\gui</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\nodes\connection.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nodes\moduleInterface.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nodes\moduleNode.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nodes\node.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

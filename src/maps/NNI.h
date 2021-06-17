@@ -17,7 +17,9 @@ public:
 	void drawInterpolationFbo(int x, int y);
 	int addPoint(ofVec2f pos);
 	void setCursor(ofVec2f cursor);
+	void setCursor(ofVec2f cursor, int index);
 	ofVec2f getCursor();
+	vector<ofVec2f> getCursors();
 	void setDrawInterpolation(bool drawInterpolation);
 	map<string, float> getOutput();
 private:

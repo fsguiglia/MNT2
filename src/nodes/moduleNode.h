@@ -20,6 +20,7 @@ public:
 	void mouseScrolled(int scroll);
 
 	void MIDIIn(string port, int control, int channel, float value);
+	void OSCIn(string address, float value);
 	map<string, float> getMidiOut();
 	map<string, float> getMidiDump();
 	void clearMIDIMessages();
@@ -115,6 +116,12 @@ template<typename T>
 inline void ModuleNode<T>::MIDIIn(string port, int control, int channel, float value)
 {
 	_page->MIDIIn(port, control, channel, value);
+}
+
+template<typename T>
+inline void ModuleNode<T>::OSCIn(string address, float value)
+{
+	_page->OSCIn(address, value);
 }
 
 template<typename T>

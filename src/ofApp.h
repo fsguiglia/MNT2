@@ -6,10 +6,10 @@
 #include "ofxNetwork.h"
 #include "ofxOsc.h"
 #include "ofxMidi.h"
-#include "gui/node.h"
-#include "gui/moduleInterface.h"
-#include "gui/moduleNode.h"
-#include "gui/connection.h"
+#include "nodes/node.h"
+#include "nodes/moduleInterface.h"
+#include "nodes/moduleNode.h"
+#include "nodes/connection.h"
 #include "pages/NNIpage.h"
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
@@ -18,7 +18,11 @@
 /*
 en vez de map<string, float> podría hacer un struct controlchange, pero ojo que ofxmidiout ya tiene
 
-tendria que haber una funcion addinput y otra addoutput para ordenar load/save y los diferentes tipos de i/o
+osc va a tener dos problemas: por un lado el control esta todo pensado para midi (como se reflejan las 
+direcciones en el control de parámetros en los mapas?) y por el otro, no preví una manera de reflejar
+la ip de destino en los outputs
+
+quiza osc tiene que ser un módulo en el que uno hace doble click y puede configurar las entradas y salidas?
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -37,10 +41,18 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void setupMIDI();
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
+		void createMIDIInput(string port);
+		void deleteMIDIInput(string port);
+		void createMIDIOutput(string port);
+		void deleteMIDIOutput(string port);
 		void newMidiMessage(ofxMidiMessage& msg);
 		//--------------------------------------------------------------
 		void setupOSC();
-		void oscTextInput(ofxDatGuiTextInputEvent e);
+		void OSCTextInput(ofxDatGuiTextInputEvent e);
+		void createOscInput(string port);
+		void deleteOscInput(string port);
+		void createOscOutput(string ip, string port);
+		void deleteOscOutput(string ip, string port);
 		//--------------------------------------------------------------
 		tuple<string, int, int> selectNode(int x, int y);
 		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in, bool dump);

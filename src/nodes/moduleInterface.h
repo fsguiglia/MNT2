@@ -17,6 +17,7 @@ public:
 	virtual void mouseScrolled(int scroll) = 0;
 
 	virtual void MIDIIn(string port, int control, int channel, float value) = 0;
+	virtual void OSCIn(string address, float value) = 0;
 	virtual map<string, float> getMidiOut() = 0;
 	virtual map<string, float> getMidiDump() = 0;
 	virtual void clearMIDIMessages() = 0;

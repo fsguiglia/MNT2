@@ -18,6 +18,9 @@ public:
 	void resize(int w, int h);
 	ofRectangle centerSquarePosition(int w, int h);
 
+	virtual void MIDIIn(string port, int channel, int control, float value) = 0;
+	void OSCIn(string address, float value);
+
 	map<string, float> getMidiDump(bool clear = false);
 	map<string, float> getMidiOut(bool clear = false);
 	void setVisible(bool visible);
@@ -105,6 +108,37 @@ inline ofRectangle BasePage<T>::centerSquarePosition(int w, int h)
 	rect.setY(float(h - min) * 0.5);
 
 	return rect;
+}
+
+template<typename T>
+inline void BasePage<T>::OSCIn(string address, float value)
+{
+	vector<string> split = ofSplitString(address, "/");
+	if (split.size() > 1)
+	{
+		if (split[0] == "control")
+		{
+			ofVec2f cursor = _map.getCursors()[0];
+			if (value > 1) value = 1;
+			if (value < 0) value = 0;
+			if (split[1] == "x") cursor.x = value;
+			if (split[1] == "y") cursor.y = value;
+			_map.setCursor(cursor, 0);
+		}
+		else if (split[0] == "point")
+		{
+			int index = ofToInt(split[1]);
+			if (index < _map.getPoints().size())
+			{
+				ofVec2f position = _map.getPoint(index).getPosition();
+				if (value > 1) value = 1;
+				if (value < 0) value = 0;
+				if (split[2] == "x") position.x = value;
+				if (split[2] == "y") position.y = value;
+				_map.movePoint(index, position);
+			}
+		}
+	}
 }
 
 template<typename T>

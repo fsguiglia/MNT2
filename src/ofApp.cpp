@@ -164,7 +164,7 @@ void ofApp::setupGui()
 	_oscFolder = _gui->addFolder("OSC");
 	_oscFolder->addTextInput("in", "")->setName("oscIn");
 	_oscFolder->addTextInput("out", "")->setName("oscOut");
-	_oscFolder->onTextInputEvent(this, &ofApp::oscTextInput);
+	_oscFolder->onTextInputEvent(this, &ofApp::OSCTextInput);
 	_oscFolder->collapse();
 	_gui->addBreak();
 	_gui->addButton("Load");
@@ -230,51 +230,11 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	string port = e.target->getLabel();
 	if (e.checked)
 	{
-		if (_MIDIInputs.find(port) == _MIDIInputs.end())
-		{
-			
-			_MIDIInputs[port] = ofxMidiIn();
-			_MIDIInputs[port].openPort(port);
-			_MIDIInputs[port].addListener(this);
-			
-			Node node;
-			node.setup(50, ofGetHeight() * 0.5, 80, 30);
-			node.setName(port);
-			node.setAsInput(true);
-			node.setColor(ofColor(80, 200, 80));
-			_inputNodes.push_back(node);
-		}
+		if (_MIDIInputs.find(port) == _MIDIInputs.end()) createMIDIInput(port);
 	}
 	else
 	{
-		if (_MIDIInputs.find(port) != _MIDIInputs.end())
-		{
-			_MIDIInputs[port].closePort();
-			_MIDIInputs[port].removeListener(this);
-			_MIDIInputs.erase(port);
-			int curIndex = -1;
-			for (int i = 0; i < _inputNodes.size(); i++)
-			{
-				if (_inputNodes[i].getName() == port)
-				{
-					curIndex = i;
-					break;
-				}
-			}
-			if (curIndex != -1)
-			{
-				vector<int> deleteConnection;
-				_inputNodes.erase(_inputNodes.begin() + curIndex);
-				for (int i = 0; i < _connections.size(); i++)
-				{
-					if (_connections[i].fromId == port) deleteConnection.push_back(i);
-				}
-				for (int i = deleteConnection.size() - 1; i >= 0; i--)
-				{
-					_connections.erase(_connections.begin() + deleteConnection[i]);
-				}
-			}
-		}
+		if (_MIDIInputs.find(port) != _MIDIInputs.end()) deleteMIDIOutput(port);
 	}
 }
 
@@ -283,49 +243,98 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 	string port = e.target->getLabel();
 	if (e.checked)
 	{
-		if (_MIDIOutputs.find(port) == _MIDIOutputs.end())
-		{
-			_MIDIOutputs[port] = ofxMidiOut();
-			_MIDIOutputs[port].openPort(port);
-			
-			Node node;
-			node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
-			node.setName(port);
-			node.setAsOutput(true);
-			node.setColor(ofColor(80, 200, 80));
-			_outputNodes.push_back(node);
-		}
+		if (_MIDIOutputs.find(port) == _MIDIOutputs.end()) createMIDIOutput(port);
 	}
 	else
 	{
-		if (_MIDIOutputs.find(port) != _MIDIOutputs.end())
+		if (_MIDIOutputs.find(port) != _MIDIOutputs.end()) deleteMIDIOutput(port);
+	}
+}
+
+void ofApp::createMIDIInput(string port)
+{
+	_MIDIInputs[port] = ofxMidiIn();
+	_MIDIInputs[port].openPort(port);
+	_MIDIInputs[port].addListener(this);
+
+	Node node;
+	node.setup(50, ofGetHeight() * 0.5, 80, 30);
+	node.setName(port);
+	node.setAsInput(true);
+	node.setColor(ofColor(80, 200, 80));
+	_inputNodes.push_back(node);
+}
+
+void ofApp::deleteMIDIInput(string port)
+{
+	_MIDIInputs[port].closePort();
+	_MIDIInputs[port].removeListener(this);
+	_MIDIInputs.erase(port);
+	int curIndex = -1;
+	for (int i = 0; i < _inputNodes.size(); i++)
+	{
+		if (_inputNodes[i].getName() == port)
 		{
-			_MIDIOutputs[port].closePort();
-			_MIDIOutputs.erase(port);
-			int curIndex = -1;
-			for (int i = 0; i < _outputNodes.size(); i++)
-			{
-				if (_outputNodes[i].getName() == port)
-				{
-					curIndex = i;
-					break;
-				}
-			}
-			if (curIndex != -1)
-			{
-				vector<int> deleteConnection;
-				_outputNodes.erase(_outputNodes.begin() + curIndex);
-				for (int i = 0; i < _connections.size(); i++)
-				{
-					if (_connections[i].toId == port) deleteConnection.push_back(i);
-				}
-				for (int i = deleteConnection.size() - 1; i >= 0; i--)
-				{
-					_connections.erase(_connections.begin() + deleteConnection[i]);
-				}
-			}
+			curIndex = i;
+			break;
 		}
 	}
+	if (curIndex != -1)
+	{
+		vector<int> deleteConnection;
+		_inputNodes.erase(_inputNodes.begin() + curIndex);
+		for (int i = 0; i < _connections.size(); i++)
+		{
+			if (_connections[i].fromId == port) deleteConnection.push_back(i);
+		}
+		for (int i = deleteConnection.size() - 1; i >= 0; i--)
+		{
+			_connections.erase(_connections.begin() + deleteConnection[i]);
+		}
+	}
+	_gui->getToggle(port)->setChecked(false);
+}
+
+void ofApp::createMIDIOutput(string port)
+{
+	_MIDIOutputs[port] = ofxMidiOut();
+	_MIDIOutputs[port].openPort(port);
+
+	Node node;
+	node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+	node.setName(port);
+	node.setAsOutput(true);
+	node.setColor(ofColor(80, 200, 80));
+	_outputNodes.push_back(node);
+}
+
+void ofApp::deleteMIDIOutput(string port)
+{
+	_MIDIOutputs[port].closePort();
+	_MIDIOutputs.erase(port);
+	int curIndex = -1;
+	for (int i = 0; i < _outputNodes.size(); i++)
+	{
+		if (_outputNodes[i].getName() == port)
+		{
+			curIndex = i;
+			break;
+		}
+	}
+	if (curIndex != -1)
+	{
+		vector<int> deleteConnection;
+		_outputNodes.erase(_outputNodes.begin() + curIndex);
+		for (int i = 0; i < _connections.size(); i++)
+		{
+			if (_connections[i].toId == port) deleteConnection.push_back(i);
+		}
+		for (int i = deleteConnection.size() - 1; i >= 0; i--)
+		{
+			_connections.erase(_connections.begin() + deleteConnection[i]);
+		}
+	}
+	_gui->getToggle(port)->setChecked(false);
 }
 
 void ofApp::newMidiMessage(ofxMidiMessage& msg)
@@ -345,101 +354,106 @@ void ofApp::setupOSC()
 	_maxOscMessages = 10;
 }
 
-void ofApp::oscTextInput(ofxDatGuiTextInputEvent e)
+void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 {
-	bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos);
-	if (isNumber)
+	if (e.target->getName() == "oscIn")
 	{
-		if (e.target->getName() == "oscIn")
-		{
-			if (_oscReceivers.find(e.text) == _oscReceivers.end())
-			{
-				ofxOscReceiver receiver;
-				receiver.setup(ofToInt(e.text));
-				_oscReceivers[e.text] = receiver;
-
-				Node node;
-				node.setup(50, ofGetHeight() * 0.5, 80, 30);
-				node.setName("osc:" + e.text);
-				node.setAsInput(true);
-				node.setColor(ofColor(80, 200, 80));
-				_inputNodes.push_back(node);
-			}
-			else
-			{
-				_oscReceivers.erase(e.text);
-				int curIndex = -1;
-				for (int i = 0; i < _inputNodes.size(); i++)
-				{
-					if (_inputNodes[i].getName() == "osc:" + e.text)
-					{
-						curIndex = i;
-						break;
-					}
-				}
-				if (curIndex != -1)
-				{
-					vector<int> deleteConnection;
-					_inputNodes.erase(_inputNodes.begin() + curIndex);
-					for (int i = 0; i < _connections.size(); i++)
-					{
-						if (_connections[i].fromId == "osc:" + e.text) deleteConnection.push_back(i);
-					}
-					for (int i = deleteConnection.size() - 1; i >= 0; i--)
-					{
-						_connections.erase(_connections.begin() + deleteConnection[i]);
-					}
-				}
-			}
-		}
-		else if (e.target->getName() == "oscOut")
-		{
-			if (_oscSenders.find(e.text) == _oscSenders.end())
-			{
-				ofxOscSender sender;
-				ofxOscSenderSettings settings;
-				settings.broadcast = true;
-				settings.host = "127.0.0.1";
-				settings.port = ofToInt(e.text);
-				sender.setup(settings);
-				_oscSenders[e.text] = sender;
-				
-				Node node;
-				node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
-				node.setName("osc:" + e.text);
-				node.setAsOutput(true);
-				node.setColor(ofColor(80, 200, 80));
-				_outputNodes.push_back(node);
-			}
-			else
-			{
-				_oscSenders.erase(e.text);
-				int curIndex = -1;
-				for (int i = 0; i < _outputNodes.size(); i++)
-				{
-					if (_outputNodes[i].getName() == "osc:" + e.text)
-					{
-						curIndex = i;
-						break;
-					}
-				}
-				if (curIndex != -1)
-				{
-					vector<int> deleteConnection;
-					_outputNodes.erase(_outputNodes.begin() + curIndex);
-					for (int i = 0; i < _connections.size(); i++)
-					{
-						if (_connections[i].toId == "osc:" + e.text) deleteConnection.push_back(i);
-					}
-					for (int i = deleteConnection.size() - 1; i >= 0; i--)
-					{
-						_connections.erase(_connections.begin() + deleteConnection[i]);
-					}
-				}
-			}
+		bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos);
+		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber) createOscInput(e.text);
+	}
+	else if (e.target->getName() == "oscOut")
+	{
+		vector<string> split = ofSplitString(e.text, ":");
+		if (split.size() == 2) {
+			bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
+			if (isNumber) createOscOutput(split[0], split[1]);
 		}
 	}
 	e.target->setText("");
+}
+
+void ofApp::createOscInput(string port)
+{
+	ofxOscReceiver receiver;
+	receiver.setup(ofToInt(port));
+	_oscReceivers[port] = receiver;
+
+	Node node;
+	node.setup(50, ofGetHeight() * 0.5, 80, 30);
+	node.setName("osc:" + port);
+	node.setAsInput(true);
+	node.setColor(ofColor(80, 200, 80));
+	_inputNodes.push_back(node);
+}
+
+void ofApp::deleteOscInput(string port)
+{
+	_oscReceivers.erase(port);
+	int curIndex = -1;
+	for (int i = 0; i < _inputNodes.size(); i++)
+	{
+		if (_inputNodes[i].getName() == "osc:" + port)
+		{
+			curIndex = i;
+			break;
+		}
+	}
+	if (curIndex != -1)
+	{
+		vector<int> deleteConnection;
+		_inputNodes.erase(_inputNodes.begin() + curIndex);
+		for (int i = 0; i < _connections.size(); i++)
+		{
+			if (_connections[i].fromId == "osc:" + port) deleteConnection.push_back(i);
+		}
+		for (int i = deleteConnection.size() - 1; i >= 0; i--)
+		{
+			_connections.erase(_connections.begin() + deleteConnection[i]);
+		}
+	}
+}
+
+void ofApp::createOscOutput(string ip, string port)
+{
+	string name = ip + ":" + port;
+	ofxOscSender sender;
+	sender.setup(ip, ofToInt(port));
+	_oscSenders[name] = sender;
+
+	Node node;
+	node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+	node.setName("osc:" + name);
+	node.setAsOutput(true);
+	node.setColor(ofColor(80, 200, 80));
+	_outputNodes.push_back(node);
+}
+
+void ofApp::deleteOscOutput(string ip, string port)
+{
+	string name = ip + ":" + port;
+	_oscSenders.erase(name);
+	int curIndex = -1;
+	for (int i = 0; i < _outputNodes.size(); i++)
+	{
+		if (_outputNodes[i].getName() == "osc:" + name)
+		{
+			curIndex = i;
+			break;
+		}
+	}
+	if (curIndex != -1)
+	{
+		vector<int> deleteConnection;
+		_outputNodes.erase(_outputNodes.begin() + curIndex);
+		for (int i = 0; i < _connections.size(); i++)
+		{
+			if (_connections[i].toId == "osc:" + name) deleteConnection.push_back(i);
+		}
+		for (int i = deleteConnection.size() - 1; i >= 0; i--)
+		{
+			_connections.erase(_connections.begin() + deleteConnection[i]);
+		}
+	}
 }
 
 
@@ -507,7 +521,7 @@ void ofApp::updateConnections()
 {
 	for (auto& connection : _connections)
 	{
-		map<string, float> messages;
+		map<string, float> MIDIMessages, OSCMessages;
 		if (connection.fromInputNode)
 		{
 			string input = connection.fromId;
@@ -521,18 +535,12 @@ void ofApp::updateConnections()
 			{
 				for (auto& receiver : _oscReceivers)
 				{
-					if (receiver.second.getPort() == ofToInt(split[1]))
+					if (receiver.first == split[1])
 					{
 						while (receiver.second.hasWaitingMessages()) {
 							ofxOscMessage m;
 							receiver.second.getNextMessage(m);
-							string sPort = "osc/" + ofToString(receiver.second.getPort());
-							string address = m.getAddress();
-							string key = sPort + address;
-							float value = m.getArgAsFloat(0);
-							if (value < 0) value = 0;
-							if (value > 1) value = 1;
-							messages[key] = value;
+							OSCMessages[m.getAddress()] = m.getArgAsFloat(0);
 						}
 					}
 				}
@@ -548,7 +556,7 @@ void ofApp::updateConnections()
 						string sControl = ofToString(msg.control);
 						string key = sPort + "/" + sChannel + "/" + sControl;
 						float value = msg.value / 127.;
-						messages[key] = value;
+						MIDIMessages[key] = value;
 					}
 				}
 			}
@@ -560,8 +568,8 @@ void ofApp::updateConnections()
 				if (node->getName() == connection.fromId)
 				{
 					
-					if (connection.isDump) messages = node->getMidiDump();
-					else messages = node->getMidiOut();
+					if (connection.isDump) MIDIMessages = node->getMidiDump();
+					else MIDIMessages = node->getMidiOut();
 					break;
 				}
 			}
@@ -571,46 +579,37 @@ void ofApp::updateConnections()
 			string output = connection.toId;
 			vector<string> split = ofSplitString(output, ":");
 			bool osc = false;
-			if (split.size() > 0)
+			if (split.size() == 3)
 			{
 				if (split[0] == "osc") osc = true;
 			}
 			if (osc)
 			{
-				for (auto& element : messages)
+				for (auto& element : MIDIMessages)
 				{
-					string port = ofSplitString(element.first, "/")[0];
-					if (port == "osc")
+					string name = split[1] + ":" + split[2];
+					string channel = "channel" + ofSplitString(element.first, "/")[1];
+					string control = "control" + ofSplitString(element.first, "/")[2];
+					float value = element.second;
+					ofxOscMessage m;
+					m.setAddress(channel + "/" + control);
+					m.addFloatArg(element.second);
+					if (_oscSenders.find(name) != _oscSenders.end())
 					{
-						string portNumber = ofSplitString(element.first, "/")[1];
-						vector<string> split = ofSplitString(element.first, "/");
-						string address = element.first;
-						address.erase(0, port.length());
-						address.erase(0, portNumber.length());
-						ofxOscMessage m;
-						m.setAddress(address);
-						m.addFloatArg(element.second);
-						if (_oscSenders.find(portNumber) != _oscSenders.end())
-						{
-							_oscSenders[portNumber].sendMessage(m);
-						}
+						_oscSenders[name].sendMessage(m);
 					}
 				}
 			}
 			else
 			{
-				for (auto& element : messages)
+				for (auto& element : MIDIMessages)
 				{
-					string port = ofSplitString(element.first, "/")[0];
-					if (port != "osc")
+					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
+					int control = ofToInt(ofSplitString(element.first, "/")[2]);
+					int value = element.second * 127;
+					if (_MIDIOutputs[output].isOpen())
 					{
-						int channel = ofToInt(ofSplitString(element.first, "/")[1]);
-						int control = ofToInt(ofSplitString(element.first, "/")[2]);
-						int value = element.second * 127;
-						if (_MIDIOutputs[connection.toId].isOpen())
-						{
-							_MIDIOutputs[connection.toId].sendControlChange(channel, control, value);
-						}
+						_MIDIOutputs[output].sendControlChange(channel, control, value);
 					}
 				}
 			}
@@ -621,13 +620,17 @@ void ofApp::updateConnections()
 			{
 				if (node->getName() == connection.toId)
 				{
-					for (auto element : messages)
+					for (auto element : MIDIMessages)
 					{
  						string port = ofSplitString(element.first, "/")[0];
 						int channel = ofToInt(ofSplitString(element.first, "/")[1]);
 						int control = ofToInt(ofSplitString(element.first, "/")[2]);
 						float value = element.second;
 						node->MIDIIn(port, channel, control, value);
+					}
+					for (auto element : OSCMessages)
+					{
+						node->OSCIn(element.first, element.second);
 					}
 				}
 			}
@@ -649,7 +652,6 @@ void ofApp::load()
 
 		//MIDI/OSC
 		ofJson jIn = jLoad["in"];
-		for (auto key : _MIDIInputs) cout << key.first << endl;
 		for (auto& element : jIn)
 		{
 			string curPort = element["port"].get<string>();
@@ -662,21 +664,10 @@ void ofApp::load()
 			if (osc)
 			{
 				bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
-				if (isNumber)
+				if (_oscReceivers.find(curPort) == _oscReceivers.end() && isNumber)
 				{
-					if (_oscReceivers.find(split[1]) == _oscReceivers.end())
-					{
-						ofxOscReceiver receiver;
-						receiver.setup(ofToInt(split[1]));
-						_oscReceivers[split[1]] = receiver;
-
-						Node node;
-						node.setup(50, ofGetHeight() * 0.5, 80, 30);
-						node.setName("osc:" + split[1]);
-						node.setAsInput(true);
-						node.setColor(ofColor(80, 200, 80));
-						_inputNodes.push_back(node);
-					}
+					createOscInput(curPort);
+					names[curPort] = curPort;
 				}
 			}
 			else
@@ -691,19 +682,8 @@ void ofApp::load()
 				}
 				if (portAvailable)
 				{
-					_MIDIInputs[curPort] = ofxMidiIn();
-					_MIDIInputs[curPort].openPort(curPort);
-					_MIDIInputs[curPort].addListener(this);
-
-					Node node;
-					node.setup(element["x"].get<int>(), element["y"].get<int>(), 80, 30);
-					node.setName(curPort);
-					node.setAsInput(true);
-					node.setColor(ofColor(80, 200, 80));
-					_inputNodes.push_back(node);
+					createMIDIInput(curPort);
 					names[curPort] = curPort;
-
-					_gui->getToggle(curPort)->setChecked(true);
 				}
 			}
 		}
@@ -713,28 +693,17 @@ void ofApp::load()
 			string curPort = element["port"].get<string>();
 			bool osc = false;
 			vector<string> split = ofSplitString(curPort, ":");
-			if (split.size() > 0)
+			if (split.size() == 3)
 			{
 				if (split[0] == "osc") osc = true;
 			}
 			if (osc)
 			{
-				if (_oscSenders.find(split[1]) == _oscSenders.end())
+				bool isNumber = (split[2].find_first_not_of("0123456789") == std::string::npos);
+				if (isNumber)
 				{
-					ofxOscSender sender;
-					ofxOscSenderSettings settings;
-					settings.broadcast = true;
-					settings.host = "127.0.0.1";
-					settings.port = ofToInt(split[1]);
-					sender.setup(settings);
-					_oscSenders[split[1]] = sender;
-
-					Node node;
-					node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
-					node.setName("osc:" + split[1]);
-					node.setAsOutput(true);
-					node.setColor(ofColor(80, 200, 80));
-					_outputNodes.push_back(node);
+					createOscOutput(split[1], split[2]);
+					names[curPort] = curPort;
 				}
 			}
 			else
@@ -749,17 +718,8 @@ void ofApp::load()
 				}
 				if (portAvailable)
 				{
-					_MIDIOutputs[curPort] = ofxMidiOut();
-					_MIDIOutputs[curPort].openPort(curPort);
-
-					Node node;
-					node.setup(element["x"], element["y"], 80, 30);
-					node.setName(curPort);
-					node.setAsOutput(true);
-					node.setColor(ofColor(80, 200, 80));
-					_outputNodes.push_back(node);
+					createMIDIOutput(curPort);
 					names[curPort] = curPort;
-					_gui->getToggle(curPort)->setChecked(true);
 				}
 			}
 		}
@@ -821,6 +781,7 @@ void ofApp::load()
 		}
 		//CONNECTIONS
 		ofJson jConnections = jLoad["Connections"];
+		int i = 0;
 		for (auto& element : jConnections)
 		{
 			Connection connection;
@@ -832,6 +793,7 @@ void ofApp::load()
 			connection.toOutputNode= element["toOutputNode"];
 			connection.isDump = element["isDump"];
 			_connections.push_back(connection);
+			i++;
 		}
 		//LOAD
 		_file = loadFile.getName();
@@ -903,7 +865,6 @@ void ofApp::save()
 		}
 		jSave["Connections"] = jConnections;
 		//Save
-		cout << path << endl;
 		ofSavePrettyJson(path, jSave);
 		_file = saveFile.getName();
 		_folder = ofSplitString(path, _file)[0];
@@ -1090,6 +1051,45 @@ void ofApp::mouseReleased(int x, int y, int button){
 				for (int i = deleteConnection.size() - 1; i >= 0; i--)
 				{
 					_connections.erase(_connections.begin() + deleteConnection[i]);
+				}
+			}
+			else {
+				for (int i = 0; i < _inputNodes.size(); i++)
+				{
+					if (_inputNodes[i].inside(x, y))
+					{
+						curSelected = _inputNodes[i].getName();
+						vector<string> split = ofSplitString(curSelected, ":");
+						bool osc = false;
+						curIndex = i;
+						if (split.size() > 1)
+						{
+							if (split[0] == "osc") osc = true;
+						}
+						if (osc) deleteOscInput(split[1]);
+						else deleteMIDIInput(curSelected);
+						break;
+					}
+				}
+				if (curIndex == -1)
+				{
+					for (int i = 0; i < _outputNodes.size(); i++)
+					{
+						if (_outputNodes[i].inside(x, y))
+						{
+							curSelected = _outputNodes[i].getName();
+							vector<string> split = ofSplitString(curSelected, ":");
+							bool osc = false;
+							curIndex = i;
+							if (split.size() > 1)
+							{
+								if (split[0] == "osc") osc = true;
+							}
+							if (osc) deleteOscOutput(split[1], split[2]);
+							else deleteMIDIOutput(curSelected);
+							break;
+						}
+					}
 				}
 			}
 			_selected = "";

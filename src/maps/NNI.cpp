@@ -133,9 +133,21 @@ void NNI::setCursor(ofVec2f cursor)
 	_cursor = cursor;
 }
 
+void NNI::setCursor(ofVec2f cursor, int index)
+{
+	if (index == 0) setCursor(cursor);
+}
+
 ofVec2f NNI::getCursor()
 {
 	return _cursor;
+}
+
+vector<ofVec2f> NNI::getCursors()
+{
+	vector<ofVec2f> cursors;
+	cursors.push_back(_cursor);
+	return cursors;
 }
 
 void NNI::setDrawInterpolation(bool drawInterpolation)
