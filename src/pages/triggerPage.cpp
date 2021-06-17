@@ -76,15 +76,18 @@ void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else if (name == "Radius" || name == "Threshold")
 	{
-		if (name == "Radius")
+		if (_map.getLastSelected() >= 0)
 		{
-			_radius = e.value;
-			_map.setRadius(_map.getLastSelected(), _radius);
-		}
-		if (name == "Threshold")
-		{
-			_threshold = e.value;
-			_map.setThreshold(_map.getLastSelected(), _threshold);
+			if (name == "Radius")
+			{
+				_radius = e.value;
+				_map.setRadius(_map.getLastSelected(), _radius);
+			}
+			if (name == "Threshold")
+			{
+				_threshold = e.value;
+				_map.setThreshold(_map.getLastSelected(), _threshold);
+			}
 		}
 	}
 	else

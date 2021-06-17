@@ -79,32 +79,35 @@ void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else if (name == "Radius" || name == "posX" || name == "posY" || name == "Width" || name == "Height")
 	{
-		if (name == "Radius")
+		if (_map.getLastSelected() >= 0)
 		{
-			_radius = e.value;
-			_map.setRadius(_radius);
-		}
-		if (name == "posX")
-		{
-			float x = e.value;
-			float y = _gui->getSlider("posY")->getValue();
-			_map.movePoint(_map.getLastSelected(), ofVec2f(x, y));
-		}
-		if (name == "posY")
-		{
-			float x = _gui->getSlider("posX")->getValue();
-			float y = e.value;
-			_map.movePoint(_map.getLastSelected(), ofVec2f(x, y));
-		}
-		if (name == "Width") {
-			int w = e.value * _map.getWidth();
-			int h = _gui->getSlider("Height")->getValue() * _map.getHeight();
-			_map.resizePoint(_map.getLastSelected(), w, h);
-		}
-		if (name == "Height") {
-			int w = _gui->getSlider("Width")->getValue() * _map.getWidth();
-			int h = e.value * _map.getHeight();
-			_map.resizePoint(_map.getLastSelected(), w, h);
+			if (name == "Radius")
+			{
+				_radius = e.value;
+				_map.setRadius(_radius);
+			}
+			if (name == "posX")
+			{
+				float x = e.value;
+				float y = _gui->getSlider("posY")->getValue();
+				_map.movePoint(_map.getLastSelected(), ofVec2f(x, y));
+			}
+			if (name == "posY")
+			{
+				float x = _gui->getSlider("posX")->getValue();
+				float y = e.value;
+				_map.movePoint(_map.getLastSelected(), ofVec2f(x, y));
+			}
+			if (name == "Width") {
+				int w = e.value * _map.getWidth();
+				int h = _gui->getSlider("Height")->getValue() * _map.getHeight();
+				_map.resizePoint(_map.getLastSelected(), w, h);
+			}
+			if (name == "Height") {
+				int w = _gui->getSlider("Width")->getValue() * _map.getWidth();
+				int h = e.value * _map.getHeight();
+				_map.resizePoint(_map.getLastSelected(), w, h);
+			}
 		}
 	}
 	else
