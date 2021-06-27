@@ -2,15 +2,13 @@
 #define _POINT
 #include "ofMain.h"
 
-//aca habria que separar midi de osc, y en midi nota y cc?
-//los puntos para clasificador no tendrian que ser otra clase?
 class Point
 {
 public:
 	Point();
 	Point(ofVec2f position);
 	void setPosition(ofVec2f position);
-	void setPosition(float x, float y);
+	void setPosition(float x, float y = 0);
 	void setValue(string key, float value);
 	void deleteValue(string key);
 	void setValues(map<string, float> parameters);

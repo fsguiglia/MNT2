@@ -16,13 +16,7 @@
 #include "utils/mntUtils.h"
 
 /*
-en vez de map<string, float> podría hacer un struct controlchange, pero ojo que ofxmidiout ya tiene
-
-osc va a tener dos problemas: por un lado el control esta todo pensado para midi (como se reflejan las 
-direcciones en el control de parámetros en los mapas?) y por el otro, no preví una manera de reflejar
-la ip de destino en los outputs
-
-quiza osc tiene que ser un módulo en el que uno hace doble click y puede configurar las entradas y salidas?
+	las direcciones para osc deberían ser del tipo /control/x o control/x?
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {

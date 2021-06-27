@@ -145,6 +145,12 @@
     <ClCompile Include="src\nodes\node.cpp">
       <Filter>src\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\gestures\gesture.cpp">
+      <Filter>src\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gestures\gesturePair.cpp">
+      <Filter>src\gestures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -245,6 +251,9 @@
     </Filter>
     <Filter Include="src\nodes">
       <UniqueIdentifier>{bb7660fa-c885-4d72-a42c-9dfdc05163a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gestures">
+      <UniqueIdentifier>{9a6af208-bcb7-404f-ab83-cd52b606b755}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -491,6 +500,12 @@
     </ClInclude>
     <ClInclude Include="src\nodes\node.h">
       <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gestures\gesture.h">
+      <Filter>src\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gestures\gesturePair.h">
+      <Filter>src\gestures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
