@@ -148,9 +148,6 @@
     <ClCompile Include="src\gestures\gesture.cpp">
       <Filter>src\gestures</Filter>
     </ClCompile>
-    <ClCompile Include="src\gestures\gesturePair.cpp">
-      <Filter>src\gestures</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -502,9 +499,6 @@
       <Filter>src\nodes</Filter>
     </ClInclude>
     <ClInclude Include="src\gestures\gesture.h">
-      <Filter>src\gestures</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gestures\gesturePair.h">
       <Filter>src\gestures</Filter>
     </ClInclude>
   </ItemGroup>

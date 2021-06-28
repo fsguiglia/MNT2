@@ -185,7 +185,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\gestures\gesture.cpp" />
-    <ClCompile Include="src\gestures\gesturePair.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\nodes\node.cpp" />
     <ClCompile Include="src\points\point.cpp" />
@@ -238,7 +237,6 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\gestures\gesture.h" />
-    <ClInclude Include="src\gestures\gesturePair.h" />
     <ClInclude Include="src\maps\baseMap.h" />
     <ClInclude Include="src\nodes\connection.h" />
     <ClInclude Include="src\nodes\moduleInterface.h" />
