@@ -4,7 +4,7 @@
 
 //========================================================================
 
-
+#if _DEBUG
 int main( ){
 	ofGLWindowSettings settings;
 	settings.setGLVersion(3, 2);
@@ -13,7 +13,7 @@ int main( ){
 	ofRunApp(new ofApp());
 }
 
-/*
+#else
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	ofGLFWWindowSettings settings;
 	settings.setGLVersion(3, 2);
@@ -27,4 +27,4 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	ofRunApp(new ofApp());
 }
-*/
+#endif
