@@ -3,6 +3,8 @@
 void ofApp::setup(){
 	setWindowTitle("untitled");
 	ofSetEscapeQuitsApp(false);
+	ofSetFrameRate(60);
+
 	_file = "";
 	setupColor();
 	//MIDI
@@ -154,11 +156,11 @@ void ofApp::setupGui()
 	_gui->addButton("Draw");
 	_gui->addBreak();
 	_midiInFolder = _gui->addFolder("Midi In");
-	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port);
+	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port.first);
 	_midiInFolder->onToggleEvent(this, &ofApp::MIDIInToggle);
 	_midiInFolder->collapse();
 	_midiOutFolder = _gui->addFolder("Midi Out");
-	for (auto port : _MIDIOutPorts) _midiOutFolder->addToggle(port);
+	for (auto port : _MIDIOutPorts) _midiOutFolder->addToggle(port.first);
 	_midiOutFolder->onToggleEvent(this, &ofApp::MIDIOutToggle);
 	_midiOutFolder->collapse();
 	_oscFolder = _gui->addFolder("OSC");
@@ -218,11 +220,19 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 
 void ofApp::setupMIDI()
 {
-	_maxMidiMessages = 10;
+	_maxMidiMessages = 20;
 	ofxMidiIn midiIn;
-	_MIDIInPorts = midiIn.getInPortList();
+	for (auto& port : midiIn.getInPortList()) _MIDIInPorts[removePortNumber(port)] = port;
 	ofxMidiOut midiOut;
-	_MIDIOutPorts = midiOut.getOutPortList();
+	for (auto& port : midiOut.getOutPortList()) _MIDIOutPorts[removePortNumber(port)] = port;
+}
+
+string ofApp::removePortNumber(string name)
+{
+	vector<string> split = ofSplitString(name, " ");
+	string newName = "";
+	for (int i = 0; i < split.size() - 1; i++) newName += split[i];
+	return newName;
 }
 
 void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
@@ -234,7 +244,7 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	}
 	else
 	{
-		if (_MIDIInputs.find(port) != _MIDIInputs.end()) deleteMIDIOutput(port);
+		if (_MIDIInputs.find(port) != _MIDIInputs.end()) deleteMIDIInput(port);
 	}
 }
 
@@ -252,9 +262,9 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 }
 
 void ofApp::createMIDIInput(string port)
-{
+{ 
 	_MIDIInputs[port] = ofxMidiIn();
-	_MIDIInputs[port].openPort(port);
+	_MIDIInputs[port].openPort(_MIDIInPorts[port]);
 	_MIDIInputs[port].addListener(this);
 
 	Node node;
@@ -298,7 +308,7 @@ void ofApp::deleteMIDIInput(string port)
 void ofApp::createMIDIOutput(string port)
 {
 	_MIDIOutputs[port] = ofxMidiOut();
-	_MIDIOutputs[port].openPort(port);
+	_MIDIOutputs[port].openPort(_MIDIOutPorts[port]);
 
 	Node node;
 	node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
@@ -339,19 +349,17 @@ void ofApp::deleteMIDIOutput(string port)
 
 void ofApp::newMidiMessage(ofxMidiMessage& msg)
 {
-	if(_MIDIMessages.size() < _maxMidiMessages - 1) _MIDIMessages.push_back(msg);
-	/*
-	esto generaba un error muy cada tanto (?)
-	
+	midiMutex.lock();
+	//if(_MIDIMessages.size() < _maxMidiMessages - 1) _MIDIMessages.push_back(msg);
 	while (_MIDIMessages.size() >= _maxMidiMessages) {
 		_MIDIMessages.erase(_MIDIMessages.begin());
 	}
-	*/
+	midiMutex.unlock();
 }
 
 void ofApp::setupOSC()
 {
-	_maxOscMessages = 10;
+	_maxOscMessages = 20;
 }
 
 void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
@@ -519,9 +527,17 @@ void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, in
 
 void ofApp::updateConnections()
 {
+	midiMutex.lock();
+	vector<ofxMidiMessage> curMessages;
+	curMessages = _MIDIMessages;
+	_MIDIMessages.clear();
+	midiMutex.unlock();
+
 	for (auto& connection : _connections)
 	{
 		map<string, float> MIDIMessages, OSCMessages;
+		
+		//input
 		if (connection.fromInputNode)
 		{
 			string input = connection.fromId;
@@ -547,7 +563,7 @@ void ofApp::updateConnections()
 			}
 			else
 			{
-				for (auto msg : _MIDIMessages)
+				for (auto msg : curMessages)
 				{
 					if (msg.portName == input)
 					{
@@ -574,6 +590,8 @@ void ofApp::updateConnections()
 				}
 			}
 		}
+
+		//output
 		if (connection.toOutputNode)
 		{
 			string output = connection.toId;
@@ -604,6 +622,7 @@ void ofApp::updateConnections()
 			{
 				for (auto& element : MIDIMessages)
 				{
+					cout << element.first << endl;
 					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
 					int control = ofToInt(ofSplitString(element.first, "/")[2]);
 					int value = element.second * 127;
@@ -637,7 +656,6 @@ void ofApp::updateConnections()
 		}
 	}
 	for (auto& node : _moduleNodes) node->clearMIDIMessages();
-	if(_MIDIMessages.size() > 0) _MIDIMessages.clear();
 }
 
 void ofApp::load()
@@ -674,7 +692,7 @@ void ofApp::load()
 			{
 				bool portAvailable = false;
 				for (auto port : _MIDIInPorts) {
-					if (port == curPort)
+					if (port.first == curPort)
 					{
 						portAvailable = true;
 						break;
@@ -710,7 +728,7 @@ void ofApp::load()
 			{
 				bool portAvailable = false;
 				for (auto port : _MIDIOutPorts) {
-					if (port == curPort)
+					if (port.first == curPort)
 					{
 						portAvailable = true;
 						break;
@@ -781,7 +799,6 @@ void ofApp::load()
 		}
 		//CONNECTIONS
 		ofJson jConnections = jLoad["Connections"];
-		int i = 0;
 		for (auto& element : jConnections)
 		{
 			Connection connection;
@@ -790,10 +807,27 @@ void ofApp::load()
 			connection.fromOutput = element["fromOutput"];
 			connection.toInput = element["toInput"];
 			connection.fromInputNode = element["fromInputNode"];
-			connection.toOutputNode= element["toOutputNode"];
+			connection.toOutputNode = element["toOutputNode"];
 			connection.isDump = element["isDump"];
-			_connections.push_back(connection);
-			i++;
+
+			bool validConnection = true;
+			if (connection.fromInputNode)
+			{
+				bool inputExists = false;
+				for (auto port : _MIDIInPorts) if (port.first == connection.fromId) inputExists = true;
+				for (auto port : _oscReceivers) if (port.first == connection.fromId) inputExists = true;
+				validConnection = validConnection && inputExists;
+			}
+			
+			if (connection.toOutputNode)
+			{
+				bool outputExists = false;
+				for (auto port : _MIDIOutPorts) if (port.first == connection.toId) outputExists = true;
+				for (auto port : _oscSenders) if (port.first == connection.toId) outputExists = true;
+				validConnection = validConnection && outputExists;
+			}
+			
+			if(validConnection) _connections.push_back(connection);
 		}
 		//LOAD
 		_file = loadFile.getName();

@@ -16,7 +16,17 @@
 #include "utils/mntUtils.h"
 
 /*
-	las direcciones para osc deberían ser del tipo /control/x o control/x?
+en vez de map<string, float> podría hacer un struct controlchange, pero ojo que ofxmidiout ya tiene
+
+osc va a tener dos problemas: por un lado el control esta todo pensado para midi (como se reflejan las 
+direcciones en el control de parámetros en los mapas?) y por el otro, no preví una manera de reflejar
+la ip de destino en los outputs
+
+quiza osc tiene que ser un módulo en el que uno hace doble click y puede configurar las entradas y salidas?
+
+hay un quilombo porque los mensajes midi llegan en otro thread. no puedo limpiar la lista una vez que los recibo.
+pero si pongo un mutex, a veces dos mensajes llegan al mismo tiempo y no necesariamente se mantiene el orden de
+llegada
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -33,6 +43,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void buttonEvent(ofxDatGuiButtonEvent e);
 		//--------------------------------------------------------------
 		void setupMIDI();
+		string removePortNumber(string name);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void createMIDIInput(string port);
@@ -97,10 +108,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 
 		//MIDI
 		map<string, ofxMidiIn> _MIDIInputs;
-		vector<string> _MIDIInPorts, _MIDIOutPorts;
+		map<string, string> _MIDIInPorts, _MIDIOutPorts;
 		map<string, ofxMidiOut> _MIDIOutputs;
 		vector<ofxMidiMessage> _MIDIMessages;
 		size_t _maxMidiMessages;
+		ofMutex midiMutex;
 
 		//OSC
 		map<string, ofxOscReceiver> _oscReceivers;
