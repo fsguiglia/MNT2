@@ -108,7 +108,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 
 		//MIDI
 		map<string, ofxMidiIn> _MIDIInputs;
-		vector<string> _MIDIInPorts, _MIDIOutPorts;
+		map<string, string> _MIDIInPorts, _MIDIOutPorts;
 		map<string, ofxMidiOut> _MIDIOutputs;
 		vector<ofxMidiMessage> _MIDIMessages;
 		size_t _maxMidiMessages;

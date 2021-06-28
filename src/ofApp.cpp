@@ -156,11 +156,11 @@ void ofApp::setupGui()
 	_gui->addButton("Draw");
 	_gui->addBreak();
 	_midiInFolder = _gui->addFolder("Midi In");
-	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port);
+	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port.first);
 	_midiInFolder->onToggleEvent(this, &ofApp::MIDIInToggle);
 	_midiInFolder->collapse();
 	_midiOutFolder = _gui->addFolder("Midi Out");
-	for (auto port : _MIDIOutPorts) _midiOutFolder->addToggle(port);
+	for (auto port : _MIDIOutPorts) _midiOutFolder->addToggle(port.first);
 	_midiOutFolder->onToggleEvent(this, &ofApp::MIDIOutToggle);
 	_midiOutFolder->collapse();
 	_oscFolder = _gui->addFolder("OSC");
@@ -220,13 +220,11 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 
 void ofApp::setupMIDI()
 {
-	_maxMidiMessages = 10;
+	_maxMidiMessages = 20;
 	ofxMidiIn midiIn;
-	_MIDIInPorts = midiIn.getInPortList();
-	for (auto& port : _MIDIInPorts) port = removePortNumber(port);
+	for (auto& port : midiIn.getInPortList()) _MIDIInPorts[removePortNumber(port)] = port;
 	ofxMidiOut midiOut;
-	_MIDIOutPorts = midiOut.getOutPortList();
-	for (auto& port : _MIDIOutPorts) port = removePortNumber(port);
+	for (auto& port : midiOut.getOutPortList()) _MIDIOutPorts[removePortNumber(port)] = port;
 }
 
 string ofApp::removePortNumber(string name)
@@ -264,9 +262,9 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 }
 
 void ofApp::createMIDIInput(string port)
-{
+{ 
 	_MIDIInputs[port] = ofxMidiIn();
-	_MIDIInputs[port].openPort(port);
+	_MIDIInputs[port].openPort(_MIDIInPorts[port]);
 	_MIDIInputs[port].addListener(this);
 
 	Node node;
@@ -285,7 +283,7 @@ void ofApp::deleteMIDIInput(string port)
 	int curIndex = -1;
 	for (int i = 0; i < _inputNodes.size(); i++)
 	{
-		if (removePortNumber(_inputNodes[i].getName()) == port)
+		if (_inputNodes[i].getName() == port)
 		{
 			curIndex = i;
 			break;
@@ -310,7 +308,7 @@ void ofApp::deleteMIDIInput(string port)
 void ofApp::createMIDIOutput(string port)
 {
 	_MIDIOutputs[port] = ofxMidiOut();
-	_MIDIOutputs[port].openPort(port);
+	_MIDIOutputs[port].openPort(_MIDIOutPorts[port]);
 
 	Node node;
 	node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
@@ -327,7 +325,7 @@ void ofApp::deleteMIDIOutput(string port)
 	int curIndex = -1;
 	for (int i = 0; i < _outputNodes.size(); i++)
 	{
-		if (removePortNumber(_outputNodes[i].getName()) == port)
+		if (_outputNodes[i].getName() == port)
 		{
 			curIndex = i;
 			break;
@@ -352,20 +350,16 @@ void ofApp::deleteMIDIOutput(string port)
 void ofApp::newMidiMessage(ofxMidiMessage& msg)
 {
 	midiMutex.lock();
-	if(_MIDIMessages.size() < _maxMidiMessages - 1) _MIDIMessages.push_back(msg);
-	midiMutex.unlock();
-	/*
-	esto generaba un error muy cada tanto (?)
-	
+	//if(_MIDIMessages.size() < _maxMidiMessages - 1) _MIDIMessages.push_back(msg);
 	while (_MIDIMessages.size() >= _maxMidiMessages) {
 		_MIDIMessages.erase(_MIDIMessages.begin());
 	}
-	*/
+	midiMutex.unlock();
 }
 
 void ofApp::setupOSC()
 {
-	_maxOscMessages = 10;
+	_maxOscMessages = 20;
 }
 
 void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
@@ -698,7 +692,7 @@ void ofApp::load()
 			{
 				bool portAvailable = false;
 				for (auto port : _MIDIInPorts) {
-					if (port == curPort)
+					if (port.first == curPort)
 					{
 						portAvailable = true;
 						break;
@@ -734,7 +728,7 @@ void ofApp::load()
 			{
 				bool portAvailable = false;
 				for (auto port : _MIDIOutPorts) {
-					if (port == curPort)
+					if (port.first == curPort)
 					{
 						portAvailable = true;
 						break;
@@ -820,7 +814,7 @@ void ofApp::load()
 			if (connection.fromInputNode)
 			{
 				bool inputExists = false;
-				for (auto port : _MIDIInPorts) if (port == connection.fromId) inputExists = true;
+				for (auto port : _MIDIInPorts) if (port.first == connection.fromId) inputExists = true;
 				for (auto port : _oscReceivers) if (port.first == connection.fromId) inputExists = true;
 				validConnection = validConnection && inputExists;
 			}
@@ -828,7 +822,7 @@ void ofApp::load()
 			if (connection.toOutputNode)
 			{
 				bool outputExists = false;
-				for (auto port : _MIDIOutPorts) if (port == connection.toId) outputExists = true;
+				for (auto port : _MIDIOutPorts) if (port.first == connection.toId) outputExists = true;
 				for (auto port : _oscSenders) if (port.first == connection.toId) outputExists = true;
 				validConnection = validConnection && outputExists;
 			}
