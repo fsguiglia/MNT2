@@ -3,6 +3,8 @@
 void ofApp::setup(){
 	setWindowTitle("untitled");
 	ofSetEscapeQuitsApp(false);
+	ofSetFrameRate(60);
+
 	_file = "";
 	setupColor();
 	//MIDI
@@ -234,7 +236,7 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	}
 	else
 	{
-		if (_MIDIInputs.find(port) != _MIDIInputs.end()) deleteMIDIOutput(port);
+		if (_MIDIInputs.find(port) != _MIDIInputs.end()) deleteMIDIInput(port);
 	}
 }
 
@@ -339,7 +341,9 @@ void ofApp::deleteMIDIOutput(string port)
 
 void ofApp::newMidiMessage(ofxMidiMessage& msg)
 {
+	midiMutex.lock();
 	if(_MIDIMessages.size() < _maxMidiMessages - 1) _MIDIMessages.push_back(msg);
+	midiMutex.unlock();
 	/*
 	esto generaba un error muy cada tanto (?)
 	
@@ -519,9 +523,17 @@ void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, in
 
 void ofApp::updateConnections()
 {
+	midiMutex.lock();
+	vector<ofxMidiMessage> curMessages;
+	curMessages = _MIDIMessages;
+	_MIDIMessages.clear();
+	midiMutex.unlock();
+
 	for (auto& connection : _connections)
 	{
 		map<string, float> MIDIMessages, OSCMessages;
+		
+		//input
 		if (connection.fromInputNode)
 		{
 			string input = connection.fromId;
@@ -547,7 +559,7 @@ void ofApp::updateConnections()
 			}
 			else
 			{
-				for (auto msg : _MIDIMessages)
+				for (auto msg : curMessages)
 				{
 					if (msg.portName == input)
 					{
@@ -574,6 +586,8 @@ void ofApp::updateConnections()
 				}
 			}
 		}
+
+		//output
 		if (connection.toOutputNode)
 		{
 			string output = connection.toId;
@@ -604,6 +618,7 @@ void ofApp::updateConnections()
 			{
 				for (auto& element : MIDIMessages)
 				{
+					cout << element.first << endl;
 					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
 					int control = ofToInt(ofSplitString(element.first, "/")[2]);
 					int value = element.second * 127;
@@ -637,7 +652,6 @@ void ofApp::updateConnections()
 		}
 	}
 	for (auto& node : _moduleNodes) node->clearMIDIMessages();
-	if(_MIDIMessages.size() > 0) _MIDIMessages.clear();
 }
 
 void ofApp::load()

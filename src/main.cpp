@@ -4,6 +4,7 @@
 
 //========================================================================
 
+
 int main( ){
 	ofGLWindowSettings settings;
 	settings.setGLVersion(3, 2);
@@ -15,6 +16,7 @@ int main( ){
 /*
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	ofGLFWWindowSettings settings;
+	settings.setGLVersion(3, 2);
 	settings.setSize(900, 600);
 	settings.resizable = false;
 	ofCreateWindow(settings);
