@@ -223,8 +223,18 @@ void ofApp::setupMIDI()
 	_maxMidiMessages = 10;
 	ofxMidiIn midiIn;
 	_MIDIInPorts = midiIn.getInPortList();
+	for (auto& port : _MIDIInPorts) port = removePortNumber(port);
 	ofxMidiOut midiOut;
 	_MIDIOutPorts = midiOut.getOutPortList();
+	for (auto& port : _MIDIOutPorts) port = removePortNumber(port);
+}
+
+string ofApp::removePortNumber(string name)
+{
+	vector<string> split = ofSplitString(name, " ");
+	string newName = "";
+	for (int i = 0; i < split.size() - 1; i++) newName += split[i];
+	return newName;
 }
 
 void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
@@ -275,7 +285,7 @@ void ofApp::deleteMIDIInput(string port)
 	int curIndex = -1;
 	for (int i = 0; i < _inputNodes.size(); i++)
 	{
-		if (_inputNodes[i].getName() == port)
+		if (removePortNumber(_inputNodes[i].getName()) == port)
 		{
 			curIndex = i;
 			break;
@@ -317,7 +327,7 @@ void ofApp::deleteMIDIOutput(string port)
 	int curIndex = -1;
 	for (int i = 0; i < _outputNodes.size(); i++)
 	{
-		if (_outputNodes[i].getName() == port)
+		if (removePortNumber(_outputNodes[i].getName()) == port)
 		{
 			curIndex = i;
 			break;
@@ -795,7 +805,6 @@ void ofApp::load()
 		}
 		//CONNECTIONS
 		ofJson jConnections = jLoad["Connections"];
-		int i = 0;
 		for (auto& element : jConnections)
 		{
 			Connection connection;
@@ -804,10 +813,27 @@ void ofApp::load()
 			connection.fromOutput = element["fromOutput"];
 			connection.toInput = element["toInput"];
 			connection.fromInputNode = element["fromInputNode"];
-			connection.toOutputNode= element["toOutputNode"];
+			connection.toOutputNode = element["toOutputNode"];
 			connection.isDump = element["isDump"];
-			_connections.push_back(connection);
-			i++;
+
+			bool validConnection = true;
+			if (connection.fromInputNode)
+			{
+				bool inputExists = false;
+				for (auto port : _MIDIInPorts) if (port == connection.fromId) inputExists = true;
+				for (auto port : _oscReceivers) if (port.first == connection.fromId) inputExists = true;
+				validConnection = validConnection && inputExists;
+			}
+			
+			if (connection.toOutputNode)
+			{
+				bool outputExists = false;
+				for (auto port : _MIDIOutPorts) if (port == connection.toId) outputExists = true;
+				for (auto port : _oscSenders) if (port.first == connection.toId) outputExists = true;
+				validConnection = validConnection && outputExists;
+			}
+			
+			if(validConnection) _connections.push_back(connection);
 		}
 		//LOAD
 		_file = loadFile.getName();

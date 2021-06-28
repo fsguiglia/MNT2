@@ -43,6 +43,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void buttonEvent(ofxDatGuiButtonEvent e);
 		//--------------------------------------------------------------
 		void setupMIDI();
+		string removePortNumber(string name);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
 		void createMIDIInput(string port);
