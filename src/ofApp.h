@@ -46,9 +46,9 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		string removePortNumber(string name);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
-		void createMIDIInput(string port);
+		string createMIDIInput(string port);
 		void deleteMIDIInput(string port);
-		void createMIDIOutput(string port);
+		string createMIDIOutput(string port);
 		void deleteMIDIOutput(string port);
 		void newMidiMessage(ofxMidiMessage& msg);
 		//--------------------------------------------------------------

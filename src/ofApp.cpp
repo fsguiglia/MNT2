@@ -238,52 +238,57 @@ string ofApp::removePortNumber(string name)
 void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 {
 	string port = e.target->getLabel();
+	string name = "in:" + port;
 	if (e.checked)
 	{
-		if (_MIDIInputs.find(port) == _MIDIInputs.end()) createMIDIInput(port);
+		if (_MIDIInputs.find(name) == _MIDIInputs.end()) createMIDIInput(port);
 	}
 	else
 	{
-		if (_MIDIInputs.find(port) != _MIDIInputs.end()) deleteMIDIInput(port);
+		if (_MIDIInputs.find(name) != _MIDIInputs.end()) deleteMIDIInput(port);
 	}
 }
 
 void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 {
 	string port = e.target->getLabel();
+	string name = "out:" + port;
 	if (e.checked)
 	{
-		if (_MIDIOutputs.find(port) == _MIDIOutputs.end()) createMIDIOutput(port);
+		if (_MIDIOutputs.find(name) == _MIDIOutputs.end()) createMIDIOutput(port);
 	}
 	else
 	{
-		if (_MIDIOutputs.find(port) != _MIDIOutputs.end()) deleteMIDIOutput(port);
+		if (_MIDIOutputs.find(name) != _MIDIOutputs.end()) deleteMIDIOutput(port);
 	}
 }
 
-void ofApp::createMIDIInput(string port)
+string ofApp::createMIDIInput(string port)
 { 
-	_MIDIInputs[port] = ofxMidiIn();
-	_MIDIInputs[port].openPort(_MIDIInPorts[port]);
-	_MIDIInputs[port].addListener(this);
+	string name = "in:" + port;
+	_MIDIInputs[name] = ofxMidiIn();
+	_MIDIInputs[name].openPort(_MIDIInPorts[port]);
+	_MIDIInputs[name].addListener(this);
 
 	Node node;
 	node.setup(50, ofGetHeight() * 0.5, 80, 30);
-	node.setName(port);
+	node.setName(name);
 	node.setAsInput(true);
 	node.setColor(ofColor(80, 200, 80));
 	_inputNodes.push_back(node);
+	return name;
 }
 
 void ofApp::deleteMIDIInput(string port)
 {
-	_MIDIInputs[port].closePort();
-	_MIDIInputs[port].removeListener(this);
-	_MIDIInputs.erase(port);
+	string name = "in:" + port;
+	_MIDIInputs[name].closePort();
+	_MIDIInputs[name].removeListener(this);
+	_MIDIInputs.erase(name);
 	int curIndex = -1;
 	for (int i = 0; i < _inputNodes.size(); i++)
 	{
-		if (_inputNodes[i].getName() == port)
+		if (_inputNodes[i].getName() == name)
 		{
 			curIndex = i;
 			break;
@@ -295,7 +300,7 @@ void ofApp::deleteMIDIInput(string port)
 		_inputNodes.erase(_inputNodes.begin() + curIndex);
 		for (int i = 0; i < _connections.size(); i++)
 		{
-			if (_connections[i].fromId == port) deleteConnection.push_back(i);
+			if (_connections[i].fromId == name) deleteConnection.push_back(i);
 		}
 		for (int i = deleteConnection.size() - 1; i >= 0; i--)
 		{
@@ -305,27 +310,30 @@ void ofApp::deleteMIDIInput(string port)
 	_gui->getToggle(port)->setChecked(false);
 }
 
-void ofApp::createMIDIOutput(string port)
+string ofApp::createMIDIOutput(string port)
 {
-	_MIDIOutputs[port] = ofxMidiOut();
-	_MIDIOutputs[port].openPort(_MIDIOutPorts[port]);
+	string name = "out:" + port;
+	_MIDIOutputs[name] = ofxMidiOut();
+	_MIDIOutputs[name].openPort(_MIDIOutPorts[port]);
 
 	Node node;
 	node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
-	node.setName(port);
+	node.setName(name);
 	node.setAsOutput(true);
 	node.setColor(ofColor(80, 200, 80));
 	_outputNodes.push_back(node);
+	return name;
 }
 
 void ofApp::deleteMIDIOutput(string port)
 {
-	_MIDIOutputs[port].closePort();
-	_MIDIOutputs.erase(port);
+	string name = "out:" + port;
+	_MIDIOutputs[name].closePort();
+	_MIDIOutputs.erase(name);
 	int curIndex = -1;
 	for (int i = 0; i < _outputNodes.size(); i++)
 	{
-		if (_outputNodes[i].getName() == port)
+		if (_outputNodes[i].getName() == name)
 		{
 			curIndex = i;
 			break;
@@ -337,7 +345,7 @@ void ofApp::deleteMIDIOutput(string port)
 		_outputNodes.erase(_outputNodes.begin() + curIndex);
 		for (int i = 0; i < _connections.size(); i++)
 		{
-			if (_connections[i].toId == port) deleteConnection.push_back(i);
+			if (_connections[i].toId == name) deleteConnection.push_back(i);
 		}
 		for (int i = deleteConnection.size() - 1; i >= 0; i--)
 		{
@@ -545,34 +553,33 @@ void ofApp::updateConnections()
 			bool osc = false;
 			if (split.size() > 0)
 			{
-				if (split[0] == "osc") osc = true;
-			}
-			if (osc)
-			{
-				for (auto& receiver : _oscReceivers)
+				if (split[0] == "osc")
 				{
-					if (receiver.first == split[1])
+					for (auto& receiver : _oscReceivers)
 					{
-						while (receiver.second.hasWaitingMessages()) {
-							ofxOscMessage m;
-							receiver.second.getNextMessage(m);
-							OSCMessages[m.getAddress()] = m.getArgAsFloat(0);
+						if (receiver.first == split[1])
+						{
+							while (receiver.second.hasWaitingMessages()) {
+								ofxOscMessage m;
+								receiver.second.getNextMessage(m);
+								OSCMessages[m.getAddress()] = m.getArgAsFloat(0);
+							}
 						}
 					}
 				}
-			}
-			else
-			{
-				for (auto msg : curMessages)
+				else
 				{
-					if (msg.portName == _MIDIInPorts[input])
+					for (auto msg : curMessages)
 					{
-						string sPort = msg.portName;
-						string sChannel = ofToString(msg.channel);
-						string sControl = ofToString(msg.control);
-						string key = sPort + "/" + sChannel + "/" + sControl;
-						float value = msg.value / 127.;
-						MIDIMessages[key] = value;
+						if (msg.portName == _MIDIInPorts[split[1]])
+						{
+							string sPort = msg.portName;
+							string sChannel = ofToString(msg.channel);
+							string sControl = ofToString(msg.control);
+							string key = sPort + "/" + sChannel + "/" + sControl;
+							float value = msg.value / 127.;
+							MIDIMessages[key] = value;
+						}
 					}
 				}
 			}
@@ -583,13 +590,13 @@ void ofApp::updateConnections()
 			{
 				if (node->getName() == connection.fromId)
 				{
-					
 					if (connection.isDump) MIDIMessages = node->getMidiDump();
 					else MIDIMessages = node->getMidiOut();
 					break;
 				}
 			}
 		}
+		
 
 		//output
 		if (connection.toOutputNode)
@@ -627,6 +634,7 @@ void ofApp::updateConnections()
 					int value = element.second * 127;
 					if (_MIDIOutputs[output].isOpen())
 					{
+						cout << "tendria que salir" << endl;
 						_MIDIOutputs[output].sendControlChange(channel, control, value);
 					}
 				}
@@ -691,7 +699,7 @@ void ofApp::load()
 			{
 				bool portAvailable = false;
 				for (auto port : _MIDIInPorts) {
-					if (port.first == curPort)
+					if (port.first == split[1])
 					{
 						portAvailable = true;
 						break;
@@ -699,8 +707,8 @@ void ofApp::load()
 				}
 				if (portAvailable)
 				{
-					createMIDIInput(curPort);
-					names[curPort] = curPort;
+					string name = createMIDIInput(split[1]);
+					names[name] = name;
 				}
 			}
 		}
@@ -727,7 +735,7 @@ void ofApp::load()
 			{
 				bool portAvailable = false;
 				for (auto port : _MIDIOutPorts) {
-					if (port.first == curPort)
+					if (port.first == split[1])
 					{
 						portAvailable = true;
 						break;
@@ -735,8 +743,8 @@ void ofApp::load()
 				}
 				if (portAvailable)
 				{
-					createMIDIOutput(curPort);
-					names[curPort] = curPort;
+					string name = createMIDIOutput(split[1]);
+					names[name] = name;
 				}
 			}
 		}
@@ -813,7 +821,7 @@ void ofApp::load()
 			if (connection.fromInputNode)
 			{
 				bool inputExists = false;
-				for (auto port : _MIDIInPorts) if (port.first == connection.fromId) inputExists = true;
+				for (auto port : _MIDIInPorts) if ("in:" + port.first == connection.fromId) inputExists = true;
 				for (auto port : _oscReceivers) if (port.first == connection.fromId) inputExists = true;
 				validConnection = validConnection && inputExists;
 			}
@@ -821,7 +829,7 @@ void ofApp::load()
 			if (connection.toOutputNode)
 			{
 				bool outputExists = false;
-				for (auto port : _MIDIOutPorts) if (port.first == connection.toId) outputExists = true;
+				for (auto port : _MIDIOutPorts) if ("out:" + port.first == connection.toId) outputExists = true;
 				for (auto port : _oscSenders) if (port.first == connection.toId) outputExists = true;
 				validConnection = validConnection && outputExists;
 			}
@@ -1070,6 +1078,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 					break;
 				}
 			}
+			
 			if (curIndex != -1)
 			{
 				vector<int> deleteConnection;
@@ -1100,7 +1109,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 							if (split[0] == "osc") osc = true;
 						}
 						if (osc) deleteOscInput(split[1]);
-						else deleteMIDIInput(curSelected);
+						else deleteMIDIInput(split[1]);
 						break;
 					}
 				}
@@ -1119,7 +1128,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 								if (split[0] == "osc") osc = true;
 							}
 							if (osc) deleteOscOutput(split[1], split[2]);
-							else deleteMIDIOutput(curSelected);
+							else deleteMIDIOutput(split[1]);
 							break;
 						}
 					}
