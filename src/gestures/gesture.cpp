@@ -21,6 +21,11 @@ void Gesture::update()
 	}
 }
 
+void Gesture::draw()
+{
+
+}
+
 void Gesture::stage(Point point)
 {
 	_curPoint = point;
@@ -48,10 +53,15 @@ void Gesture::start()
 	_recording = true;
 	_startTime = ofGetElapsedTimeMillis();
 	_lastSample = _startTime;
-	_points.clear();
+	clear();
 }
 
 void Gesture::end()
 {
 	_recording = false;
+}
+
+void Gesture::clear()
+{
+	_points.clear();
 }

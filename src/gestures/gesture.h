@@ -22,6 +22,7 @@ public:
 
 	void start();
 	void end();
+	void clear();
 	
 private:
 	int _Tms, _startTime, _lastSample;

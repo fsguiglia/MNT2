@@ -350,7 +350,7 @@ void ofApp::deleteMIDIOutput(string port)
 void ofApp::newMidiMessage(ofxMidiMessage& msg)
 {
 	midiMutex.lock();
-	//if(_MIDIMessages.size() < _maxMidiMessages - 1) _MIDIMessages.push_back(msg);
+	_MIDIMessages.push_back(msg);
 	while (_MIDIMessages.size() >= _maxMidiMessages) {
 		_MIDIMessages.erase(_MIDIMessages.begin());
 	}
@@ -565,7 +565,7 @@ void ofApp::updateConnections()
 			{
 				for (auto msg : curMessages)
 				{
-					if (msg.portName == input)
+					if (msg.portName == _MIDIInPorts[input])
 					{
 						string sPort = msg.portName;
 						string sChannel = ofToString(msg.channel);
@@ -622,7 +622,6 @@ void ofApp::updateConnections()
 			{
 				for (auto& element : MIDIMessages)
 				{
-					cout << element.first << endl;
 					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
 					int control = ofToInt(ofSplitString(element.first, "/")[2]);
 					int value = element.second * 127;
