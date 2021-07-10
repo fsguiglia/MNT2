@@ -634,7 +634,6 @@ void ofApp::updateConnections()
 					int value = element.second * 127;
 					if (_MIDIOutputs[output].isOpen())
 					{
-						cout << "tendria que salir" << endl;
 						_MIDIOutputs[output].sendControlChange(channel, control, value);
 					}
 				}

@@ -14,6 +14,7 @@ public:
 	Gesture();
 	void setup(int period = 0);
 	void update();
+	void draw();
 
 	void stage(Point point);
 	void stage(map<string, float> parameters);

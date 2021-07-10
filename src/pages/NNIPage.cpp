@@ -147,7 +147,7 @@ void NNIPage::mousePressed(int x, int y, int button, bool doubleClick)
 		{
 			int lastSelected = _map.getLastSelected();
 			int curSelected = _map.getClosest(pos, true)[0];
-			if (curSelected != lastSelected)
+			if (curSelected != lastSelected && _map.getPoints().size() > 0)
 			{
 				updateSelected(curSelected, _map.getPoint(curSelected));
 			}
@@ -167,7 +167,7 @@ void NNIPage::mouseReleased(int x, int y, int button)
 			if (_map.getPoints().size() > 0)
 			{
 				int curPoint = _map.getPoints().size() - 1;
-				if (curPoint >= 0)
+				if (curPoint >= 0 && _map.getPoints().size() > 0)
 				{
 					_map.setLastSelected(curPoint);
 					updateSelected(curPoint, _map.getPoint(curPoint));
