@@ -685,7 +685,8 @@ void ofApp::clear()
 	{
 		if (port.second.isOpen()) port.second.closePort();
 	}
-
+	_file = "";
+	setWindowTitle("untitled");
 }
 
 void ofApp::load()
