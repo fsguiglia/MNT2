@@ -241,7 +241,7 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	string name = "in:" + port;
 	if (e.checked)
 	{
-		if (_MIDIInputs.find(name) == _MIDIInputs.end()) createMIDIInput(port);
+		if (_MIDIInputs.find(name) == _MIDIInputs.end()) createMIDIInput(port, 50, ofGetHeight() * 0.5);
 	}
 	else
 	{
@@ -255,7 +255,7 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 	string name = "out:" + port;
 	if (e.checked)
 	{
-		if (_MIDIOutputs.find(name) == _MIDIOutputs.end()) createMIDIOutput(port);
+		if (_MIDIOutputs.find(name) == _MIDIOutputs.end()) createMIDIOutput(port, ofGetWidth() - 250, ofGetHeight() * 0.5);
 	}
 	else
 	{
@@ -263,7 +263,7 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 	}
 }
 
-string ofApp::createMIDIInput(string port)
+string ofApp::createMIDIInput(string port, int x, int y)
 { 
 	string name = "in:" + port;
 	_MIDIInputs[name] = ofxMidiIn();
@@ -271,7 +271,7 @@ string ofApp::createMIDIInput(string port)
 	_MIDIInputs[name].addListener(this);
 
 	Node node;
-	node.setup(50, ofGetHeight() * 0.5, 80, 30);
+	node.setup(x, y, 80, 30);
 	node.setName(name);
 	node.setAsInput(true);
 	node.setColor(ofColor(80, 200, 80));
@@ -310,14 +310,14 @@ void ofApp::deleteMIDIInput(string port)
 	_gui->getToggle(port)->setChecked(false);
 }
 
-string ofApp::createMIDIOutput(string port)
+string ofApp::createMIDIOutput(string port, int x, int y)
 {
 	string name = "out:" + port;
 	_MIDIOutputs[name] = ofxMidiOut();
 	_MIDIOutputs[name].openPort(_MIDIOutPorts[port]);
 
 	Node node;
-	node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+	node.setup(x, y, 80, 30);
 	node.setName(name);
 	node.setAsOutput(true);
 	node.setColor(ofColor(80, 200, 80));
@@ -375,27 +375,27 @@ void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 	if (e.target->getName() == "oscIn")
 	{
 		bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos);
-		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber) createOscInput(e.text);
+		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber) createOscInput(e.text, 50, ofGetHeight() * 0.5);
 	}
 	else if (e.target->getName() == "oscOut")
 	{
 		vector<string> split = ofSplitString(e.text, ":");
 		if (split.size() == 2) {
 			bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
-			if (isNumber) createOscOutput(split[0], split[1]);
+			if (isNumber) createOscOutput(split[0], split[1], ofGetWidth() - 250, ofGetHeight() * 0.5);
 		}
 	}
 	e.target->setText("");
 }
 
-void ofApp::createOscInput(string port)
+void ofApp::createOscInput(string port, int x, int y)
 {
 	ofxOscReceiver receiver;
 	receiver.setup(ofToInt(port));
 	_oscReceivers[port] = receiver;
 
 	Node node;
-	node.setup(50, ofGetHeight() * 0.5, 80, 30);
+	node.setup(x, y, 80, 30);
 	node.setName("osc:" + port);
 	node.setAsInput(true);
 	node.setColor(ofColor(80, 200, 80));
@@ -429,7 +429,7 @@ void ofApp::deleteOscInput(string port)
 	}
 }
 
-void ofApp::createOscOutput(string ip, string port)
+void ofApp::createOscOutput(string ip, string port, int x, int y)
 {
 	string name = ip + ":" + port;
 	ofxOscSender sender;
@@ -437,7 +437,7 @@ void ofApp::createOscOutput(string ip, string port)
 	_oscSenders[name] = sender;
 
 	Node node;
-	node.setup(ofGetWidth() - 250, ofGetHeight() * 0.5, 80, 30);
+	node.setup(x, y, 80, 30);
 	node.setName("osc:" + name);
 	node.setAsOutput(true);
 	node.setColor(ofColor(80, 200, 80));
@@ -690,7 +690,7 @@ void ofApp::load()
 				bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
 				if (_oscReceivers.find(curPort) == _oscReceivers.end() && isNumber)
 				{
-					createOscInput(curPort);
+					createOscInput(curPort, element["x"], element["y"]);
 					names[curPort] = curPort;
 				}
 			}
@@ -706,7 +706,7 @@ void ofApp::load()
 				}
 				if (portAvailable)
 				{
-					string name = createMIDIInput(split[1]);
+					string name = createMIDIInput(split[1], element["x"], element["y"]);
 					names[name] = name;
 				}
 			}
@@ -726,7 +726,7 @@ void ofApp::load()
 				bool isNumber = (split[2].find_first_not_of("0123456789") == std::string::npos);
 				if (isNumber)
 				{
-					createOscOutput(split[1], split[2]);
+					createOscOutput(split[1], split[2], element["x"], element["y"]);
 					names[curPort] = curPort;
 				}
 			}
@@ -742,7 +742,8 @@ void ofApp::load()
 				}
 				if (portAvailable)
 				{
-					string name = createMIDIOutput(split[1]);
+					cout << element["x"] << "," << element["y"] << endl;
+					string name = createMIDIOutput(split[1], element["x"], element["y"]);
 					names[name] = name;
 				}
 			}

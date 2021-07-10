@@ -46,17 +46,17 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		string removePortNumber(string name);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
-		string createMIDIInput(string port);
+		string createMIDIInput(string port, int x, int y);
 		void deleteMIDIInput(string port);
-		string createMIDIOutput(string port);
+		string createMIDIOutput(string port, int x, int y);
 		void deleteMIDIOutput(string port);
 		void newMidiMessage(ofxMidiMessage& msg);
 		//--------------------------------------------------------------
 		void setupOSC();
 		void OSCTextInput(ofxDatGuiTextInputEvent e);
-		void createOscInput(string port);
+		void createOscInput(string port, int x, int y);
 		void deleteOscInput(string port);
-		void createOscOutput(string ip, string port);
+		void createOscOutput(string ip, string port, int x, int y);
 		void deleteOscOutput(string ip, string port);
 		//--------------------------------------------------------------
 		tuple<string, int, int> selectNode(int x, int y);
