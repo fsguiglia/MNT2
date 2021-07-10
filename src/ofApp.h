@@ -63,6 +63,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in, bool dump);
 		void updateConnections();
 		//--------------------------------------------------------------
+		void clear();
 		void load();
 		void save();
 		void setWindowTitle(string title);

@@ -169,6 +169,7 @@ void ofApp::setupGui()
 	_oscFolder->onTextInputEvent(this, &ofApp::OSCTextInput);
 	_oscFolder->collapse();
 	_gui->addBreak();
+	_gui->addButton("New");
 	_gui->addButton("Load");
 	_gui->addButton("Save");
 	_gui->addFooter();
@@ -214,6 +215,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setName("Draw", true);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
+	if (label == "New") clear();
 	if (label == "Load") load();
 	if (label == "Save") save();
 }
@@ -664,8 +666,31 @@ void ofApp::updateConnections()
 	for (auto& node : _moduleNodes) node->clearMIDIMessages();
 }
 
+void ofApp::clear()
+{
+	_connections.clear();
+	_moduleNodes.clear();
+	_outputNodes.clear();
+	_inputNodes.clear();
+
+	for (auto port : _MIDIInputs)
+	{
+		if (port.second.isOpen())
+		{
+			port.second.closePort();
+			port.second.removeListener(this);
+		}
+	}
+	for (auto port : _MIDIOutputs)
+	{
+		if (port.second.isOpen()) port.second.closePort();
+	}
+
+}
+
 void ofApp::load()
 {
+	clear();
 	string path;
 	ofFileDialogResult loadFile = ofSystemLoadDialog("Load MNT set", false, _folder);
 	if (loadFile.bSuccess)
