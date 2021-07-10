@@ -12,6 +12,7 @@ public:
 	
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
+	void textInputEvent(ofxDatGuiTextInputEvent e);
 	void updateSelected(int selected, Point point);
 
 	void mouseMoved(int x, int y);

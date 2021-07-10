@@ -38,9 +38,11 @@ void NNIPage::setupGui()
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+	_gui->addTextInput("add");
 	_gui->addToggle("learn")->setName("parameterLearn");
 	_gui->onToggleEvent(this, &NNIPage::toggleEvent);
 	_gui->onSliderEvent(this, &NNIPage::sliderEvent);
+	_gui->onTextInputEvent(this, &NNIPage::textInputEvent);
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
@@ -68,10 +70,12 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else
 	{
+		int lastSelected = _map.getLastSelected();
 		int channel = ofToInt(ofSplitString(name, "/")[0]);
 		int control = ofToInt(ofSplitString(name, "/")[1]);
 		float value = e.value;
 		_map.setGlobalParameter(name, value);
+		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
 		map<string, float> message;
 		message[name] = value;
 		addMidiMessages(message, _MIDIDumpMessages);
@@ -102,6 +106,26 @@ void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "active") _map.setActive(e.checked);
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
+}
+
+void NNIPage::textInputEvent(ofxDatGuiTextInputEvent e)
+{
+	bool prevLearn = _parameterLearn;
+	_parameterLearn = true;
+	vector<string> split = ofSplitString(e.text, "/");
+	if (split.size() == 1)
+	{
+		bool isNumber = split[0].find_first_not_of("0123456789") == std::string::npos;
+		if (isNumber) MIDIIn("text_input", 1, ofToInt(split[0]), 0);
+	}
+	else if (split.size() == 2)
+	{
+		bool isNumber = split[0].find_first_not_of("0123456789") == std::string::npos;
+		isNumber = isNumber && split[1].find_first_not_of("0123456789") == std::string::npos;
+		if (isNumber)  MIDIIn("text_input", ofToInt(split[0]), ofToInt(split[1]), 0);
+	}
+	e.target->setText("");
+	_parameterLearn = prevLearn;
 }
 
 void NNIPage::updateSelected(int selected, Point point)

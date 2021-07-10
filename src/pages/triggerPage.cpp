@@ -44,10 +44,14 @@ void TriggerPage::setupGui()
 	_gui->addToggle("Switch");
 	_gui->addSlider("Radius", 0., 1., _radius);
 	_gui->addSlider("Threshold", 0., 1., _threshold);
-	_gui->addToggle("learn")->setName("parameterLearn");
 	_gui->addBreak();
+	_gui->addLabel("Parameters")->setName("Parameters");
+	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+	_gui->addTextInput("add");
+	_gui->addToggle("learn")->setName("parameterLearn");
 	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
 	_gui->onSliderEvent(this, &TriggerPage::sliderEvent);
+	_gui->onTextInputEvent(this, &TriggerPage::textInputEvent);
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
@@ -134,6 +138,26 @@ void TriggerPage::toggleEvent(ofxDatGuiToggleEvent e)
 			_map.setSwitch(_map.getLastSelected(), e.checked);
 		}
 	}
+}
+
+void TriggerPage::textInputEvent(ofxDatGuiTextInputEvent e)
+{
+	bool prevLearn = _parameterLearn;
+	_parameterLearn = true;
+	vector<string> split = ofSplitString(e.text, "/");
+	if (split.size() == 1)
+	{
+		bool isNumber = split[0].find_first_not_of("0123456789") == std::string::npos;
+		if (isNumber) MIDIIn("text_input", 1, ofToInt(split[0]), 0);
+	}
+	else if (split.size() == 2)
+	{
+		bool isNumber = split[0].find_first_not_of("0123456789") == std::string::npos;
+		isNumber = isNumber && split[1].find_first_not_of("0123456789") == std::string::npos;
+		if(isNumber)  MIDIIn("text_input", ofToInt(split[0]), ofToInt(split[1]), 0);
+	}
+	e.target->setText("");
+	_parameterLearn = prevLearn;
 }
 
 void TriggerPage::updateSelected(int selected, Trigger trigger)

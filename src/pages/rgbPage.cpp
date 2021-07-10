@@ -47,10 +47,14 @@ void RGBPage::setupGui()
 	_gui->addSlider("y", 0., 1.)->setName("posY");
 	_gui->addSlider("Width", 0., 1.);
 	_gui->addSlider("Height", 0., 1.);
-	_gui->addToggle("learn")->setName("parameterLearn");
 	_gui->addBreak();
+	_gui->addLabel("Parameters")->setName("Parameters");
+	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+	_gui->addTextInput("add");
+	_gui->addToggle("learn")->setName("parameterLearn");
 	_gui->onToggleEvent(this, &RGBPage::toggleEvent);
 	_gui->onSliderEvent(this, &RGBPage::sliderEvent);
+	_gui->onTextInputEvent(this, &RGBPage::textInputEvent);
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
@@ -154,6 +158,26 @@ void RGBPage::toggleEvent(ofxDatGuiToggleEvent e)
 			_map.setTrigger(_map.getLastSelected(), e.checked);
 		}
 	}
+}
+
+void RGBPage::textInputEvent(ofxDatGuiTextInputEvent e)
+{
+	bool prevLearn = _parameterLearn;
+	_parameterLearn = true;
+	vector<string> split = ofSplitString(e.text, "/");
+	if (split.size() == 1)
+	{
+		bool isNumber = split[0].find_first_not_of("0123456789") == std::string::npos;
+		if (isNumber) MIDIIn("text_input", 1, ofToInt(split[0]), 0);
+	}
+	else if (split.size() == 2)
+	{
+		bool isNumber = split[0].find_first_not_of("0123456789") == std::string::npos;
+		isNumber = isNumber && split[1].find_first_not_of("0123456789") == std::string::npos;
+		if (isNumber)  MIDIIn("text_input", ofToInt(split[0]), ofToInt(split[1]), 0);
+	}
+	e.target->setText("");
+	_parameterLearn = prevLearn;
 }
 
 void RGBPage::updateSelected(int selected, RGBPoint point)
