@@ -26,6 +26,9 @@ public:
 	void setVisible(bool visible);
 	void clearMIDIMessages();
 
+	virtual void load(ofJson& json) = 0;
+	virtual ofJson save() = 0;
+
 protected:
 	void addMidiMessages(map<string, float> messages, map<string, float>& queue);
 	void clearMIDIMessages(map<string, float>& queue);

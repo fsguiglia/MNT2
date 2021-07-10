@@ -742,7 +742,6 @@ void ofApp::load()
 				}
 				if (portAvailable)
 				{
-					cout << element["x"] << "," << element["y"] << endl;
 					string name = createMIDIOutput(split[1], element["x"], element["y"]);
 					names[name] = name;
 				}

@@ -275,9 +275,19 @@ void NNIPage::load(ofJson& json)
 		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
 	}
 	//gui
+	vector<string> split;
+	string sliderLabel;
 	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
+	split = ofSplitString(_CCXY[0], "/");
+	sliderLabel = "cc" + split[split.size() - 1];
+	_gui->getSlider("x")->setLabel(sliderLabel);
+
 	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
+	split = ofSplitString(_CCXY[1], "/");
+	sliderLabel = "cc" + split[split.size() - 1];
+	_gui->getSlider("y")->setLabel(sliderLabel);
 	_gui->update();
+
 	if (_map.getPoints().size() != 0)
 	{
 		updateSelected(0, _map.getPoint(0));

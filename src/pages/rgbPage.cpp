@@ -367,10 +367,19 @@ void RGBPage::load(ofJson & json)
 	_radius = json["radius"];
 	_map.setRadius(_radius);
 	//gui
+	vector<string> split;
+	string sliderLabel;
 	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
+	split = ofSplitString(_CCXY[0], "/");
+	sliderLabel = "cc" + split[split.size() - 1];
+	_gui->getSlider("x")->setLabel(sliderLabel);
+
 	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
-	_gui->getSlider("Radius")->setValue(_radius, false);
+	split = ofSplitString(_CCXY[1], "/");
+	sliderLabel = "cc" + split[split.size() - 1];
+	_gui->getSlider("y")->setLabel(sliderLabel);
 	_gui->update();
+
 	if (_map.getPoints().size() != 0)
 	{
 		RGBPoint point = _map.getPoint(0);

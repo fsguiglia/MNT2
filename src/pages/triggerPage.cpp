@@ -314,9 +314,19 @@ void TriggerPage::load(ofJson& json)
 		for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
 	}
 	//gui
+	vector<string> split;
+	string sliderLabel;
 	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
+	split = ofSplitString(_CCXY[0], "/");
+	sliderLabel = "cc" + split[split.size() - 1];
+	_gui->getSlider("x")->setLabel(sliderLabel);
+
 	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
+	split = ofSplitString(_CCXY[1], "/");
+	sliderLabel = "cc" + split[split.size() - 1];
+	_gui->getSlider("y")->setLabel(sliderLabel);
 	_gui->update();
+
 	if (_map.getPoints().size() != 0)
 	{
 		Trigger point = _map.getPoint(0);
