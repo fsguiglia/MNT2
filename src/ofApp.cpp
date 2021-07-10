@@ -629,8 +629,8 @@ void ofApp::updateConnections()
 			{
 				for (auto& element : MIDIMessages)
 				{
-					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
-					int control = ofToInt(ofSplitString(element.first, "/")[2]);
+					int channel = ofToInt(ofSplitString(element.first, "/")[0]);
+					int control = ofToInt(ofSplitString(element.first, "/")[1]);
 					int value = element.second * 127;
 					if (_MIDIOutputs[output].isOpen())
 					{
