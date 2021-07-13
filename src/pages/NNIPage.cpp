@@ -2,6 +2,7 @@
 
 NNIPage::NNIPage()
 {
+	_useGlobalParameters = true;
 }
 
 void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
@@ -222,56 +223,6 @@ void NNIPage::mouseScrolled(int scroll)
 	_gui->scroll(scroll);
 }
 
-void NNIPage::MIDIIn(string port, int channel, int control, float value)
-{
-	string sControl = ofToString(control);
-	string sChannel = ofToString(channel);
-	string parameterName = sChannel + "/" + sControl;
-	string controlName = port + "/" + parameterName;
-	string sliderLabel = "cc" + sControl;
-	map<string, float> curParameters = _map.getParameters();
-	if (_controlLearn)
-	{
-		if (_lastSelectedControl == "x")
-		{
-			_CCXY[0] = controlName;
-			_gui->getSlider("x")->setLabel(sliderLabel);
-		}
-		if (_lastSelectedControl == "y")
-		{
-			_CCXY[1] = controlName;
-			_gui->getSlider("y")->setLabel(sliderLabel);
-		}
-	}
-	else if (_parameterLearn)
-	{
-		if (curParameters.find(parameterName) == curParameters.end())
-		{
-			_map.addGlobalParameter(parameterName, value);
-			_gui->addSlider(sliderLabel, 0., 1.);
-			_gui->getSlider(sliderLabel)->setName(parameterName);
-			_gui->setRemovableSlider(parameterName);
-			_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
-			_gui->setWidth(300, 0.3);
-			_gui->setOpacity(0.5);
-			_gui->update();
-		}
-		else
-		{
-			_gui->getSlider(parameterName)->setValue(value, false);
-			_map.setGlobalParameter(parameterName, value);
-			if (_map.getLastSelected() >= 0) _map.setPointParameter(_map.getLastSelected(), parameterName, value);
-		}
-		map<string, float> curMessage;
-		curMessage[parameterName] = value;
-		addMidiMessages(curMessage, _MIDIOutMessages);
-	}
-	else
-	{
-		if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
-		if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
-	}
-}
 
 void NNIPage::load(ofJson& json)
 {

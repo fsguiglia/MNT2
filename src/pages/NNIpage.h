@@ -20,8 +20,6 @@ public:
 	void mousePressed(int x, int y, int button, bool doubleClick = false);
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
-
-	void MIDIIn(string port, int channel, int control, float value);
 	
 	void load(ofJson& json);
 	ofJson save();

@@ -2,6 +2,7 @@
 
 TriggerPage::TriggerPage()
 {
+	_useGlobalParameters = false;
 }
 
 void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)
@@ -265,60 +266,6 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 void TriggerPage::mouseScrolled(int scroll)
 {
 	_gui->scroll(scroll);
-}
-
-void TriggerPage::MIDIIn(string port, int channel, int control, float value)
-{
-	string sControl = ofToString(control);
-	string sChannel = ofToString(channel);
-	string parameterName = sChannel + "/" + sControl;
-	string controlName = port + "/" + parameterName;
-	string sliderLabel = "cc" + sControl;
-	map<string, float> curParameters = _map.getParameters();
-	if (_controlLearn)
-	{
-		if (_lastSelectedControl == "x")
-		{
-			_CCXY[0] = controlName;
-			_gui->getSlider("x")->setLabel(sliderLabel);
-		}
-		if (_lastSelectedControl == "y")
-		{
-			_CCXY[1] = controlName;
-			_gui->getSlider("y")->setLabel(sliderLabel);
-		}
-	}
-	else if (_parameterLearn)
-	{
-		int lastSelected = _map.getLastSelected();
-		if (lastSelected != -1)
-		{
-			if (!_map.getPoint(lastSelected).hasValue(parameterName))
-			{
-				_map.addPointParameter(lastSelected, parameterName, value);
-				_gui->addSlider(sliderLabel, 0., 1.);
-				_gui->getSlider(sliderLabel)->setName(parameterName);
-				_gui->setRemovableSlider(parameterName);
-				_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
-				_gui->setWidth(300, 0.3);
-				_gui->setOpacity(0.5);
-				_gui->update();
-			}
-			else
-			{
-				_gui->getSlider(parameterName)->setValue(value, false);
-				_map.setPointParameter(lastSelected, parameterName, value);
-			}
-			map<string, float> curMessage;
-			curMessage[parameterName] = value;
-			addMidiMessages(curMessage, _MIDIOutMessages);
-		}
-	}
-	else
-	{
-		if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
-		if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
-	}
 }
 
 void TriggerPage::load(ofJson& json)
