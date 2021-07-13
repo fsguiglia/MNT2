@@ -122,59 +122,67 @@ inline void BasePage<T>::MIDIIn(string port, int channel, int control, float val
 		string sChannel = ofToString(channel);
 		string parameterName = sChannel + "/" + sControl;
 		string controlName = port + "/" + parameterName;
-		string sliderLabel = "cc" + sControl;
+		string sliderLabel = "ch" + sChannel + "/cc" + sControl;
 		map<string, float> curParameters;
 
-		if (_controlLearn)
-		{
-			if (_lastSelectedControl == "x")
-			{
-				_CCXY[0] = controlName;
-				_gui->getSlider("x")->setLabel(sliderLabel);
-			}
-			if (_lastSelectedControl == "y")
-			{
-				_CCXY[1] = controlName;
-				_gui->getSlider("y")->setLabel(sliderLabel);
-			}
-		}
-		else if (_parameterLearn)
-		{
-			int lastSelected = _map.getLastSelected();
-			if (lastSelected != -1)
-			{
-				if (_useGlobalParameters) curParameters = _map.getParameters();
-				else curParameters = _map.getPoint(lastSelected).getValues();
+		bool valid = true;
+		valid = valid && channel >= 0 && channel < 128;
+		valid = valid && control >= 0 && control < 128;
+		valid = valid && value >= 0 && value < 1;
 
-				if (curParameters.find(parameterName) == curParameters.end())
+		if (valid)
+		{
+			if (_controlLearn)
+			{
+				if (_lastSelectedControl == "x")
 				{
-					if (_useGlobalParameters) _map.addGlobalParameter(parameterName, value);
-					else _map.addPointParameter(lastSelected, parameterName, value);
-
-					_gui->addSlider(sliderLabel, 0., 1.);
-					_gui->getSlider(sliderLabel)->setName(parameterName);
-					_gui->setRemovableSlider(parameterName);
-					_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
-					_gui->setWidth(300, 0.3);
-					_gui->setOpacity(0.5);
-					_gui->update();
+					_CCXY[0] = controlName;
+					_gui->getSlider("x")->setLabel(sliderLabel);
 				}
-				else if (curParameters[parameterName] != value)
+				if (_lastSelectedControl == "y")
 				{
-					if (_useGlobalParameters) _map.setGlobalParameter(parameterName, value);
-					_map.setPointParameter(_map.getLastSelected(), parameterName, value);
-					_gui->getSlider(parameterName)->setValue(value, false);
-
-					map<string, float> curMessage;
-					curMessage[parameterName] = value;
-					addMidiMessages(curMessage, _MIDIOutMessages);
+					_CCXY[1] = controlName;
+					_gui->getSlider("y")->setLabel(sliderLabel);
 				}
 			}
-		}
-		else
-		{
-			if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
-			if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
+			else if (_parameterLearn)
+			{
+				int lastSelected = _map.getLastSelected();
+				if (lastSelected != -1)
+				{
+					if (_useGlobalParameters) curParameters = _map.getParameters();
+					else curParameters = _map.getPoint(lastSelected).getValues();
+
+					if (curParameters.find(parameterName) == curParameters.end())
+					{
+						if (_useGlobalParameters) _map.addGlobalParameter(parameterName, value);
+						else _map.addPointParameter(lastSelected, parameterName, value);
+
+						_gui->addSlider(sliderLabel, 0., 1.);
+						_gui->getSlider(sliderLabel)->setName(parameterName);
+						_gui->setRemovableSlider(parameterName);
+						_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
+						_gui->setWidth(300, 0.3);
+						_gui->setOpacity(0.5);
+						_gui->update();
+					}
+					else if (curParameters[parameterName] != value)
+					{
+						if (_useGlobalParameters) _map.setGlobalParameter(parameterName, value);
+						_map.setPointParameter(_map.getLastSelected(), parameterName, value);
+						_gui->getSlider(parameterName)->setValue(value, false);
+
+						map<string, float> curMessage;
+						curMessage[parameterName] = value;
+						addMidiMessages(curMessage, _MIDIOutMessages);
+					}
+				}
+			}
+			else
+			{
+				if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
+				if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
+			}
 		}
 	}
 }
