@@ -309,7 +309,7 @@ void ofApp::deleteMIDIInput(string port)
 			_connections.erase(_connections.begin() + deleteConnection[i]);
 		}
 	}
-	_gui->getToggle(port)->setChecked(false);
+	_gui->getToggle(port, "Midi In")->setChecked(false);
 }
 
 string ofApp::createMIDIOutput(string port, int x, int y)
@@ -354,7 +354,7 @@ void ofApp::deleteMIDIOutput(string port)
 			_connections.erase(_connections.begin() + deleteConnection[i]);
 		}
 	}
-	_gui->getToggle(port)->setChecked(false);
+	_gui->getToggle(port, "Midi Out")->setChecked(false);
 }
 
 void ofApp::newMidiMessage(ofxMidiMessage& msg)
@@ -679,11 +679,19 @@ void ofApp::clear()
 		{
 			port.second.closePort();
 			port.second.removeListener(this);
+			vector<string> split = ofSplitString(port.first, ":");
+			_gui->getToggle(split[1], "Midi In")->setChecked(false);
 		}
 	}
 	for (auto port : _MIDIOutputs)
 	{
-		if (port.second.isOpen()) port.second.closePort();
+		if (port.second.isOpen())
+		{
+			port.second.closePort();
+			cout << port.first << endl;
+			vector<string> split = ofSplitString(port.first, ":");
+			_gui->getToggle(split[1], "Midi Out")->setChecked(false);
+		}
 	}
 	_file = "";
 	setWindowTitle("untitled");
