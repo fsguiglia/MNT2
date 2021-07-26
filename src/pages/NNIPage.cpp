@@ -30,6 +30,7 @@ void NNIPage::setupGui()
 	_gui->addHeader("NNI", false);
 	_gui->addToggle("active");
 	_gui->addToggle("randomize");
+	_gui->addButton("sort");
 	_gui->addBreak();
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("learn")->setName("controlLearn");
@@ -42,6 +43,7 @@ void NNIPage::setupGui()
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
 	_gui->addToggle("learn")->setName("parameterLearn");
+	_gui->onButtonEvent(this, &NNIPage::buttonEvent);
 	_gui->onToggleEvent(this, &NNIPage::toggleEvent);
 	_gui->onSliderEvent(this, &NNIPage::sliderEvent);
 	_gui->onTextInputEvent(this, &NNIPage::textInputEvent);
@@ -68,10 +70,20 @@ void NNIPage::update()
 		if (_tsne.getCompleted()) load(_tsne.getData());
 		else _tsne.check();
 	}
-	else
+	
+	BasePage::update();
+}
+
+void NNIPage::runTsne()
+{
+
+}
+
+void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
+{
+	if (e.target->getName() == "sort")
 	{
-		///esto seria asi? para que no actualice mientras hace tsne
-		BasePage::update();
+		if (!_tsne.getRunning()) _tsne.start(save(), ofToString(ofGetElapsedTimeMillis()));
 	}
 }
 

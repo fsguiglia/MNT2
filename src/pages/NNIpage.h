@@ -14,6 +14,9 @@ public:
 
 	void update();
 	
+	void runTsne();
+
+	void buttonEvent(ofxDatGuiButtonEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
 	void textInputEvent(ofxDatGuiTextInputEvent e);
