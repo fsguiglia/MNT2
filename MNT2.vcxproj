@@ -187,6 +187,7 @@
     <ClCompile Include="src\gestures\gesture.cpp" />
     <ClCompile Include="src\gestures\gesture3d.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\ML\dimensionalityReduction.cpp" />
     <ClCompile Include="src\nodes\node.cpp" />
     <ClCompile Include="src\points\point.cpp" />
     <ClCompile Include="src\points\rgbPoint.cpp" />
@@ -240,6 +241,7 @@
     <ClInclude Include="src\gestures\gesture.h" />
     <ClInclude Include="src\gestures\gesture3d.h" />
     <ClInclude Include="src\maps\baseMap.h" />
+    <ClInclude Include="src\ML\dimensionalityReduction.h" />
     <ClInclude Include="src\nodes\connection.h" />
     <ClInclude Include="src\nodes\moduleInterface.h" />
     <ClInclude Include="src\nodes\moduleNode.h" />

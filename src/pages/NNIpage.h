@@ -2,6 +2,7 @@
 #define _NNIPAGE
 #include "ofMain.h"
 #include "basePage.h"
+#include "../ML/dimensionalityReduction.h"
 #include "../maps/NNI.h"
 
 class NNIPage : public BasePage<NNI> {
@@ -9,6 +10,9 @@ public:
 	NNIPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 20);
 	void setupGui();
+	void setupTsne(int perplexity, int learningRate, int iterations);
+
+	void update();
 	
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
@@ -23,5 +27,8 @@ public:
 	
 	void load(ofJson& json);
 	ofJson save();
+
+private:
+		DimensionalityReduction _tsne;
 };
 #endif

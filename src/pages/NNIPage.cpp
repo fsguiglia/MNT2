@@ -21,6 +21,7 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_visible = false;
 	setupGui();
 	_maxMessages = maxMessages;
+	setupTsne(0, 0, 0); ///ver valores por defecto
 }
 
 void NNIPage::setupGui()
@@ -53,6 +54,25 @@ void NNIPage::setupGui()
 	_gui->setEnabled(false);
 	_gui->setVisible(false);
 	_gui->update();
+}
+
+void NNIPage::setupTsne(int perplexity, int learningRate, int iterations)
+{
+	_tsne.setup(perplexity, learningRate, iterations);
+}
+
+void NNIPage::update()
+{
+	if (_tsne.getRunning())
+	{
+		if (_tsne.getCompleted()) load(_tsne.getData());
+		else _tsne.check();
+	}
+	else
+	{
+		///esto seria asi? para que no actualice mientras hace tsne
+		BasePage::update();
+	}
 }
 
 void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
