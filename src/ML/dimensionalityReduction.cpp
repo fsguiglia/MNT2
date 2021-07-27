@@ -2,12 +2,11 @@
 
 DimensionalityReduction::DimensionalityReduction()
 {
-	//set default values
+	//check default values
 	_perplexity = 0;
 	_learningRate = 0;
 	_iterations = 0;
 	_running = false;
-	_analizing = false;
 	_completed = false;
 }
 
@@ -20,28 +19,26 @@ void DimensionalityReduction::setup(int perplexity, int learningRate, int iterat
 
 void DimensionalityReduction::start(ofJson data, string name)
 {
-	_path = "../../analysis/tmp/" + name + "_analisis";
-	string curPath = _path + ".json";
-	ofSavePrettyJson(curPath, data);
+	_path = "../../analysis/tmp/" + name + "_analisis.tmp";
+	_tsnePath = "../../analysis/tmp/" + name + "_analisis_tsne.tmp";
+	_path = ofFilePath::getAbsolutePath(_path);
+	_tsnePath = ofFilePath::getAbsolutePath(_tsnePath);
 
-	string absolutePath = ofFilePath::getAbsolutePath(curPath);
+	ofSavePrettyJson(_path, data);
+
+	
 	string command = "python ../analysis/tsne.py";
-	command += " -f " + absolutePath;
+	command += " -f " + _path;
 	command += " -p " + ofToString(_perplexity);
 	command += " -l " + ofToString(_learningRate);
 	command += " -i " + ofToString(_iterations);
 	system(command.c_str());
-
 	_running = true;
 }
 
 void DimensionalityReduction::check()
 {
-
-
-		
-	//chequea si python creo el archivo de analisis
-	//si ya estamos llama a end
+	if (ofFile::doesFileExist(_tsnePath)) _completed = true;
 }
 
 bool DimensionalityReduction::getRunning()
@@ -56,13 +53,17 @@ bool DimensionalityReduction::getCompleted()
 
 ofJson DimensionalityReduction::getData()
 {
-	ofJson data;
-	_completed = false;
+	ofJson data = ofLoadJson(_tsnePath);
+	end();
 	return data;
 }
 
 void DimensionalityReduction::end()
 {
-	//carga los puntos y borra los archivos de analisis
-	_completed = true;
+	ofFile::removeFile(_path);
+	ofFile::removeFile(_tsnePath);
+	_path = "";
+	_tsnePath = "";
+	_running = false;
+	_completed = false;
 }

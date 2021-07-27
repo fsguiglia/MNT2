@@ -16,6 +16,6 @@ public:
 private:
 	void end();
 	int _perplexity, _learningRate, _iterations;
-	bool _running, _analizing, _completed;
+	bool _running, _completed;
 	string _path, _tsnePath;
 };

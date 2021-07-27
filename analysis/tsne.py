@@ -19,11 +19,20 @@ def main():
 	
 	data = dict()
 	parameters = list()
-	print(args["input_file"])
-	with open(args["input_file"]) as f:
+	path = args["input_file"]
+	
+	with open(path) as f:
 		data = json.load(f)
 	
-	print(data)
+	#aca el analisis, va un random de placeholder
+	for point in data["points"]:
+		point["pos"]["x"] = np.random.random()
+		point["pos"]["y"] = np.random.random()
+	
+	new_path = path[:path.rfind('.')] + "_tsne.tmp"
+	
+	with open(new_path, "w+") as f:
+		json.dump(data, f, indent = 4)
 	
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='CBCS t-SNE')
