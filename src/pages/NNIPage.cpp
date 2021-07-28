@@ -21,7 +21,7 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_visible = false;
 	setupGui();
 	_maxMessages = maxMessages;
-	setupTsne(0, 0, 0); ///ver valores por defecto
+	setupTsne(30, 1, 250); ///ver valores por defecto
 }
 
 void NNIPage::setupGui()
@@ -165,7 +165,7 @@ void NNIPage::updateSelected(int selected, Point point)
 {
 	map<string, float> parameters = point.getValues();
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
-	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second);
+	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second, false);
 	map<string, float> curMessage;
 	addMidiMessages(parameters, _MIDIOutMessages);
 	addMidiMessages(parameters, _MIDIDumpMessages);
@@ -238,7 +238,6 @@ void NNIPage::mouseReleased(int x, int y, int button)
 			_gui->update();
 			_gui->updatePositions();
 			string removableSlider = _gui->inside(x, y);
-			cout << removableSlider << endl;
 			if (removableSlider != "")
 			{
 				_map.removeGlobalParameter(removableSlider);
@@ -260,7 +259,9 @@ void NNIPage::load(ofJson& json)
 {
 	//clear current NNI
 	_map.clearPoints();
+	_map.clearGlobalParameters();
 	_gui->clearRemovableSliders();
+	
 	//load parameters to NNI and GUI
 	for (auto parameter : json["parameters"])
 	{
@@ -282,6 +283,7 @@ void NNIPage::load(ofJson& json)
 		}
 		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
 	}
+	
 	//gui
 	vector<string> split;
 	string sliderLabel;
@@ -298,7 +300,7 @@ void NNIPage::load(ofJson& json)
 
 	if (_map.getPoints().size() != 0)
 	{
-		updateSelected(0, _map.getPoint(0));
+		updateSelected(0, _map.getPoint(_map.getPoints().size() - 1));
 	}
 }
 

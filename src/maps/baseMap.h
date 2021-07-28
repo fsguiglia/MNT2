@@ -23,6 +23,7 @@ public:
 	void addGlobalParameter(string parameter, float value);
 	void setGlobalParameter(string parameter, float value);
 	void removeGlobalParameter(string parameter);
+	void clearGlobalParameters();
 	void addPointParameter(int index, string parameter, float value);
 	void setPointParameter(int index, string parameter, float value);
 	void removePointParameter(int index, string parameter);
@@ -210,6 +211,12 @@ void BaseMap<T>::removeGlobalParameter(string parameter)
 {
 	if (_parameters.find(parameter) != _parameters.end()) _parameters.erase(parameter);
 	for (auto& point : _points) point.deleteValue(parameter);
+}
+
+template<typename T>
+inline void BaseMap<T>::clearGlobalParameters()
+{
+	_parameters.clear();
 }
 
 template<typename T>
