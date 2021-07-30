@@ -41,7 +41,7 @@ void DimensionalityReduction::start(ofJson data)
 	string command = "python " + _scriptPath;
 	command += " -f " + _inputFilePath;
 	for (auto parameter : _parameters) command = command + " " + parameter.first + " " + ofToString(parameter.second);
-	cout << command << endl;
+	
 	system(command.c_str());
 	_running = true;
 }
@@ -72,8 +72,6 @@ void DimensionalityReduction::end()
 {
 	ofFile::removeFile(_inputFilePath);
 	ofFile::removeFile(_outputFilePath);
-	_inputFilePath = "";
-	_outputFilePath = "";
 	_running = false;
 	_completed = false;
 }

@@ -11,10 +11,9 @@ public:
 	void setup(int width, int height, int guiWidth, int maxMessages = 20);
 	void setupGui();
 	void setupTsne();
+	void setupPca();
 
 	void update();
-	
-	void runTsne();
 
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
@@ -33,5 +32,6 @@ public:
 
 private:
 		DimensionalityReduction _tsne;
+		DimensionalityReduction _pca;
 };
 #endif

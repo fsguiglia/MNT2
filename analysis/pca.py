@@ -4,7 +4,7 @@ import argparse
 import sys
 import json
 import numpy as np
-from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 
 def main():
 	args = process_arguments(sys.argv)
@@ -16,9 +16,6 @@ def main():
 	parameters = []
 	path = args['input_file']
 	dimentions = int(args['dimentions'])
-	perplexity = int(args['perplexity'])
-	learning_rate = int(args['learning_rate'])
-	iterations = int(args['iterations'])
 	
 	with open(path) as f:
 		data = json.load(f)
@@ -29,8 +26,9 @@ def main():
 			cur_parameters.append(parameter)
 		parameters.append(cur_parameters)
 	
-	#t-sne
-	y = tsne(parameters, dimentions, perplexity, learning_rate, iterations)
+	#pca
+	pca = PCA(n_components=2)
+	y = pca.fit_transform(parameters)
 	y = min_max_normalize(y)
 	y = y.tolist()
 	
@@ -57,53 +55,7 @@ def process_arguments(args):
 						default=2,
 						help='Dimension of the embedded space (default: 2)')
 
-	parser.add_argument('-p', '--perplexity',
-						action='store',
-						default=30,
-						help='Perplexity (default: 30)')
-						
-	parser.add_argument('-l', '--learning_rate',
-						action='store',
-						default = 1,
-						help = 'Learning rate (default: 1)')
-						
-	parser.add_argument('-i', '--iterations',
-						action='store',
-						default=250,
-						help='Iterations (default: 10)')
-
 	return vars(parser.parse_args())
-
-
-def tsne(data, d, p, l, i):
-	print('--------processing--------')
-	X = np.array(data)
-	augmentation = 0
-	if X.shape[0] < 10:
-		augmentation = 1
-		X = augment(X,augmentation)
-	
-	tsne_2d = TSNE(
-		n_components = d,
-		perplexity = p,
-		learning_rate= l,
-		n_iter = i,
-		early_exaggeration = 6).fit_transform(X)
-	
-	tsne_2d = tsne_2d[:int(X.shape[0] / (augmentation + 1))]
-	
-	return tsne_2d
-
-def augment(a, n):
-	#this is a little bit diry but it seems to work on small number of zones
-	random = a
-	for i in range(n):
-		cur_random = np.random.rand(a.shape[0], a.shape[1])
-		cur_random *= 0.2
-		cur_random -= 0.1
-		random = np.concatenate((random, cur_random))
-	return random
-	
 
 def min_max_normalize(a):
 	a = np.transpose(a)

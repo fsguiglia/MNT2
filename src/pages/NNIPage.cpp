@@ -19,6 +19,7 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
+	setupPca();
 	setupTsne();
 	setupGui();
 	_maxMessages = maxMessages;
@@ -35,6 +36,8 @@ void NNIPage::setupGui()
 	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _tsne.getParameter("--iterations"))->setName("--iterations");
+	_arrangeFolder->addBreak();
+	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addBreak();
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->collapse();
@@ -74,6 +77,11 @@ void NNIPage::setupTsne()
 	_tsne.setParameters(tsneParameters);
 }
 
+void NNIPage::setupPca()
+{
+	_pca.setup("../../analysis/pca.py", "pca"); //ver valores por defecto
+}
+
 void NNIPage::update()
 {
 	if (_tsne.getRunning())
@@ -82,12 +90,13 @@ void NNIPage::update()
 		else _tsne.check();
 	}
 	
+	if (_pca.getRunning())
+	{
+		if (_pca.getCompleted()) load(_pca.getData());
+		else _pca.check();
+	}
+
 	BasePage::update();
-}
-
-void NNIPage::runTsne()
-{
-
 }
 
 void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
@@ -98,7 +107,7 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 	}
 	else if (e.target->getName() == "pca")
 	{
-		
+		if (!_pca.getRunning()) _pca.start(save());
 	}
 }
 
