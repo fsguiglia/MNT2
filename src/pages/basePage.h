@@ -36,6 +36,7 @@ protected:
 	T _map;
 	ScrollGui* _gui;
 	ofxDatGuiFolder* _controlFolder;
+	ofxDatGuiFolder* _arrangeFolder;
 	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters;
 	int _guiWidth, _maxMessages;
 	string _lastSelectedControl;

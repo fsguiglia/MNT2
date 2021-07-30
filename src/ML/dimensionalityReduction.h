@@ -7,6 +7,12 @@ class DimensionalityReduction : public ofThread
 public:
 	DimensionalityReduction();
 	void setup(int perplexity, int learningRate, int iterations);
+	void setPerplexity(int perplexity);
+	int getPerplexity();
+	void setLearningRate(int learningRate);
+	int getLearningRate();
+	void setIterations(int iterations);
+	int getIterations();
 	void start(ofJson data, string name);
 	void check();
 	bool getRunning();

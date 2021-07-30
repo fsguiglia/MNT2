@@ -17,6 +17,36 @@ void DimensionalityReduction::setup(int perplexity, int learningRate, int iterat
 	_iterations = iterations;
 }
 
+void DimensionalityReduction::setPerplexity(int perplexity)
+{
+	_perplexity = perplexity;
+}
+
+int DimensionalityReduction::getPerplexity()
+{
+	return _perplexity;
+}
+
+void DimensionalityReduction::setLearningRate(int learningRate)
+{
+	_learningRate = learningRate;
+}
+
+int DimensionalityReduction::getLearningRate()
+{
+	return _learningRate;
+}
+
+void DimensionalityReduction::setIterations(int iterations)
+{
+	_iterations = iterations;
+}
+
+int DimensionalityReduction::getIterations()
+{
+	return _iterations;
+}
+
 void DimensionalityReduction::start(ofJson data, string name)
 {
 	_path = "../../analysis/tmp/" + name + "_analisis.tmp";

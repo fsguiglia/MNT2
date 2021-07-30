@@ -19,9 +19,10 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
+	setupTsne(5, 15, 1000); //ver valores por defecto
 	setupGui();
 	_maxMessages = maxMessages;
-	setupTsne(30, 1, 250); ///ver valores por defecto
+	
 }
 
 void NNIPage::setupGui()
@@ -29,9 +30,14 @@ void NNIPage::setupGui()
 	_gui = new ScrollGui();
 	_gui->addHeader("NNI", false);
 	_gui->addToggle("active");
-	_gui->addToggle("randomize");
-	_gui->addButton("sort");
-	_gui->addBreak();
+	_arrangeFolder = _gui->addFolder("arrange");
+	_arrangeFolder->addButton("t-SNE")->setName("tsne");
+	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getPerplexity());
+	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getLearningRate());
+	_arrangeFolder->addSlider("iterations", 250, 2500, _tsne.getIterations());
+	_arrangeFolder->addBreak();
+	_arrangeFolder->addToggle("randomize");
+	_arrangeFolder->collapse();
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("learn")->setName("controlLearn");
 	_controlFolder->addToggle("Mouse Control");
@@ -81,16 +87,26 @@ void NNIPage::runTsne()
 
 void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
-	if (e.target->getName() == "sort")
+	if (e.target->getName() == "tsne")
 	{
 		if (!_tsne.getRunning()) _tsne.start(save(), ofToString(ofGetElapsedTimeMillis()));
+	}
+	else if (e.target->getName() == "pca")
+	{
+		
 	}
 }
 
 void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
-	if (name == "x" || name == "y")
+	if (name == "perplexity" || name == "learning rate" || name == "iterations")
+	{
+		if (name == "perplexity") _tsne.setPerplexity(e.value);
+		if (name == "learning rate") _tsne.setLearningRate(e.value);
+		if (name == "iterations") _tsne.setIterations(e.value);
+	}
+	else if (name == "x" || name == "y")
 	{
 		_lastSelectedControl = name;
 		if (!_controlLearn)
