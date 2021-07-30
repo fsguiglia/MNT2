@@ -699,11 +699,12 @@ void ofApp::clear()
 
 void ofApp::load()
 {
-	clear();
 	string path;
 	ofFileDialogResult loadFile = ofSystemLoadDialog("Load MNT set", false, _folder);
 	if (loadFile.bSuccess)
 	{
+		_mode = false;
+		clear();
 		path = loadFile.getPath();
 		ofJson jLoad = ofLoadJson(path);
 		map<string, string> names;
