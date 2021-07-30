@@ -2,73 +2,53 @@
 
 DimensionalityReduction::DimensionalityReduction()
 {
-	//check default values
-	_perplexity = 0;
-	_learningRate = 0;
-	_iterations = 0;
 	_running = false;
 	_completed = false;
 }
 
-void DimensionalityReduction::setup(int perplexity, int learningRate, int iterations)
+void DimensionalityReduction::setup(string scriptPath, string name)
 {
-	_perplexity = perplexity;
-	_learningRate = learningRate;
-	_iterations = iterations;
+	_scriptPath = ofFilePath::getAbsolutePath(scriptPath);
+	string folder = _scriptPath.substr(0, _scriptPath.find_last_of("\\/")) + "/tmp/";
+	_inputFilePath = folder + name + ".tmp";
+	_outputFilePath = folder + name + "_o.tmp";
+
 }
 
-void DimensionalityReduction::setPerplexity(int perplexity)
+void DimensionalityReduction::setParameters(map<string, float> parameters)
 {
-	_perplexity = perplexity;
+	_parameters = parameters;
 }
 
-int DimensionalityReduction::getPerplexity()
+map<string, float> DimensionalityReduction::getParameters()
 {
-	return _perplexity;
+	return _parameters;
 }
 
-void DimensionalityReduction::setLearningRate(int learningRate)
+void DimensionalityReduction::setParameter(string parameter, float value)
 {
-	_learningRate = learningRate;
+	_parameters[parameter] = value;
 }
 
-int DimensionalityReduction::getLearningRate()
+float DimensionalityReduction::getParameter(string parameter)
 {
-	return _learningRate;
+	return _parameters[parameter];
 }
 
-void DimensionalityReduction::setIterations(int iterations)
+void DimensionalityReduction::start(ofJson data)
 {
-	_iterations = iterations;
-}
-
-int DimensionalityReduction::getIterations()
-{
-	return _iterations;
-}
-
-void DimensionalityReduction::start(ofJson data, string name)
-{
-	_path = "../../analysis/tmp/" + name + "_analisis.tmp";
-	_tsnePath = "../../analysis/tmp/" + name + "_analisis_tsne.tmp";
-	_path = ofFilePath::getAbsolutePath(_path);
-	_tsnePath = ofFilePath::getAbsolutePath(_tsnePath);
-
-	ofSavePrettyJson(_path, data);
-
-	
-	string command = "python ../analysis/tsne.py";
-	command += " -f " + _path;
-	command += " -p " + ofToString(_perplexity);
-	command += " -l " + ofToString(_learningRate);
-	command += " -i " + ofToString(_iterations);
+	ofSavePrettyJson(_inputFilePath, data);
+	string command = "python " + _scriptPath;
+	command += " -f " + _inputFilePath;
+	for (auto parameter : _parameters) command = command + " " + parameter.first + " " + ofToString(parameter.second);
+	cout << command << endl;
 	system(command.c_str());
 	_running = true;
 }
 
 void DimensionalityReduction::check()
 {
-	if (ofFile::doesFileExist(_tsnePath)) _completed = true;
+	if (ofFile::doesFileExist(_outputFilePath)) _completed = true;
 }
 
 bool DimensionalityReduction::getRunning()
@@ -83,17 +63,17 @@ bool DimensionalityReduction::getCompleted()
 
 ofJson DimensionalityReduction::getData()
 {
-	ofJson data = ofLoadJson(_tsnePath);
+	ofJson data = ofLoadJson(_outputFilePath);
 	end();
 	return data;
 }
 
 void DimensionalityReduction::end()
 {
-	ofFile::removeFile(_path);
-	ofFile::removeFile(_tsnePath);
-	_path = "";
-	_tsnePath = "";
+	ofFile::removeFile(_inputFilePath);
+	ofFile::removeFile(_outputFilePath);
+	_inputFilePath = "";
+	_outputFilePath = "";
 	_running = false;
 	_completed = false;
 }

@@ -10,7 +10,7 @@ public:
 	NNIPage();
 	void setup(int width, int height, int guiWidth, int maxMessages = 20);
 	void setupGui();
-	void setupTsne(int perplexity, int learningRate, int iterations);
+	void setupTsne();
 
 	void update();
 	

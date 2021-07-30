@@ -6,14 +6,12 @@ class DimensionalityReduction : public ofThread
 {
 public:
 	DimensionalityReduction();
-	void setup(int perplexity, int learningRate, int iterations);
-	void setPerplexity(int perplexity);
-	int getPerplexity();
-	void setLearningRate(int learningRate);
-	int getLearningRate();
-	void setIterations(int iterations);
-	int getIterations();
-	void start(ofJson data, string name);
+	void setup(string scriptPath, string name);
+	void setParameters(map<string, float> parameters);
+	map<string, float> getParameters();
+	void setParameter(string parameter, float value);
+	float getParameter(string parameter);
+	void start(ofJson data);
 	void check();
 	bool getRunning();
 	bool getCompleted();
@@ -21,7 +19,7 @@ public:
 
 private:
 	void end();
-	int _perplexity, _learningRate, _iterations;
+	map<string, float> _parameters;
 	bool _running, _completed;
-	string _path, _tsnePath;
+	string _name, _scriptPath, _inputFilePath, _outputFilePath;
 };

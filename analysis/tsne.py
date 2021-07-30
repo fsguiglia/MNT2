@@ -42,7 +42,7 @@ def main():
 		point['pos']['y'] = pos[1]
 	
 	#save data
-	new_path = path[:path.rfind('.')] + '_tsne.tmp'
+	new_path = path[:path.rfind('.')] + '_o.tmp'
 	
 	with open(new_path, 'w+') as f:
 		json.dump(data, f, indent = 4)

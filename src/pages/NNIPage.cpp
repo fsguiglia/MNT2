@@ -19,7 +19,7 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
-	setupTsne(5, 15, 1000); //ver valores por defecto
+	setupTsne();
 	setupGui();
 	_maxMessages = maxMessages;
 	
@@ -32,9 +32,9 @@ void NNIPage::setupGui()
 	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("arrange");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
-	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getPerplexity());
-	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getLearningRate());
-	_arrangeFolder->addSlider("iterations", 250, 2500, _tsne.getIterations());
+	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getParameter("--perplexity"))->setName("--perplexity");
+	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getParameter("--learning_rate"))->setName("--learning_rate");
+	_arrangeFolder->addSlider("iterations", 250, 2500, _tsne.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addBreak();
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->collapse();
@@ -64,9 +64,14 @@ void NNIPage::setupGui()
 	_gui->update();
 }
 
-void NNIPage::setupTsne(int perplexity, int learningRate, int iterations)
+void NNIPage::setupTsne()
 {
-	_tsne.setup(perplexity, learningRate, iterations);
+	_tsne.setup("../../analysis/tsne.py", "tsne"); //ver valores por defecto
+	map<string, float> tsneParameters;
+	tsneParameters["--perplexity"] = 5;
+	tsneParameters["--learning_rate"] = 15;
+	tsneParameters["--iterations"] = 1000;
+	_tsne.setParameters(tsneParameters);
 }
 
 void NNIPage::update()
@@ -89,7 +94,7 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
 	if (e.target->getName() == "tsne")
 	{
-		if (!_tsne.getRunning()) _tsne.start(save(), ofToString(ofGetElapsedTimeMillis()));
+		if (!_tsne.getRunning()) _tsne.start(save());
 	}
 	else if (e.target->getName() == "pca")
 	{
@@ -102,9 +107,7 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 	string name = e.target->getName();
 	if (name == "perplexity" || name == "learning rate" || name == "iterations")
 	{
-		if (name == "perplexity") _tsne.setPerplexity(e.value);
-		if (name == "learning rate") _tsne.setLearningRate(e.value);
-		if (name == "iterations") _tsne.setIterations(e.value);
+		_tsne.setParameter(name, e.value);
 	}
 	else if (name == "x" || name == "y")
 	{
