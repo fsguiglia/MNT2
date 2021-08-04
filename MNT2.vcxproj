@@ -185,7 +185,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\gestures\gesture.cpp" />
-    <ClCompile Include="src\gestures\gesture3d.cpp" />
+    <ClCompile Include="src\gestures\gesturePage.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ML\dimensionalityReduction.cpp" />
     <ClCompile Include="src\nodes\node.cpp" />
@@ -239,7 +239,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\gestures\gesture.h" />
-    <ClInclude Include="src\gestures\gesture3d.h" />
+    <ClInclude Include="src\gestures\gesturePage.h" />
     <ClInclude Include="src\maps\baseMap.h" />
     <ClInclude Include="src\ML\dimensionalityReduction.h" />
     <ClInclude Include="src\nodes\connection.h" />

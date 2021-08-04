@@ -3,34 +3,27 @@
 #include "ofMain.h"
 #include "../points/point.h"
 
-/*
-cuidado con dos puntos en una misma posicion->reemplaza?
-la posicion del punto esta dada por su propia posicion o mejor un map<int, point> con timetag?
-o bien tiene un periodo fijo y asume que los puntos estan ordenados (index * T)
-*/
-
 class Gesture {
 public:
 	Gesture();
-	void setup(int period = 0);
-	void update();
-	void draw();
-
-	void stage(Point point);
-	void stage(map<string, float> parameters);
-	void setPoints(vector<Point> points);
+	void addPoint(float time, Point point);
+	Point getPoint(int index);
 	vector<Point> getPoints();
-
-	void start();
-	void end();
-	void clear();
+	void deletePoint(int index);
 	
+	ofPolyline getPolyline();
+	void draw(int x, int y, ofColor color = ofColor::black);
+
+	void sort();
+	void normalizeTimes();
+
+	ofJson save();
+	void load(ofJson loadFile, bool sortPoints = true, bool normalizeTimeStamps = true);
+	void clear();
 private:
-	int _Tms, _startTime, _lastSample;
-	bool _recording;
-	map<string, float> _parameters;
 	vector<Point> _points;
-	Point _curPoint;
+	int _lengthMs;
+	ofPolyline _polyline;
 };
 
 #endif

@@ -59,7 +59,7 @@ template<typename T>
 inline void ModuleNode<T>::setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette)
 {
 	_page->setup(w, h, guiWidth);
-	_page->setMapColorPallete(colorPalette);
+	_page->setColorPallete(colorPalette);
 	_page->setVisible(false);
 }
 

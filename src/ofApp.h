@@ -13,6 +13,7 @@
 #include "pages/NNIpage.h"
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
+#include "gestures/gesturePage.h"
 #include "utils/mntUtils.h"
 
 /*

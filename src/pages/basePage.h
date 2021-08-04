@@ -11,7 +11,7 @@ public:
 	BasePage();
 
 	virtual void setup(int width, int height, int guiWidth, int maxMessages = 20) = 0;
-	void setMapColorPallete(vector<ofColor> colorPallete);
+	void setColorPallete(vector<ofColor> colorPallete);
 	void update();
 	void draw(ofTrueTypeFont font);
 
@@ -52,7 +52,7 @@ inline BasePage<T>::BasePage()
 }
 
 template<typename T>
-inline void BasePage<T>::setMapColorPallete(vector<ofColor> colorPallete)
+inline void BasePage<T>::setColorPallete(vector<ofColor> colorPallete)
 {
 	_map.setColorPallete(colorPallete);
 }
