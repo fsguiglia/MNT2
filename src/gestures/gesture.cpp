@@ -55,6 +55,7 @@ void Gesture::sort()
 			pair<int, int> curValue;
 			curValue.first = _points[i].getValue("t");
 			curValue.second = i;
+			timeStamps.push_back(curValue);
 		}
 	
 		std::sort(timeStamps.begin(), timeStamps.end());

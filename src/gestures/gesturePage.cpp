@@ -126,7 +126,7 @@ void GesturePage::endRecording()
 	if (_curGesture.getPoints().size() > 1)
 	{
 		string name = ofToString(_index);
-		//_curGesture.sort();
+		_curGesture.sort();
 		_gestures[name] = _curGesture;
 		_scrollView->add("gesture " + name);
 		_index++;
