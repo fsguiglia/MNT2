@@ -148,11 +148,11 @@
     <ClCompile Include="src\gestures\gesture.cpp">
       <Filter>src\gestures</Filter>
     </ClCompile>
-    <ClCompile Include="src\ML\dimensionalityReduction.cpp">
-      <Filter>src\ML</Filter>
-    </ClCompile>
     <ClCompile Include="src\gestures\gesturePage.cpp">
       <Filter>src\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ML\dimensionalityReduction.cpp">
+      <Filter>src\ML</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -510,11 +510,11 @@
     <ClInclude Include="src\gestures\gesture.h">
       <Filter>src\gestures</Filter>
     </ClInclude>
-    <ClInclude Include="src\ML\dimensionalityReduction.h">
-      <Filter>src\ML</Filter>
-    </ClInclude>
     <ClInclude Include="src\gestures\gesturePage.h">
       <Filter>src\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ML\dimensionalityReduction.h">
+      <Filter>src\ML</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
