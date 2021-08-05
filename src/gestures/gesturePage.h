@@ -10,6 +10,7 @@ public:
 	void setup(int w, int h, int guiWidth);
 	void setupGui();
 	void update();
+	void updateGui();
 	void draw(ofTrueTypeFont font);
 	
 	void resize(int w, int h);

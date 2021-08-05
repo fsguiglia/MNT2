@@ -69,26 +69,30 @@ void GesturePage::update()
 {
 	if (_playing) play();
 	else if (_recording) record();
-
 	if (_cursor != _prevCursor)
 	{
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_oscOutput.clear();
 			_oscOutput["control/x"] = _cursor.x;
 			_oscOutput["control/y"] = _cursor.y;
 		}
 	}
 	_prevCursor = _cursor;
-	
+	updateGui();
+}
+
+void GesturePage::updateGui()
+{
 	_gui->setVisible(_visible);
 	_gui->setEnabled(_visible);
 	_gui->update();
+
 	if (_gui->getHeight() != _guiHeight)
 	{
 		_guiHeight = _gui->getHeight();
 		_scrollView->setPosition(ofGetWidth() - _guiWidth, _guiHeight);
 	}
+
 	_scrollView->setVisible(_visible);
 	_scrollView->setEnabled(_visible);
 	_scrollView->update();
@@ -328,8 +332,11 @@ void GesturePage::mouseDragged(int x, int y, int button)
 	{
 		if (_inside) {
 			_cursor = normalize(ofVec2f(x, y), _position);
+			/*
+			//esto hace caer el framerate sensiblemente
 			_gui->getSlider("x")->setValue(_cursor.x, false);
 			_gui->getSlider("y")->setValue(_cursor.y, false);
+			*/
 		}
 	}
 }
