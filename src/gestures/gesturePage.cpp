@@ -24,7 +24,7 @@ void GesturePage::setupGui()
 {
 	_gui = new ofxDatGui();
 	_gui->addToggle("Record")->setName("Record");
-	_gui->addButton("Play");
+	_gui->addButton("Play")->setName("Play");
 	_gui->addButton("Delete");
 	_gui->addSlider("x", 0, 1, 0)->setName("x");
 	_gui->addSlider("y", 0, 1, 0)->setName("y");
@@ -69,7 +69,12 @@ void GesturePage::update()
 
 	if (_cursor != _prevCursor)
 	{
-		
+		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
+		{
+			_oscOutput.clear();
+			_oscOutput["control/x"] = _cursor.x;
+			_oscOutput["control/y"] = _cursor.y;
+		}
 	}
 	_prevCursor = _cursor;
 }
@@ -202,7 +207,8 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 	}
 	if (e.target->getName() == "Play")
 	{
-		startPlaying();
+		if(_learn) _lastControl = "button/Play";
+		else startPlaying();
 	}
 }
 
@@ -300,6 +306,11 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 					string newName = vLastControl[1] + "(" + controlLabel + ")";
 					_gui->getToggle(vLastControl[1])->setLabel(newName);
 				}
+				else if (vLastControl[0] == "button")
+				{
+					string newName = vLastControl[1] + "(" + controlLabel + ")";
+					_gui->getButton(vLastControl[1])->setLabel(newName);
+				}
 				else if (vLastControl[0] == "slider")
 				{
 					string newName = vLastControl[1] + "(" + controlLabel + ")";
@@ -319,8 +330,18 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 					{
 						bool checked = value >= 0.75;
 						_gui->getToggle(name[1])->setChecked(checked);
-						if (checked) startRecording();
-						else endRecording();
+						if (name[1] == "Record")
+						{
+							if (checked) startRecording();
+							else endRecording();
+						}
+					}
+					if (name[0] == "button")
+					{
+						if (value >= 0.75)
+						{
+							if (name[1] == "Play") startPlaying();
+						}
 					}
 					else if (name[0] == "slider")
 					{
@@ -384,6 +405,11 @@ void GesturePage::load(ofJson & json)
 		{
 			string newName = vLastControl[1] + "(" + controlLabel + ")";
 			_gui->getToggle(vLastControl[1])->setLabel(newName);
+		}
+		else if (vLastControl[0] == "button")
+		{
+			string newName = vLastControl[1] + "(" + controlLabel + ")";
+			_gui->getButton(vLastControl[1])->setLabel(newName);
 		}
 		else if (vLastControl[0] == "slider")
 		{
