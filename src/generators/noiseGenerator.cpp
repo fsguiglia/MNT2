@@ -35,7 +35,7 @@ void NoiseGenerator::setupGui()
 	_gui->addSlider("x max", 0, 1, 1)->setName("x max");
 	_gui->addSlider("y min", 0, 1, 0)->setName("y min");
 	_gui->addSlider("y max", 0, 1, 1)->setName("y max");
-	_gui->addToggle("MIDI Learn");
+	_gui->addToggle("MIDI Learn")->setName("Learn");
 	_gui->addButton("Clear mappings");
 	_gui->onSliderEvent(this, &NoiseGenerator::sliderEvent);
 	_gui->onButtonEvent(this, &NoiseGenerator::buttonEvent);
@@ -187,6 +187,7 @@ void NoiseGenerator::MIDIIn(string port, int control, int channel, float value)
 			}
 			if (!mapExists)
 			{
+				_midiMap[_lastControl] = controlName;
 				if (vLastControl[0] == "toggle")
 				{
 					string newName = vLastControl[1] + "(" + controlLabel + ")";
