@@ -44,6 +44,7 @@ public:
 	void OSCIn(string address, float value);
 	map<string, float> getOscOut();
 	void clearMessages();
+	void clearMappings();
 
 	void load(ofJson& json);
 	ofJson save();
@@ -77,7 +78,7 @@ private:
 	ofxDatGuiScrollView* _scrollView;
 	vector<ofColor> _colorPallete;
 	ofRectangle _position;
-	int _guiWidth;
+	int _guiWidth, _guiHeight;
 	bool _inside, _visible, _mouseControl, _learn;
 
 	map<string, float> _oscOutput;

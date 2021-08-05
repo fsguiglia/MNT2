@@ -26,9 +26,9 @@ void GesturePage::setupGui()
 	_transportFolder = _gui->addFolder("Transport");
 	_transportFolder->addToggle("Record")->setName("Record");
 	_transportFolder->addButton("Play")->setName("Play");
-	_transportFolder->addButton("Play next")->setName("Next");
-	_transportFolder->addButton("Play prev")->setName("Prev");
-	_transportFolder->addButton("Play random")->setName("Random");
+	_transportFolder->addButton("Play next")->setName("Play next");
+	_transportFolder->addButton("Play prev")->setName("Play prev");
+	_transportFolder->addButton("Play random")->setName("Play random");
 	_transportFolder->addButton("Delete");
 	_transportFolder->collapse();
 	_generateFolder = _gui->addFolder("Generate");
@@ -37,7 +37,7 @@ void GesturePage::setupGui()
 	_gui->addSlider("x", 0, 1, 0)->setName("x");
 	_gui->addSlider("y", 0, 1, 0)->setName("y");
 	_gui->addToggle("MIDI Learn")->setName("Learn");
-	_gui->addButton("Clear mappings (not implemented)");
+	_gui->addButton("Clear mappings");
 	_gui->onSliderEvent(this, &GesturePage::sliderEvent);
 	_gui->onButtonEvent(this, &GesturePage::buttonEvent);
 	_gui->onToggleEvent(this, &GesturePage::toggleEvent);
@@ -52,13 +52,14 @@ void GesturePage::setupGui()
 	_gui->setVisible(false);
 	_gui->update();
 
+	_guiHeight = _gui->getHeight();
 	_scrollView = new ofxDatGuiScrollView("Gestures", 15);
 	_scrollView->onScrollViewEvent(this, &GesturePage::scrollViewEvent);
 	_scrollView->setOpacity(0.5);
 	//_scrollView->setTheme(new ofxDatGuiThemeWireframe());
 	_scrollView->setWidth(_guiWidth, 0.3);
-	_scrollView->setPosition(ofGetWidth() - _guiWidth, _gui->getHeight());
-	_scrollView->setHeight(_position.height - _gui->getHeight());
+	_scrollView->setPosition(ofGetWidth() - _guiWidth, _guiHeight);
+	_scrollView->setHeight(_position.height - _guiHeight);
 	_scrollView->setEnabled(false);
 	_scrollView->setVisible(false);
 	_scrollView->update();
@@ -68,13 +69,6 @@ void GesturePage::update()
 {
 	if (_playing) play();
 	else if (_recording) record();
-	
-	_scrollView->setVisible(_visible);
-	_scrollView->setEnabled(_visible);
-	_scrollView->update();
-	_gui->setVisible(_visible);
-	_gui->setEnabled(_visible);
-	_gui->update();
 
 	if (_cursor != _prevCursor)
 	{
@@ -86,6 +80,18 @@ void GesturePage::update()
 		}
 	}
 	_prevCursor = _cursor;
+	
+	_gui->setVisible(_visible);
+	_gui->setEnabled(_visible);
+	_gui->update();
+	if (_gui->getHeight() != _guiHeight)
+	{
+		_guiHeight = _gui->getHeight();
+		_scrollView->setPosition(ofGetWidth() - _guiWidth, _guiHeight);
+	}
+	_scrollView->setVisible(_visible);
+	_scrollView->setEnabled(_visible);
+	_scrollView->update();
 }
 
 void GesturePage::draw(ofTrueTypeFont font)
@@ -255,20 +261,24 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 		if(_learn) _lastControl = "button/Play";
 		else startPlaying();
 	}
-	if (e.target->getName() == "Next")
+	if (e.target->getName() == "Play next")
 	{
-		if (_learn) _lastControl = "button/Next";
+		if (_learn) _lastControl = "button/Play next";
 		else playNext();
 	}
-	if (e.target->getName() == "Prev")
+	if (e.target->getName() == "Play prev")
 	{
-		if (_learn) _lastControl = "button/Prev";
+		if (_learn) _lastControl = "button/Play prev";
 		else playPrev();
 	}
-	if (e.target->getName() == "Random")
+	if (e.target->getName() == "Play random")
 	{
-		if (_learn) _lastControl = "button/Random";
+		if (_learn) _lastControl = "button/Play random";
 		else playRandom();
+	}
+	if (e.target->getName() == "Clear mappings")
+	{
+		clearMappings();
 	}
 }
 
@@ -409,9 +419,9 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 						if (value >= 0.75)
 						{
 							if (name[1] == "Play") startPlaying();
-							if (name[1] == "Next") playNext();
-							if (name[1] == "Prev") playPrev();
-							if (name[1] == "Random") playRandom();
+							if (name[1] == "Play next") playNext();
+							if (name[1] == "Play prev") playPrev();
+							if (name[1] == "Play random") playRandom();
 						}
 					}
 					else if (name[0] == "slider")
@@ -452,6 +462,27 @@ map<string, float> GesturePage::getOscOut()
 void GesturePage::clearMessages()
 {
 	_oscOutput.clear();
+}
+
+void GesturePage::clearMappings()
+{
+	for (auto element : _midiMap)
+	{
+		vector<string> split = ofSplitString(element.first, "/");
+		if (split[0] == "button")
+		{
+			_gui->getButton(split[1])->setLabel(_gui->getButton(split[1])->getName());
+		}
+		if (split[0] == "toggle")
+		{
+			_gui->getToggle(split[1])->setLabel(_gui->getToggle(split[1])->getName());
+		}
+		if (split[0] == "slider")
+		{
+			_gui->getSlider(split[1])->setLabel(_gui->getSlider(split[1])->getName());
+		}
+	}
+	_midiMap.clear();
 }
 
 void GesturePage::load(ofJson & json)
