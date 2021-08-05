@@ -23,12 +23,21 @@ void GesturePage::setup(int w, int h, int guiWidth)
 void GesturePage::setupGui()
 {
 	_gui = new ofxDatGui();
-	_gui->addToggle("Record")->setName("Record");
-	_gui->addButton("Play")->setName("Play");
-	_gui->addButton("Delete");
+	_transportFolder = _gui->addFolder("Transport");
+	_transportFolder->addToggle("Record")->setName("Record");
+	_transportFolder->addButton("Play")->setName("Play");
+	_transportFolder->addButton("Play next")->setName("Next");
+	_transportFolder->addButton("Play prev")->setName("Prev");
+	_transportFolder->addButton("Play random")->setName("Random");
+	_transportFolder->addButton("Delete");
+	_transportFolder->collapse();
+	_generateFolder = _gui->addFolder("Generate");
+	_generateFolder->addButton("Generate (not implemented)");
+	_generateFolder->collapse();
 	_gui->addSlider("x", 0, 1, 0)->setName("x");
 	_gui->addSlider("y", 0, 1, 0)->setName("y");
 	_gui->addToggle("MIDI Learn")->setName("Learn");
+	_gui->addButton("Clear mappings (not implemented)");
 	_gui->onSliderEvent(this, &GesturePage::sliderEvent);
 	_gui->onButtonEvent(this, &GesturePage::buttonEvent);
 	_gui->onToggleEvent(this, &GesturePage::toggleEvent);
@@ -142,8 +151,7 @@ void GesturePage::endRecording()
 	{
 		string name = ofToString(_index);
 		_curGesture.sort();
-		_gestures[name] = _curGesture;
-		_scrollView->add("gesture " + name);
+		addGesture(_curGesture, name);
 		_index++;
 		_recording = false;
 		_cursor.set(-1, -1);
@@ -175,6 +183,44 @@ void GesturePage::play()
 	}
 }
 
+void GesturePage::playNext()
+{
+	if (_gestureNames.size() > 0)
+	{
+		if (_curGestureIndex >= 0)
+		{
+			_curGestureIndex++;
+			if (_curGestureIndex > _gestureNames.size() - 1) _curGestureIndex = 0;
+			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
+			startPlaying();
+		}
+	}
+}
+
+void GesturePage::playPrev()
+{
+	if (_gestureNames.size() > 0)
+	{
+		if (_curGestureIndex >= 0)
+		{
+			_curGestureIndex--;
+			if (_curGestureIndex < 0) _curGestureIndex = _gestureNames.size() - 1;
+			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
+			startPlaying();
+		}
+	}
+}
+
+void GesturePage::playRandom()
+{
+	if (_gestureNames.size() > 0)
+	{
+		int index = (int)ofRandom(0, _gestureNames.size() - 1);
+		_curGesture = _gestures[_gestureNames[index]];
+		startPlaying();
+	}
+}
+
 void GesturePage::startPlaying()
 {
 	if (_curGesture.size() > 0)
@@ -201,14 +247,28 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 {
 	if (e.target->getName() == "Delete")
 	{
-		_gestures.erase(_curGestureName);
-		_scrollView->remove(_scrollView->getItemByName("gesture " + _curGestureName));
+		removeGesture(_curGestureName);
 		_curGesture.clear();
 	}
 	if (e.target->getName() == "Play")
 	{
 		if(_learn) _lastControl = "button/Play";
 		else startPlaying();
+	}
+	if (e.target->getName() == "Next")
+	{
+		if (_learn) _lastControl = "button/Next";
+		else playNext();
+	}
+	if (e.target->getName() == "Prev")
+	{
+		if (_learn) _lastControl = "button/Prev";
+		else playPrev();
+	}
+	if (e.target->getName() == "Random")
+	{
+		if (_learn) _lastControl = "button/Random";
+		else playRandom();
 	}
 }
 
@@ -300,21 +360,29 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 			if (_lastControl != "")
 			{
 				vector<string> vLastControl = ofSplitString(_lastControl, "/");
-				_midiMap[_lastControl] = controlName;
-				if (vLastControl[0] == "toggle")
+				bool mapExists = false;
+				for (auto element : _midiMap)
 				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getToggle(vLastControl[1])->setLabel(newName);
+					if (element.second == controlName) mapExists = true;
 				}
-				else if (vLastControl[0] == "button")
+				if (!mapExists)
 				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getButton(vLastControl[1])->setLabel(newName);
-				}
-				else if (vLastControl[0] == "slider")
-				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getSlider(vLastControl[1])->setLabel(newName);
+					_midiMap[_lastControl] = controlName;
+					if (vLastControl[0] == "toggle")
+					{
+						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						_gui->getToggle(vLastControl[1])->setLabel(newName);
+					}
+					else if (vLastControl[0] == "button")
+					{
+						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						_gui->getButton(vLastControl[1])->setLabel(newName);
+					}
+					else if (vLastControl[0] == "slider")
+					{
+						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						_gui->getSlider(vLastControl[1])->setLabel(newName);
+					}
 				}
 			}
 
@@ -341,6 +409,9 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 						if (value >= 0.75)
 						{
 							if (name[1] == "Play") startPlaying();
+							if (name[1] == "Next") playNext();
+							if (name[1] == "Prev") playPrev();
+							if (name[1] == "Random") playRandom();
 						}
 					}
 					else if (name[0] == "slider")
@@ -398,7 +469,7 @@ void GesturePage::load(ofJson & json)
 		string sControl = ofSplitString(value, "/")[1];
 		string controlName = sChannel + "/" + sControl;
 		string controlLabel = "ch" + sChannel + "/cc" + sControl;
-		cout << name << ", " << value;
+
 		vector<string> vLastControl = ofSplitString(name, "/");
 		_midiMap[name] = controlName;
 		if (vLastControl[0] == "toggle")
@@ -420,12 +491,14 @@ void GesturePage::load(ofJson & json)
 
 	for (auto element : json["gestures"])
 	{
+		
 		Gesture gesture;
+		gesture.load(element["data"]);
+
 		string name = element["name"].get<string>();
 		if (ofToInt(name) > _index) _index = ofToInt(name);
-		gesture.load(element["data"]);
-		_gestures[name] = gesture;
-		_scrollView->add("gesture " + name);
+		
+		addGesture(gesture, name);
 	}
 
 	_index++;
@@ -452,6 +525,37 @@ ofJson GesturePage::save()
 	}
 	
 	return save;
+}
+
+void GesturePage::addGesture(Gesture gesture, string name)
+{
+	_gestures[name] = gesture;
+	_gestureNames.push_back(name);
+	_scrollView->add("gesture " + name);
+	bool nameExists = false;
+	for (auto curName : _gestureNames)
+	{
+		if (curName == name) nameExists = true;
+	}
+	if (!nameExists) _gestureNames.push_back(name);
+	_curGestureIndex = _gestureNames.size() - 1;
+}
+
+void GesturePage::removeGesture(string name)
+{
+	_gestures.erase(_curGestureName);
+	_scrollView->remove(_scrollView->getItemByName("gesture " + _curGestureName));
+	int index = -1;
+	for (int i = 0; i < _gestureNames.size(); i++)
+	{
+		if (_gestureNames[i] == name)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index != -1) _gestureNames.erase(_gestureNames.begin() + index);
+	_curGestureIndex = _gestureNames.size() - 1;
 }
 
 ofRectangle GesturePage::centerSquarePosition(int w, int h)

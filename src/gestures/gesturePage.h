@@ -21,6 +21,9 @@ public:
 	void endRecording();
 	
 	void play();
+	void playNext();
+	void playPrev();
+	void playRandom();
 	void startPlaying();
 
 	void scrollViewEvent(ofxDatGuiScrollViewEvent e);
@@ -46,13 +49,18 @@ public:
 	ofJson save();
 
 private:
+	void addGesture(Gesture gesture, string name);
+	void removeGesture(string name);
+
 	ofRectangle centerSquarePosition(int w, int h);
 
 	map<string, Gesture> _gestures;
+	vector<string> _gestureNames;
 	int _index;
 
 	Gesture _curGesture;
 	string _curGestureName;
+	int _curGestureIndex;
 	bool _recording;
 	
 	Gesture _playGesture;
@@ -63,6 +71,9 @@ private:
 	
 	
 	ofxDatGui* _gui;
+	ofxDatGuiFolder* _transportFolder;
+	ofxDatGuiFolder* _controlFolder;
+	ofxDatGuiFolder* _generateFolder;
 	ofxDatGuiScrollView* _scrollView;
 	vector<ofColor> _colorPallete;
 	ofRectangle _position;
