@@ -330,7 +330,7 @@ ofJson NoiseGenerator::save()
 	save["xMin"] = _minX;
 	save["xMax"] = _maxX;
 	save["yMin"] = _minY;
-	save["xMax"] = _maxY;
+	save["yMax"] = _maxY;
 	save["xSpeed"] = _xSpeed;
 	save["ySpeed"] = _ySpeed;
 
