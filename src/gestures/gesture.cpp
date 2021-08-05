@@ -3,13 +3,16 @@
 Gesture::Gesture()
 {
 	_lengthMs = 0;
+	_lastInputMs = 0;
 }
 
 void Gesture::addPoint(float time, Point point)
 {
 	point.setValue("t", time);
-	_points.push_back(point);
-	_polyline.addVertex(point.getPosition().x, point.getPosition().y);
+	if(size() > 0) point.setValue("dt", time - _lastInputMs);
+	else point.setValue("dt", 0);
+	addPoint(point);
+	_lastInputMs = time;
 }
 
 Point Gesture::getPoint(int index)
@@ -27,6 +30,11 @@ vector<Point> Gesture::getPoints()
 void Gesture::deletePoint(int index)
 {
 	_points.erase(_points.begin() + index);
+}
+
+int Gesture::size()
+{
+	return _points.size();
 }
 
 ofPolyline Gesture::getPolyline()
@@ -91,6 +99,7 @@ ofJson Gesture::save()
 	{
 		ofJson jPoint, parameters;
 		jPoint["time"] = point.getValue("t");
+		jPoint["dtime"] = point.getValue("dt");
 		jPoint["x"] = point.getPosition().x;
 		jPoint["y"] = point.getPosition().y;
 		/*
@@ -110,9 +119,10 @@ void Gesture::load(ofJson loadFile, bool sortPoints, bool normalizeTimeStamps)
 {
 	for (auto curPoint : loadFile)
 	{
-		int time = curPoint["time"];
 		Point point;
 		point.setPosition(curPoint["x"], curPoint["y"]);
+		point.setValue("t", curPoint["time"]);
+		point.setValue("dt", curPoint["dtime"]);
 		/*
 		//in case we want to load some other parameter
 		auto obj = curPoint["parameters"].get<ofJson::object_t>();
@@ -121,7 +131,7 @@ void Gesture::load(ofJson loadFile, bool sortPoints, bool normalizeTimeStamps)
 			point.setValue(parameter.first, parameter.second);
 		}
 		*/
-		addPoint(time, point);
+		addPoint(point);
 	}
 }
 
@@ -129,4 +139,10 @@ void Gesture::clear()
 {
 	_polyline.clear();
 	_points.clear();
+}
+
+void Gesture::addPoint(Point point)
+{
+	_points.push_back(point);
+	_polyline.addVertex(point.getPosition().x, point.getPosition().y);
 }

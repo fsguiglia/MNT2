@@ -19,7 +19,9 @@ public:
 	void record();
 	void startRecording();
 	void endRecording();
+	
 	void play();
+	void startPlaying();
 
 	void scrollViewEvent(ofxDatGuiScrollViewEvent e);
 	void buttonEvent(ofxDatGuiButtonEvent e);
@@ -45,11 +47,18 @@ private:
 	ofRectangle centerSquarePosition(int w, int h);
 
 	map<string, Gesture> _gestures;
+	int _index;
+
 	Gesture _curGesture;
-	string _curGestureIndex;
+	string _curGestureName;
 	bool _recording;
+	
+	Gesture _playGesture;
+	ofPolyline _playPoly;
+	int _playGestureIndex;
+	int _lastPointTime;
 	bool _playing;
-	int _curSelected, _index;
+	
 	
 	ofxDatGui* _gui;
 	ofxDatGuiScrollView* _scrollView;

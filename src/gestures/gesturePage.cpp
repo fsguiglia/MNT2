@@ -4,10 +4,10 @@ GesturePage::GesturePage()
 {
 	_visible = false;
 	_recording = false;
+	_playing = false;
 	_mouseControl = false;
 	_inside = false;
 	_learn = false;
-	_curSelected = NULL;
 	_cursor.set(-1, -1);
 	_lastControl = "";
 	_index = 0;
@@ -57,8 +57,9 @@ void GesturePage::setupGui()
 
 void GesturePage::update()
 {
-	if (_recording) record();
-	else if (_playing) play();
+	if (_playing) play();
+	else if (_recording) record();
+	
 
 	_scrollView->setVisible(_visible);
 	_scrollView->setEnabled(_visible);
@@ -75,16 +76,22 @@ void GesturePage::draw(ofTrueTypeFont font)
 	ofPushStyle();
 	ofSetColor(255);
 	ofDrawRectangle(_position);
+	
 	ofSetColor(_colorPallete[0]);
 	ofPolyline curPolyline = _curGesture.getPolyline();
 	curPolyline.scale(_position.width, _position.height);
 	curPolyline.draw();
+	
+	ofSetColor(100, 255, 100);
+	ofDrawEllipse(_cursor.x *_position.width + _position.x, _cursor.y * _position.height + _position.y, 10, 10);
+	ofPolyline playPolylne = _playPoly;
+	playPolylne.scale(_position.width, _position.height);
+	playPolylne.draw();
+
 	ofSetColor(50);
 	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
 	_scrollView->draw();
 	_gui->draw();
-	ofSetColor(255, 100, 100);
-	ofDrawEllipse(_cursor.x *_position.width + _position.x, _cursor.y * _position.height + _position.y, 10, 10);
 	ofPopStyle();
 }
 
@@ -123,7 +130,7 @@ void GesturePage::startRecording()
 
 void GesturePage::endRecording()
 {
-	if (_curGesture.getPoints().size() > 1)
+	if (_curGesture.size() > 1)
 	{
 		string name = ofToString(_index);
 		_curGesture.sort();
@@ -137,6 +144,39 @@ void GesturePage::endRecording()
 
 void GesturePage::play()
 {
+	if (_playGestureIndex < _playGesture.size())
+	{
+		Point curPoint = _playGesture.getPoint(_playGestureIndex);
+		bool playNext = false;
+		if (_playGestureIndex == 0) playNext = true;
+		else if (ofGetElapsedTimeMillis() - _lastPointTime >= curPoint.getValue("dt")) playNext = true;
+		if (playNext)
+		{
+			_cursor = curPoint.getPosition();
+			_playPoly.addVertex(_cursor.x, _cursor.y);
+			_lastPointTime = ofGetElapsedTimeMillis();
+			_playGestureIndex++;
+		}
+	}
+	else
+	{
+		_playPoly.clear();
+		_playGestureIndex = 0;
+		_playing = false;
+		_cursor.set(-1, -1);
+	}
+}
+
+void GesturePage::startPlaying()
+{
+	if (_curGesture.size() > 0)
+	{
+		_playPoly.clear();
+		_playGesture = _curGesture;
+		_lastPointTime = 0;
+		_playGestureIndex = 0;
+		_playing = true;
+	}
 }
 
 void GesturePage::scrollViewEvent(ofxDatGuiScrollViewEvent e)
@@ -144,7 +184,7 @@ void GesturePage::scrollViewEvent(ofxDatGuiScrollViewEvent e)
 	string sIndex = ofSplitString(e.target->getLabel(), " ")[1];
 	if (_gestures.find(sIndex) != _gestures.end())
 	{
-		_curGestureIndex = sIndex;
+		_curGestureName = sIndex;
 		_curGesture = _gestures[sIndex];
 	}
 }
@@ -153,9 +193,13 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 {
 	if (e.target->getName() == "Delete")
 	{
-		_gestures.erase(_curGestureIndex);
-		_scrollView->remove(_scrollView->getItemByName("gesture " + _curGestureIndex));
+		_gestures.erase(_curGestureName);
+		_scrollView->remove(_scrollView->getItemByName("gesture " + _curGestureName));
 		_curGesture.clear();
+	}
+	if (e.target->getName() == "Play")
+	{
+		startPlaying();
 	}
 }
 
