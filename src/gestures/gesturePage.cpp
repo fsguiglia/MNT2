@@ -23,6 +23,7 @@ void GesturePage::setup(int w, int h, int guiWidth)
 void GesturePage::setupGui()
 {
 	_gui = new ofxDatGui();
+	_gui->addHeader("Gesture", false);
 	_transportFolder = _gui->addFolder("Transport");
 	_transportFolder->addToggle("Record")->setName("Record");
 	_transportFolder->addButton("Play")->setName("Play");
@@ -451,10 +452,6 @@ map<string, float> GesturePage::getMidiOut()
 map<string, float> GesturePage::getMidiDump()
 {
 	return map<string, float>();
-}
-
-void GesturePage::clearMIDIMessages()
-{
 }
 
 void GesturePage::OSCIn(string address, float value)

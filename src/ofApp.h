@@ -14,6 +14,7 @@
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
 #include "gestures/gesturePage.h"
+#include "generators/noiseGenerator.h"
 #include "utils/mntUtils.h"
 
 /*

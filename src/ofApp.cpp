@@ -155,6 +155,7 @@ void ofApp::setupGui()
 	_gui->addButton("Trigger");
 	_gui->addButton("Draw");
 	_gui->addButton("Gesture");
+	_gui->addButton("Noise");
 	_gui->addBreak();
 	_midiInFolder = _gui->addFolder("Midi In");
 	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port.first);
@@ -224,6 +225,16 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("Gesture", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+	}
+	if (label == "Noise")
+	{
+		ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+		node->setName("Noise", true);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "New") clear();
@@ -855,6 +866,22 @@ void ofApp::load()
 			else if (element["type"].get<string>() == "Gesture")
 			{
 				ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
+				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+				node->setInputs(element["inputs"]);
+				node->setOutputs(element["outputs"]);
+				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+				node->setName(element["type"].get<string>(), true);
+				node->setPosition(element["x"], element["y"]);
+				ofJson data = element["data"];
+				node->load(data);
+				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+				string newName = node->getName();
+				names[oldName] = newName;
+			}
+			else if (element["type"].get<string>() == "Noise")
+			{
+				ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
 				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
 				node->setInputs(element["inputs"]);
 				node->setOutputs(element["outputs"]);

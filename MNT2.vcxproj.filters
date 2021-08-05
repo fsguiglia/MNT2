@@ -154,6 +154,9 @@
     <ClCompile Include="src\ML\dimensionalityReduction.cpp">
       <Filter>src\ML</Filter>
     </ClCompile>
+    <ClCompile Include="src\generators\noiseGenerator.cpp">
+      <Filter>src\generators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -260,6 +263,9 @@
     </Filter>
     <Filter Include="src\ML">
       <UniqueIdentifier>{e70a6df5-2abf-401c-b49a-da6622633e9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\generators">
+      <UniqueIdentifier>{67800d27-125c-42f4-a7be-438e26a9212f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -515,6 +521,9 @@
     </ClInclude>
     <ClInclude Include="src\ML\dimensionalityReduction.h">
       <Filter>src\ML</Filter>
+    </ClInclude>
+    <ClInclude Include="src\generators\noiseGenerator.h">
+      <Filter>src\generators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

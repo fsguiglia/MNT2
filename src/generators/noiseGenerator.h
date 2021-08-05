@@ -1,33 +1,19 @@
 #pragma once
 #include "ofMain.h"
-#include "gesture.h"
 #include "ofxDatGui.h"
-#include "../utils/mntUtils.h"
 
-class GesturePage {
+class NoiseGenerator {
 public:
-	GesturePage();
+	NoiseGenerator();
 	void setup(int w, int h, int guiWidth);
 	void setupGui();
 	void update();
-	void updateGui();
 	void draw(ofTrueTypeFont font);
-	
+
 	void resize(int w, int h);
 	void setColorPallete(vector<ofColor> colorPalette);
 	void setVisible(bool visible);
-	
-	void record();
-	void startRecording();
-	void endRecording();
-	
-	void play();
-	void playNext();
-	void playPrev();
-	void playRandom();
-	void startPlaying();
 
-	void scrollViewEvent(ofxDatGuiScrollViewEvent e);
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
@@ -50,39 +36,25 @@ public:
 	ofJson save();
 
 private:
-	void addGesture(Gesture gesture, string name);
-	void removeGesture(string name);
 	ofRectangle centerSquarePosition(int w, int h);
-
-	map<string, Gesture> _gestures;
-	vector<string> _gestureNames;
-	int _index;
-
-	Gesture _curGesture;
-	string _curGestureName;
-	int _curGestureIndex;
-	bool _recording;
-	
-	Gesture _playGesture;
-	ofPolyline _playPoly;
-	int _playGestureIndex;
-	int _lastPointTime;
-	bool _playing;
-	
-	
-	ofxDatGui* _gui;
-	ofxDatGuiFolder* _transportFolder;
-	ofxDatGuiFolder* _controlFolder;
-	ofxDatGuiFolder* _generateFolder;
-	ofxDatGuiScrollView* _scrollView;
-	vector<ofColor> _colorPallete;
-	ofRectangle _position;
-	int _guiWidth, _guiHeight;
-	bool _inside, _visible, _mouseControl, _learn;
-
-	map<string, float> _oscOutput;
-	map<string, string> _midiMap;
-	string _lastControl;
+	void generate();
 
 	ofVec2f _cursor, _prevCursor;
+	float _seed;
+	float _xFrame;
+	float _yFrame;
+
+	vector<ofColor> _colorPallete;
+	ofxDatGui* _gui;
+	ofRectangle _position;
+	float _xSpeed, _ySpeed;
+	float _minX, _maxX, _minY, _maxY;
+	int _guiWidth;
+	bool _visible, _active;
+
+	map<string, string> _midiMap;
+	string _lastControl;
+	bool _learn;
+
+	map<string, float> _oscOutput;
 };
