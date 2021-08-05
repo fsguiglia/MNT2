@@ -21,9 +21,10 @@ public:
 
 	void MIDIIn(string port, int control, int channel, float value);
 	void OSCIn(string address, float value);
+	map<string, float> getOSCOut();
 	map<string, float> getMidiOut();
 	map<string, float> getMidiDump();
-	void clearMIDIMessages();
+	void clearMessages();
 
 	void setVisible(bool visible);
 	bool getVisible();
@@ -125,6 +126,12 @@ inline void ModuleNode<T>::OSCIn(string address, float value)
 }
 
 template<typename T>
+inline map<string, float> ModuleNode<T>::getOSCOut()
+{
+	return _page->getOscOut();
+}
+
+template<typename T>
 inline map<string, float> ModuleNode<T>::getMidiOut()
 {
 	return _page->getMidiOut();
@@ -137,9 +144,9 @@ inline map<string, float> ModuleNode<T>::getMidiDump()
 }
 
 template<typename T>
-inline void ModuleNode<T>::clearMIDIMessages()
+inline void ModuleNode<T>::clearMessages()
 {
-	_page->clearMIDIMessages();
+	_page->clearMessages();
 }
 
 template<typename T>

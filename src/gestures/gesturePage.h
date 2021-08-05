@@ -39,6 +39,8 @@ public:
 	map<string, float> getMidiDump();
 	void clearMIDIMessages();
 	void OSCIn(string address, float value);
+	map<string, float> getOscOut();
+	void clearMessages();
 
 	void load(ofJson& json);
 	ofJson save();
@@ -67,6 +69,7 @@ private:
 	int _guiWidth;
 	bool _inside, _visible, _mouseControl, _learn;
 
+	map<string, float> _oscOutput;
 	map<string, string> _midiMap;
 	string _lastControl;
 

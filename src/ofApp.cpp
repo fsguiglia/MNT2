@@ -604,7 +604,11 @@ void ofApp::updateConnections()
 				if (node->getName() == connection.fromId)
 				{
 					if (connection.isDump) MIDIMessages = node->getMidiDump();
-					else MIDIMessages = node->getMidiOut();
+					else
+					{
+						MIDIMessages = node->getMidiOut();
+						OSCMessages = node->getOSCOut();
+					}
 					break;
 				}
 			}
@@ -674,7 +678,7 @@ void ofApp::updateConnections()
 			}
 		}
 	}
-	for (auto& node : _moduleNodes) node->clearMIDIMessages();
+	for (auto& node : _moduleNodes) node->clearMessages();
 }
 
 void ofApp::clear()

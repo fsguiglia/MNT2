@@ -21,17 +21,19 @@ public:
 	void MIDIIn(string port, int channel, int control, float value);
 	void OSCIn(string address, float value);
 
+	map<string, float> getOscOut(bool clear = false);
 	map<string, float> getMidiDump(bool clear = false);
 	map<string, float> getMidiOut(bool clear = false);
+	
 	void setVisible(bool visible);
-	void clearMIDIMessages();
+	void clearMessages();
 
 	virtual void load(ofJson& json) = 0;
 	virtual ofJson save() = 0;
 
 protected:
 	void addMidiMessages(map<string, float> messages, map<string, float>& queue);
-	void clearMIDIMessages(map<string, float>& queue);
+	void clearMessages(map<string, float>& queue);
 
 	T _map;
 	ScrollGui* _gui;
@@ -42,7 +44,7 @@ protected:
 	string _lastSelectedControl;
 	string _CCXY[2];
 	ofRectangle _position;
-	map<string, float> _previousOutput, _MIDIOutMessages, _MIDIDumpMessages;
+	map<string, float> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
 };
 #endif
 
@@ -220,18 +222,26 @@ inline void BasePage<T>::OSCIn(string address, float value)
 }
 
 template<typename T>
-inline map<string, float> BasePage<T>::getMidiDump(bool clearMessages)
+inline map<string, float> BasePage<T>::getOscOut(bool clear)
 {
-	map<string, float> out = _MIDIDumpMessages;
-	if (clearMessages) clearMIDIMessages(_MIDIDumpMessages);
+	map<string, float> out = _OSCOutMessages;
+	if (clear) clearMessages(_OSCOutMessages);
 	return out;
 }
 
 template<typename T>
-inline map<string, float> BasePage<T>::getMidiOut(bool clearMessages)
+inline map<string, float> BasePage<T>::getMidiDump(bool clear)
+{
+	map<string, float> out = _MIDIDumpMessages;
+	if (clear) clearMessages(_MIDIDumpMessages);
+	return out;
+}
+
+template<typename T>
+inline map<string, float> BasePage<T>::getMidiOut(bool clear)
 {
 	map<string, float> out = _MIDIOutMessages;
-	if (clearMessages) clearMIDIMessages(_MIDIOutMessages);
+	if (clear) clearMessages(_MIDIOutMessages);
 	return out;
 }
 
@@ -250,10 +260,11 @@ inline void BasePage<T>::setVisible(bool visible)
 }
 
 template<typename T>
-inline void BasePage<T>::clearMIDIMessages()
+inline void BasePage<T>::clearMessages()
 {
 	_MIDIOutMessages.clear();
 	_MIDIDumpMessages.clear();
+	_OSCOutMessages.clear();
 }
 
 template<typename T>
@@ -264,7 +275,7 @@ inline void BasePage<T>::addMidiMessages(map<string, float> messages, map<string
 }
 
 template<typename T>
-inline void BasePage<T>::clearMIDIMessages(map<string, float>& queue)
+inline void BasePage<T>::clearMessages(map<string, float>& queue)
 {
 	queue.clear();
 }

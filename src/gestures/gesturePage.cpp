@@ -60,7 +60,6 @@ void GesturePage::update()
 	if (_playing) play();
 	else if (_recording) record();
 	
-
 	_scrollView->setVisible(_visible);
 	_scrollView->setEnabled(_visible);
 	_scrollView->update();
@@ -68,6 +67,10 @@ void GesturePage::update()
 	_gui->setEnabled(_visible);
 	_gui->update();
 
+	if (_cursor != _prevCursor)
+	{
+		
+	}
 	_prevCursor = _cursor;
 }
 
@@ -347,6 +350,16 @@ void GesturePage::clearMIDIMessages()
 
 void GesturePage::OSCIn(string address, float value)
 {
+}
+
+map<string, float> GesturePage::getOscOut()
+{
+	return _oscOutput;
+}
+
+void GesturePage::clearMessages()
+{
+	_oscOutput.clear();
 }
 
 void GesturePage::load(ofJson & json)
