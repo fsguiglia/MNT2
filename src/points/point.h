@@ -12,17 +12,17 @@ public:
 	void setValue(string key, float value);
 	void deleteValue(string key);
 	void setValues(map<string, float> parameters);
-	void setClass(int class_);
+	void setName(string name);
+	string getName();
 	ofVec2f getPosition();
 	bool hasValue(string key);
 	float getValue(string key);
 	map<string, float> getValues();
-	int getClass();
 	vector<pair<float, int>> getClosest(vector<ofVec2f>& positions, int n);
 	pair<float,int> getClosest(vector<ofVec2f>& positions);
 protected:
 	map<string, float> _parameters;
 	ofVec2f _position;
-	int _class;
+	string _name;
 };
 #endif

@@ -1,3 +1,4 @@
+ofxSpatialHash
 ofxDatGui
 ofxMidi
 ofxNetwork

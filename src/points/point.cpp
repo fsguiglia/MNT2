@@ -3,6 +3,7 @@
 Point::Point()
 {
 	setPosition(-1, -1);
+	_name = "";
 }
 
 Point::Point(ofVec2f position)
@@ -35,9 +36,14 @@ void Point::setValues(map<string, float> parameters)
 	_parameters = parameters;
 }
 
-void Point::setClass(int class_)
+void Point::setName(string name)
 {
-	_class = class_;
+	_name = name;
+}
+
+string Point::getName()
+{
+	return _name;
 }
 
 ofVec2f Point::getPosition()
@@ -62,11 +68,6 @@ float Point::getValue(string key)
 map<string, float> Point::getValues()
 {
 	return _parameters;
-}
-
-int Point::getClass()
-{
-	return _class;
 }
 
 vector<pair<float, int>> Point::getClosest(vector<ofVec2f>& positions, int n)
