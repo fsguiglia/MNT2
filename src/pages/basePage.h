@@ -250,8 +250,8 @@ inline void BasePage<T>::setVisible(bool visible)
 {
 	if (_visible && !visible)
 	{
-		_gui->getToggle("controlLearn")->setChecked(false);
-		_gui->getToggle("parameterLearn")->setChecked(false);
+		if(_controlLearn) _gui->getToggle("controlLearn")->setChecked(false);
+		if(_parameterLearn) _gui->getToggle("parameterLearn")->setChecked(false);
 		_controlLearn = false;
 		_parameterLearn = false;
 	}

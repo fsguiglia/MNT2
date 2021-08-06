@@ -3,6 +3,7 @@
 CBCSPage::CBCSPage()
 {
 	_useGlobalParameters = false;
+	_address = "cbcs/";
 }
 
 void CBCSPage::setup(int width, int height, int guiWidth, int maxMessages)
@@ -31,6 +32,7 @@ void CBCSPage::setupGui()
 	_gui = new ScrollGui();
 	_gui->addHeader("NNI", false);
 	_gui->addToggle("active");
+	_arrangeFolder = _gui->addFolder("analize");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getParameter("--learning_rate"))->setName("--learning_rate");
@@ -44,9 +46,11 @@ void CBCSPage::setupGui()
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
 	_controlFolder->collapse();
+	_gui->addTextInput("address", "cbcs/");
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
 	_gui->onToggleEvent(this, &CBCSPage::toggleEvent);
 	_gui->onSliderEvent(this, &CBCSPage::sliderEvent);
+	_gui->onTextInputEvent(this, &CBCSPage::textInputEvent);
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
@@ -127,6 +131,11 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "controlLearn") _controlLearn = e.checked;
 	if (e.target->getName() == "active") _map.setActive(e.checked);
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
+}
+
+void CBCSPage::textInputEvent(ofxDatGuiTextInputEvent e)
+{
+	_address = e.text;
 }
 
 void CBCSPage::mouseMoved(int x, int y)

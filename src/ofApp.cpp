@@ -152,6 +152,7 @@ void ofApp::setupGui()
 	_gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
 	_gui->addHeader("MNT");
 	_gui->addButton("NNI");
+	_gui->addButton("CBCS");
 	_gui->addButton("Trigger");
 	_gui->addButton("Draw");
 	_gui->addButton("Gesture");
@@ -195,6 +196,16 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("NNI", true);
+		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+	}
+	if (label == "CBCS")
+	{
+		ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setInputs(1);
+		node->setOutputs(1);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+		node->setName("CBCS", true);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Trigger")
@@ -817,6 +828,23 @@ void ofApp::load()
 			if (element["type"].get<string>() == "NNI")
 			{
 				
+				ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
+				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+				node->setInputs(element["inputs"]);
+				node->setOutputs(element["outputs"]);
+				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
+				node->setName(element["type"].get<string>(), true);
+				node->setPosition(element["x"], element["y"]);
+				ofJson data = element["data"];
+				node->load(data);
+				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+				string newName = node->getName();
+				names[oldName] = newName;
+			}
+			if (element["type"].get<string>() == "CBCS")
+			{
+
 				ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
 				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
 				node->setInputs(element["inputs"]);

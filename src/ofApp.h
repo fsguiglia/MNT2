@@ -11,6 +11,7 @@
 #include "nodes/moduleNode.h"
 #include "nodes/connection.h"
 #include "pages/NNIpage.h"
+#include "pages/CBCSPage.h"
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
 #include "gestures/gesturePage.h"

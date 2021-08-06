@@ -18,6 +18,7 @@ public:
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
+	void textInputEvent(ofxDatGuiTextInputEvent e);
 
 	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);
@@ -28,6 +29,7 @@ public:
 	void load(ofJson& json);
 	ofJson save();
 private:
+	string _address;
 	DimensionalityReduction _tsne;
 	DimensionalityReduction _pca;
 };

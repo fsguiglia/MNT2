@@ -3,7 +3,6 @@
 #include "BaseMap.h"
 #include "../points/point.h"
 #include "ofxSpatialHash.h"
-#include "ofxDatGui.h"
 
 class CBCS : public BaseMap<Point>
 {
@@ -12,7 +11,7 @@ public:
 	void setup(int width, int height, vector<string> features);
 	void setup(int width, int height);
 	void update();
-	void draw(int x, int y, ofTrueTypeFont& font);
+	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
 
 	void addPoint(Point point);
 	void selectFeatures(string xFeature, string yFeature);
@@ -33,6 +32,7 @@ public:
 	vector<int> getKnn(ofVec2f position, int max_n);
 	void removeSelection();
 
+	map<string, float> getOutput();
 private:	
 	vector<string> _features;
 	pair<string, string> _selectedFeatures;

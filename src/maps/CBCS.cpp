@@ -44,14 +44,20 @@ void CBCS::update()
 	}
 }
 
-void CBCS::draw(int x, int y, ofTrueTypeFont & font)
+void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 {
-	_fbo.draw(0, 0);
+	ofPushStyle();
+	ofSetColor(255);
+	_fbo.draw(x, y, w, h);
 	for (int i = 0; i < _selection.size(); i++)
 	{
 		ofSetColor(_colorPallete[i % _colorPallete.size()]);
+		ofVec2f curPos = _points[_selection[i]].getPosition();
+		curPos.x = x + curPos.x * w;
+		curPos.y = y + curPos.y * h;
 		ofDrawEllipse(_points[_selection[i]].getPosition(), 10, 10);
 	}
+	ofPopStyle();
 }
 
 void CBCS::addPoint(Point point)
@@ -114,7 +120,7 @@ void CBCS::setRadius(float radius)
 
 float CBCS::getRadius()
 {
-	_radius;
+	return _radius;
 }
 
 void CBCS::build()
@@ -156,4 +162,9 @@ void CBCS::removeSelection()
 		_selection.clear();
 		build();
 	}
+}
+
+map<string, float> CBCS::getOutput()
+{
+	return _output;
 }
