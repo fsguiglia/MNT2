@@ -11,7 +11,6 @@ public:
 	void setup(int width, int height, int guiWidth, int maxMessages = 50);
 	void setupGui();
 	void setupTsne();
-	void setupPca();
 
 	void update();
 
@@ -30,6 +29,5 @@ public:
 	ofJson save();
 private:
 	string _address;
-	DimensionalityReduction _tsne;
-	DimensionalityReduction _pca;
+	DimensionalityReduction _dr;
 };

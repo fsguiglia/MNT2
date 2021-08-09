@@ -29,14 +29,15 @@ def main():
 	if len(files) < 5:
 		exit()
 	
-	sample_rate = args['sample_rate']
-	window_size = args['window_size']
-	hop_length = args['hop_length']
-	perplexity = args['perplexity']
-	learning_rate = args['learning_rate']
-	iterations = args['iterations']
-	mode = args['mode']
-	technique = args['technique']
+	output_folder = args['output_folder']
+	sample_rate = int(args['sample_rate'])
+	window_size = int(args['window_size'])
+	hop_length = int(args['hop_length'])
+	perplexity = int(args['perplexity'])
+	learning_rate = int(args['learning_rate'])
+	iterations = int(args['iterations'])
+	mode = int(args['mode'])
+	technique = int(args['technique'])
 	
 	X = np.array([]).reshape(0, int(sample_rate * 0.5))
 	file_position = list()
@@ -54,22 +55,28 @@ def main():
 	D = getFeatures(X, window_size, hop_length)
 	Y = np.zeros((len(file_position),2))
 	
-	if technique == 'pca':
+	if technique == 1:
 		Y = getPCA(D, 2)
-	elif technique == 'tsne':
+	elif technique == 0:
 		pca = getPCA(D, 0.8)
 		Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
 	
-	min_max_normalize(Y)
-	save(Y, file_position)
+	Y = min_max_normalize(Y)
+	
+	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
+	save(Y, file_position, new_path)
 	exit()
 		
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='CBCS t-SNE')
 	
-	parser.add_argument('-f', '--input',
+	parser.add_argument('-i', '--input',
 						action='store',
 						help='path to the input directory')
+	
+	parser.add_argument('-f', '--output_folder',
+						action='store',
+						help='path to the output directory')
 
 	parser.add_argument('-d', '--dimentions',
 						action='store',
@@ -86,7 +93,7 @@ def process_arguments(args):
 						default = 200,
 						help = 'Learning rate (default: 200)')
 						
-	parser.add_argument('-i', '--iterations',
+	parser.add_argument('-it', '--iterations',
 						action='store',
 						default=1000,
 						help='Iterations (default: 1000)')
@@ -108,13 +115,13 @@ def process_arguments(args):
 	
 	parser.add_argument('-m', '--mode',
 					 action='store',
-					 default='sample',
-					 help= 'mode (sample, granular)')
+					 default=0,
+					 help= 'mode (0:sample, 1:granular)')
 	
 	parser.add_argument('-t', '--technique',
 					 action='store',
-					 default='tsne',
-					 help='Dimensionality reduction technique (tsne, pca)')
+					 default=1,
+					 help='Dimensionality reduction technique (0: tsne, 1: pca)')
 
 	return vars(parser.parse_args())
 
@@ -135,13 +142,13 @@ def getListOfFiles(dirName, extensions):
 				allFiles.append(fullPath)
 	return allFiles
 
-def getFilePosition(file, sample_rate, mode='sample'):
+def getFilePosition(file, sample_rate, mode=0):
 	y, sr = librosa.load(file, sample_rate)
 	y = librosa.to_mono(y)
 	shape = int(sample_rate * 0.5)
 
 	windows = int(y.shape[0] / shape)
-	if mode == 'sample': 
+	if mode == 0: 
 		windows = 0
 	X = list()
 	D = np.array([]).reshape(0, shape)
@@ -200,17 +207,19 @@ def min_max_normalize(a):
 	norm = (a - min_values) / (max_values - min_values)
 	return norm
 
-def save(data, files):
+def save(data, files, output_file):
 	out = dict()
+	points = dict()
 	for i in range(len(files)):
 		curOut = dict()
 		curOut['file'] = files[i][0][0]
 		curOut['pos'] = files[i][0][1]
 		curOut['x'] = float(data[i][0])
 		curOut['y'] = float(data[i][1])
-		out[i] = curOut
+		points[i] = curOut
 	
-	with open('test.json', 'w+') as f:
+	out['points'] = points
+	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
 		
 		

@@ -12,6 +12,7 @@ public:
 	void setParameter(string parameter, float value);
 	float getParameter(string parameter);
 	void start(ofJson data);
+	void start();
 	void check();
 	bool getRunning();
 	bool getCompleted();

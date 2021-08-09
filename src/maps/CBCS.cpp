@@ -5,6 +5,7 @@ CBCS::CBCS() :
 {
 	_selectedFeatures.first = "";
 	_selectedFeatures.second = "";
+	_maxN = 10;
 }
 
 void CBCS::setup(int width, int height, vector<string> features)
@@ -34,10 +35,13 @@ void CBCS::update()
 	{
 		if (_cursor != _prevCursor)
 		{
-			_selection = getKnn(_cursor, _maxN);
-			for (auto index : _selection)
+			if (_cursor.x > 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 			{
-				_output[_points[index].getName()] = _points[index].getValue("position");
+				_selection = getKnn(_cursor, _maxN);
+				for (auto index : _selection)
+				{
+					_output[_points[index].getName()] = _points[index].getValue("position");
+				}
 			}
 		}
 		_prevCursor = _cursor;
@@ -49,6 +53,9 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 	ofPushStyle();
 	ofSetColor(255);
 	_fbo.draw(x, y, w, h);
+	ofSetColor(255, 0, 0, 100);
+	ofSetCircleResolution(100);
+	ofDrawEllipse(_cursor * ofVec2f(_width, _height) + ofVec2f(x, y), _radius * _width, _radius * _height);
 	for (int i = 0; i < _selection.size(); i++)
 	{
 		ofSetColor(_colorPallete[i % _colorPallete.size()]);
@@ -126,19 +133,15 @@ float CBCS::getRadius()
 void CBCS::build()
 {
 	_hash.buildIndex();
-	_mesh.clear();
-	for (auto point : _points)
-	{
-		ofVec3f meshPoint = point.getPosition();
-		meshPoint.x *= _width;
-		meshPoint.y *= _height;
-		_mesh.addVertex(meshPoint);
-	}
 	_fbo.begin();
 	ofPushStyle();
 	ofSetColor(0);
+	for (auto point : _points)
+	{
+		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);
+		ofDrawEllipse(curPos, 10, 10);
+	}
 	ofPopStyle();
-	_mesh.draw();
 	_fbo.end();
 }
 

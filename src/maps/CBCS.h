@@ -43,7 +43,6 @@ private:
 	ofx::KDTree<ofVec2f>::SearchResults _searchResults;
 
 	ofFbo _fbo;
-	ofMesh _mesh;
 	ofVec2f _cursor, _prevCursor;
 	float _radius;
 	int _maxN;

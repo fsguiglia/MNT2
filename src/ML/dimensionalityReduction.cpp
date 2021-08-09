@@ -38,10 +38,14 @@ float DimensionalityReduction::getParameter(string parameter)
 void DimensionalityReduction::start(ofJson data)
 {
 	ofSavePrettyJson(_inputFilePath, data);
+	start();
+}
+
+void DimensionalityReduction::start()
+{
 	string command = "python " + _scriptPath;
 	command += " -f " + _inputFilePath;
 	for (auto parameter : _parameters) command = command + " " + parameter.first + " " + ofToString(parameter.second);
-	
 	system(command.c_str());
 	_running = true;
 }

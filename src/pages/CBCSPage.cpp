@@ -12,16 +12,17 @@ void CBCSPage::setup(int width, int height, int guiWidth, int maxMessages)
 	_guiWidth = guiWidth;
 
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
+	_map.setRadius(0.05);
 	_map.setActive(false);
 	_map.setRandomize(0.);
-	
 	_map.setDrawSelected(true);
+	_map.setCursor(ofVec2f(-1, -1));
+
 	_mouseControl = false;
 	_controlLearn = false;
 	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
-	setupPca();
 	setupTsne();
 	setupGui();
 	_maxMessages = maxMessages;
@@ -34,9 +35,9 @@ void CBCSPage::setupGui()
 	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("analize");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
-	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getParameter("--perplexity"))->setName("--perplexity");
-	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getParameter("--learning_rate"))->setName("--learning_rate");
-	_arrangeFolder->addSlider("iterations", 250, 2500, _tsne.getParameter("--iterations"))->setName("--iterations");
+	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
+	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
+	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addBreak();
 	_arrangeFolder->collapse();
 	_arrangeFolder->addButton("PCA")->setName("pca");
@@ -46,6 +47,7 @@ void CBCSPage::setupGui()
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
 	_controlFolder->collapse();
+	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
 	_gui->addTextInput("address", "cbcs/");
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
 	_gui->onToggleEvent(this, &CBCSPage::toggleEvent);
@@ -64,31 +66,20 @@ void CBCSPage::setupGui()
 
 void CBCSPage::setupTsne()
 {
-	_tsne.setup("../../analysis/tsne_audio.py", "tsne"); //ver valores por defecto
-	map<string, float> tsneParameters;
-	tsneParameters["--perplexity"] = 5;
-	tsneParameters["--learning_rate"] = 15;
-	tsneParameters["--iterations"] = 1000;
-	_tsne.setParameters(tsneParameters);
-}
-
-void CBCSPage::setupPca()
-{
-	_pca.setup("../../analysis/pca_audio.py", "pca"); //ver valores por defecto
+	_dr.setup("../../analysis/tsne_audio.py", "cbcs"); //ver valores por defecto
+	map<string, float> drParameters;
+	drParameters["--perplexity"] = 30;
+	drParameters["--learning_rate"] = 200;
+	drParameters["--iterations"] = 1000;
+	_dr.setParameters(drParameters);
 }
 
 void CBCSPage::update()
 {
-	if (_tsne.getRunning())
+	if (_dr.getRunning())
 	{
-		if (_tsne.getCompleted()) load(_tsne.getData());
-		else _tsne.check();
-	}
-
-	if (_pca.getRunning())
-	{
-		if (_pca.getCompleted()) load(_pca.getData());
-		else _pca.check();
+		if (_dr.getCompleted()) load(_dr.getData());
+		else _dr.check();
 	}
 
 	BasePage::update();
@@ -98,11 +89,13 @@ void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
 	if (e.target->getName() == "tsne")
 	{
-		if (!_tsne.getRunning()) _tsne.start(save());
+		_dr.setParameter("--technique", 0);
+		if (!_dr.getRunning()) _dr.start();
 	}
-	else if (e.target->getName() == "pca")
+	if (e.target->getName() == "pca")
 	{
-		if (!_pca.getRunning()) _pca.start(save());
+		_dr.setParameter("--technique", 1);
+		if (!_dr.getRunning()) _dr.start();
 	}
 }
 
@@ -111,7 +104,7 @@ void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 	string name = e.target->getName();
 	if (name == "perplexity" || name == "learning rate" || name == "iterations")
 	{
-		_tsne.setParameter(name, e.value);
+		_dr.setParameter(name, e.value);
 	}
 	else if (name == "x" || name == "y")
 	{
@@ -123,6 +116,10 @@ void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 			if (name == "y") nniCursor.y = e.value;
 			_map.setCursor(nniCursor);
 		}
+	}
+	else if (name == "radius")
+	{
+		_map.setRadius(e.value * 0.5);
 	}
 }
 
@@ -186,11 +183,12 @@ void CBCSPage::load(ofJson & json)
 	for (ofJson point : json["points"])
 	{
 		Point curPoint;
-		curPoint.setPosition(point["pos"]["x"], point["pos"]["y"]);
-		curPoint.setName(point["name"].get<string>());
-		auto obj = point["parameters"].get<ofJson::object_t>();
-		for (auto parameter : obj) curPoint.setValue(parameter.first, parameter.second);
+		curPoint.setPosition(point["x"], point["y"]);
+		curPoint.setName(point["file"].get<string>());
+		curPoint.setValue("position", point["pos"]);
+		_map.addPoint(curPoint);
 	}
+	_map.build();
 }
 
 ofJson CBCSPage::save()
@@ -200,13 +198,11 @@ ofJson CBCSPage::save()
 	for (int i = 0; i < points.size(); i++)
 	{
 		ofJson curPoint;
-		curPoint["pos"]["x"] = points[i].getPosition().x;
-		curPoint["pos"]["y"] = points[i].getPosition().y;
+		curPoint["x"] = points[i].getPosition().x;
+		curPoint["y"] = points[i].getPosition().y;
 		curPoint["name"] = points[i].getName();
+		curPoint["pos"] = points[i].getValue("position");
 		for (auto parameter : points[i].getValues())
-		{
-			curPoint["parameters"][parameter.first] = parameter.second;
-		}
 		jSave["points"].push_back(curPoint);
 	}
 
