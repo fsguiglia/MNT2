@@ -649,6 +649,17 @@ void ofApp::updateConnections()
 			}
 			if (osc)
 			{
+				for (auto& element : OSCMessages)
+				{
+					string name = split[1] + ":" + split[2];
+					ofxOscMessage m;
+					m.setAddress(element.first);
+					m.addFloatArg(element.second);
+					if (_oscSenders.find(name) != _oscSenders.end())
+					{
+						_oscSenders[name].sendMessage(m);
+					}
+				}
 				for (auto& element : MIDIMessages)
 				{
 					string name = split[1] + ":" + split[2];
@@ -845,7 +856,7 @@ void ofApp::load()
 			if (element["type"].get<string>() == "CBCS")
 			{
 
-				ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
+				ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
 				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
 				node->setInputs(element["inputs"]);
 				node->setOutputs(element["outputs"]);
@@ -950,7 +961,7 @@ void ofApp::load()
 			{
 				bool outputExists = false;
 				for (auto port : _MIDIOutPorts) if ("out:" + port.first == connection.toId) outputExists = true;
-				for (auto port : _oscSenders) if (port.first == connection.toId) outputExists = true;
+				for (auto port : _oscSenders) if ("osc:" + port.first == connection.toId) outputExists = true;
 				validConnection = validConnection && outputExists;
 			}
 			

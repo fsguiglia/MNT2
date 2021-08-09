@@ -32,14 +32,14 @@ public:
 	virtual ofJson save() = 0;
 
 protected:
-	void addMidiMessages(map<string, float> messages, map<string, float>& queue);
+	void addMessages(map<string, float> messages, map<string, float>& queue);
 	void clearMessages(map<string, float>& queue);
 
 	T _map;
 	ScrollGui* _gui;
 	ofxDatGuiFolder* _controlFolder;
 	ofxDatGuiFolder* _arrangeFolder;
-	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters;
+	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters, _oscOutput;
 	int _guiWidth, _maxMessages;
 	string _lastSelectedControl;
 	string _CCXY[2];
@@ -67,7 +67,8 @@ inline void BasePage<T>::update()
 	{
 		if (_map.getOutput() != _previousOutput)
 		{
-			addMidiMessages(_map.getOutput(), _MIDIOutMessages);
+			if(_oscOutput) addMessages(_map.getOutput(), _OSCOutMessages);
+			else addMessages(_map.getOutput(), _MIDIOutMessages);
 			_previousOutput = _map.getOutput();
 		}
 	}
@@ -177,7 +178,7 @@ inline void BasePage<T>::MIDIIn(string port, int channel, int control, float val
 
 						map<string, float> curMessage;
 						curMessage[parameterName] = value;
-						addMidiMessages(curMessage, _MIDIOutMessages);
+						addMessages(curMessage, _MIDIOutMessages);
 					}
 				}
 			}
@@ -268,7 +269,7 @@ inline void BasePage<T>::clearMessages()
 }
 
 template<typename T>
-inline void BasePage<T>::addMidiMessages(map<string, float> messages, map<string, float>& queue)
+inline void BasePage<T>::addMessages(map<string, float> messages, map<string, float>& queue)
 {
 	queue.insert(messages.begin(), messages.end());
 	while (queue.size() > _maxMessages) queue.erase(queue.begin());;

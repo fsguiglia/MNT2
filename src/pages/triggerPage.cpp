@@ -3,6 +3,7 @@
 TriggerPage::TriggerPage()
 {
 	_useGlobalParameters = false;
+	_oscOutput = false;
 }
 
 void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)
@@ -104,8 +105,8 @@ void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
 		map<string, float> message;
 		message[name] = value;
-		addMidiMessages(message, _MIDIOutMessages);
-		addMidiMessages(message, _MIDIDumpMessages);
+		addMessages(message, _MIDIOutMessages);
+		addMessages(message, _MIDIDumpMessages);
 	}
 }
 

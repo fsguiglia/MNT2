@@ -3,6 +3,7 @@
 CBCSPage::CBCSPage()
 {
 	_useGlobalParameters = false;
+	_oscOutput = true;
 	_address = "cbcs/";
 }
 
@@ -189,7 +190,7 @@ void CBCSPage::load(ofJson & json)
 	{
 		Point curPoint;
 		curPoint.setPosition(point["x"], point["y"]);
-		curPoint.setName(point["file"].get<string>());
+		curPoint.setName(point["name"].get<string>());
 		curPoint.setValue("position", point["pos"]);
 		_map.addPoint(curPoint);
 	}

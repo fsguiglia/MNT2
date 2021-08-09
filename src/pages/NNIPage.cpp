@@ -3,6 +3,7 @@
 NNIPage::NNIPage()
 {
 	_useGlobalParameters = true;
+	_oscOutput = false;
 }
 
 void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
@@ -139,8 +140,8 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
 		map<string, float> message;
 		message[name] = value;
-		addMidiMessages(message, _MIDIDumpMessages);
-		addMidiMessages(message, _MIDIOutMessages);
+		addMessages(message, _MIDIDumpMessages);
+		addMessages(message, _MIDIOutMessages);
 	}
 }
 
@@ -195,8 +196,8 @@ void NNIPage::updateSelected(int selected, Point point)
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second, false);
 	map<string, float> curMessage;
-	addMidiMessages(parameters, _MIDIOutMessages);
-	addMidiMessages(parameters, _MIDIDumpMessages);
+	addMessages(parameters, _MIDIOutMessages);
+	addMessages(parameters, _MIDIDumpMessages);
 }
 
 void NNIPage::mouseMoved(int x, int y)

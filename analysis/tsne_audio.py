@@ -212,7 +212,7 @@ def save(data, files, output_file):
 	points = dict()
 	for i in range(len(files)):
 		curOut = dict()
-		curOut['file'] = files[i][0][0]
+		curOut['name'] = files[i][0][0]
 		curOut['pos'] = files[i][0][1]
 		curOut['x'] = float(data[i][0])
 		curOut['y'] = float(data[i][1])
