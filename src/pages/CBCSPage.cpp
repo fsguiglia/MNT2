@@ -33,14 +33,14 @@ void CBCSPage::setupGui()
 	_gui = new ScrollGui();
 	_gui->addHeader("NNI", false);
 	_gui->addToggle("active");
-	_arrangeFolder = _gui->addFolder("analize");
+	_arrangeFolder = _gui->addFolder("Analize");
+	_arrangeFolder->addToggle("Analize complete files", false);
+	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
-	_arrangeFolder->addBreak();
 	_arrangeFolder->collapse();
-	_arrangeFolder->addButton("PCA")->setName("pca");
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("learn")->setName("controlLearn");
 	_controlFolder->addToggle("Mouse Control");
@@ -71,6 +71,7 @@ void CBCSPage::setupTsne()
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;
 	drParameters["--iterations"] = 1000;
+	drParameters["--mode"] = 0;
 	_dr.setParameters(drParameters);
 }
 
@@ -128,6 +129,10 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "controlLearn") _controlLearn = e.checked;
 	if (e.target->getName() == "active") _map.setActive(e.checked);
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
+	if (e.target->getName() == "Analize complete files") {
+		if (e.checked) _dr.setParameter("mode", 1);
+		else _dr.setParameter("mode", 0);
+	}
 }
 
 void CBCSPage::textInputEvent(ofxDatGuiTextInputEvent e)

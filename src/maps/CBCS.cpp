@@ -53,22 +53,28 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 	ofPushStyle();
 	ofSetColor(255);
 	_fbo.draw(x, y, w, h);
+	
 	ofSetColor(255, 0, 0, 100);
 	ofSetCircleResolution(100);
-	ofDrawEllipse(_cursor * ofVec2f(_width, _height) + ofVec2f(x, y), _radius * _width, _radius * _height);
+	ofVec2f scaledCursor = _cursor * ofVec2f(w, h);
+	scaledCursor.x += x;
+	scaledCursor.y += y;
+	ofDrawEllipse(scaledCursor, _radius * _width, _radius * _height);
+
 	for (int i = 0; i < _selection.size(); i++)
 	{
 		ofSetColor(_colorPallete[i % _colorPallete.size()]);
-		ofVec2f curPos = _points[_selection[i]].getPosition();
-		curPos.x = x + curPos.x * w;
-		curPos.y = y + curPos.y * h;
-		ofDrawEllipse(_points[_selection[i]].getPosition(), 10, 10);
+		ofVec2f curPos = _points[_selection[i]].getPosition() * ofVec2f(w, h);
+		curPos.x += x;
+		curPos.y += y;
+		ofDrawEllipse(curPos, 10, 10);
 	}
 	ofPopStyle();
 }
 
 void CBCS::addPoint(Point point)
 {
+	_positions.push_back(point.getPosition());
 	BaseMap::addPoint(point);
 }
 
@@ -132,7 +138,6 @@ float CBCS::getRadius()
 
 void CBCS::build()
 {
-	_hash.buildIndex();
 	_fbo.begin();
 	ofPushStyle();
 	ofSetColor(0);
@@ -143,6 +148,7 @@ void CBCS::build()
 	}
 	ofPopStyle();
 	_fbo.end();
+	_hash.buildIndex();
 }
 
 vector<int> CBCS::getKnn(ofVec2f position, int max_n)
