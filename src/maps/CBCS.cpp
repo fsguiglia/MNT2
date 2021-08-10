@@ -143,11 +143,14 @@ void CBCS::build()
 {
 	_fbo.begin();
 	ofPushStyle();
-	ofSetColor(0);
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, _fbo.getWidth(), _fbo.getHeight());
+	ofSetColor(50,50,100);
+	ofSetCircleResolution(100);
 	for (auto point : _points)
 	{
 		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);
-		ofDrawEllipse(curPos, 10, 10);
+		ofDrawEllipse(curPos, 15, 15);
 	}
 	ofPopStyle();
 	_fbo.end();

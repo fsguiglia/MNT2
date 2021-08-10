@@ -82,7 +82,11 @@ void CBCSPage::update()
 {
 	if (_dr.getRunning())
 	{
-		if (_dr.getCompleted()) load(_dr.getData());
+		if (_dr.getCompleted())
+		{
+			_map.clearPoints();
+			load(_dr.getData());
+		}
 		else _dr.check();
 	}
 

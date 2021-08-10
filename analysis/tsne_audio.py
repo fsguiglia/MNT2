@@ -16,19 +16,6 @@ import json
 
 def main():
 	args = process_arguments(sys.argv)
-	
-	if args['input'] is None:
-		init_path = os.environ['USERPROFILE'] + '//Desktop//'
-		args['input'] = (easygui.diropenbox(default = init_path))
-		if args['input'] is None:
-			exit()
-
-	files = getListOfFiles(args['input'], ['.wav'])
-	
-	
-	if len(files) < 5:
-		exit()
-	
 	output_folder = args['output_folder']
 	sample_rate = int(args['sample_rate'])
 	window_size = int(args['window_size'])
@@ -38,9 +25,24 @@ def main():
 	iterations = int(args['iterations'])
 	mode = int(args['mode'])
 	technique = int(args['technique'])
+	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
+	file_position = list()
+	Y = np.array([])
+	
+	if args['input'] is None:
+		init_path = os.environ['USERPROFILE'] + '//Desktop//'
+		args['input'] = (easygui.diropenbox(default = init_path))
+		if args['input'] is None:
+			save(Y, file_position, new_path)
+			exit()
+
+	files = getListOfFiles(args['input'], ['.wav'])
+	
+	if len(files) < 5:
+		save(y, file_position, new_path)
+		exit()
 	
 	X = np.array([]).reshape(0, int(sample_rate * 0.5))
-	file_position = list()
 	
 	print('loading ' + str(len(files)) + ' files')
 	bar = progressbar.ProgressBar(maxval=len(files), \
@@ -63,7 +65,7 @@ def main():
 	
 	Y = min_max_normalize(Y)
 	
-	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
+	
 	save(Y, file_position, new_path)
 	exit()
 		

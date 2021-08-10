@@ -26,8 +26,7 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 	setupPca();
 	setupTsne();
 	setupGui();
-	_maxMessages = maxMessages;
-	
+	_maxMessages = maxMessages;	
 }
 
 void NNIPage::setupGui()
@@ -36,7 +35,9 @@ void NNIPage::setupGui()
 	_gui->addHeader("NNI", false);
 	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("arrange");
+	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
+	_arrangeFolder->addButton("t-SNE")->setName("tsne_audio");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _tsne.getParameter("--iterations"))->setName("--iterations");
