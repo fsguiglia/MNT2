@@ -36,7 +36,7 @@ void ofApp::draw(){
 
 	if (_mode)
 	{
-		ofSetColor(50, 50);
+		ofSetColor(0);
 		ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
 		ofSetColor(0);
 		for (auto& node : _moduleNodes)
@@ -154,8 +154,8 @@ void ofApp::setupGui()
 	_ioColor = ofColor(30, 125, 30);
 	_gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
 	_gui->addHeader("MNT");
-	_gui->addButton("NNI");
-	_gui->addButton("CBCS");
+	_gui->addButton("Interpolate");
+	_gui->addButton("Concatenate");
 	_gui->addButton("Trigger");
 	_gui->addButton("Draw");
 	_gui->addButton("Gesture");
@@ -185,8 +185,8 @@ void ofApp::setupGui()
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
-	_gui->getButton("NNI")->setLabelColor(_moduleColor);
-	_gui->getButton("CBCS")->setLabelColor(_moduleColor);
+	_gui->getButton("Interpolate")->setLabelColor(_moduleColor);
+	_gui->getButton("Concatenate")->setLabelColor(_moduleColor);
 	_gui->getButton("Trigger")->setLabelColor(_moduleColor);
 	_gui->getButton("Draw")->setLabelColor(_moduleColor);
 	_gui->getButton("Gesture")->setLabelColor(_generatorColor);
@@ -200,25 +200,25 @@ void ofApp::setupGui()
 void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 {
 	string label = e.target->getLabel();
-	if (label == "NNI")
+	if (label == "Interpolate")
 	{
 		ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 95, 30);
 		node->setInputs(1);
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("NNI", true);
+		node->setName("Interpolate", true);
 		node->setColor(_moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
-	if (label == "CBCS")
+	if (label == "Concatenate")
 	{
 		ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 100, 30);
 		node->setInputs(1);
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("CBCS", true);
+		node->setName("Concatenate", true);
 		node->setColor(_moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
@@ -876,11 +876,11 @@ void ofApp::load()
 		for (auto& element : jModules)
 		{
 			
-			if (element["type"].get<string>() == "NNI")
+			if (element["type"].get<string>() == "Interpolate")
 			{
 				
 				ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 95, 30);
 				node->setInputs(element["inputs"]);
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
@@ -894,11 +894,11 @@ void ofApp::load()
 				string newName = node->getName();
 				names[oldName] = newName;
 			}
-			if (element["type"].get<string>() == "CBCS")
+			if (element["type"].get<string>() == "Concatenate")
 			{
 
 				ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
+				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 100, 30);
 				node->setInputs(element["inputs"]);
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);

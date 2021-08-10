@@ -34,7 +34,7 @@ void CBCSPage::setup(int width, int height, int guiWidth, int maxMessages)
 void CBCSPage::setupGui()
 {
 	_gui = new ScrollGui();
-	_gui->addHeader("NNI", false);
+	_gui->addHeader("Concatenate", false);
 	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("Analize");
 	_arrangeFolder->addToggle("Analize complete files", false);

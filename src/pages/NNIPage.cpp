@@ -32,7 +32,7 @@ void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
 void NNIPage::setupGui()
 {
 	_gui = new ScrollGui();
-	_gui->addHeader("NNI", false);
+	_gui->addHeader("Interpolate", false);
 	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("arrange");
 	_arrangeFolder->addButton("PCA")->setName("pca");
