@@ -15,16 +15,18 @@ ofVec2f normalize(ofVec2f pos, ofRectangle rect)
 
 vector<float> normalize(vector<float> values)
 {
-	float min = NULL;
-	float max = NULL;
-
-	for (float value : values)
+	if (values.size() > 0)
 	{
-		if (value < min || min == NULL) min = value;
-		if (value > max || max == NULL) max = value;
-	}
-	for (float& value : values) value = normalize(value, min, max);
+		float min = values[0];
+		float max = values[0];
 
+		for (float value : values)
+		{
+			if (value < min) min = value;
+			if (value > max) max = value;
+		}
+		for (float& value : values) value = normalize(value, min, max);
+	}
 	return values;
 }
 

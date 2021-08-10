@@ -18,7 +18,6 @@ void CBCS::setup(int width, int height)
 {
 	_width = width;
 	_height = height;
-
 	_fbo.allocate(_width, _height);
 	_fbo.begin();
 	ofPushStyle();
@@ -55,8 +54,8 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 {
 	ofPushStyle();
 	ofSetColor(255);
+	ofDrawRectangle(x, y, w, h);
 	_fbo.draw(x, y, w, h);
-	
 	ofSetColor(255, 0, 0, 100);
 	ofSetCircleResolution(100);
 	ofVec2f scaledCursor = _cursor * ofVec2f(w, h);
@@ -73,6 +72,23 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 		ofDrawEllipse(curPos, 10, 10);
 	}
 	ofPopStyle();
+}
+
+void CBCS::updateFbo()
+{
+	_fbo.begin();
+	ofPushStyle();
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, _fbo.getWidth(), _fbo.getHeight());
+	ofSetColor(50, 50, 100);
+	ofSetCircleResolution(100);
+	for (auto point : _points)
+	{
+		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);
+		ofDrawEllipse(curPos, 15, 15);
+	}
+	ofPopStyle();
+	_fbo.end();
 }
 
 void CBCS::addPoint(Point point)
@@ -139,21 +155,33 @@ float CBCS::getRadius()
 	return _radius;
 }
 
+void CBCS::normalize()
+{
+	float minX = _positions[0].x;
+	float maxX = _positions[0].x;
+	float minY = _positions[0].y;
+	float maxY = _positions[0].y;
+
+	for (auto position : _positions)
+	{
+		if (position.x < minX) minX = position.x;
+		if (position.x > maxX) maxX = position.x;
+		if (position.y < minY) minY = position.y;
+		if (position.y > maxY) maxY = position.y;
+	}
+
+	for (int i = 0; i < _positions.size(); i++)
+	{
+		if (minX != maxX) _positions[i].x = (_positions[i].x - minX) / (maxX - minX);
+		if (minY != maxY) _positions[i].y = (_positions[i].y - minY) / (maxY - minY);
+		_points[i].setPosition(_positions[i]);
+	}
+	build();
+}
+
 void CBCS::build()
 {
-	_fbo.begin();
-	ofPushStyle();
-	ofSetColor(255);
-	ofDrawRectangle(0, 0, _fbo.getWidth(), _fbo.getHeight());
-	ofSetColor(50,50,100);
-	ofSetCircleResolution(100);
-	for (auto point : _points)
-	{
-		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);
-		ofDrawEllipse(curPos, 15, 15);
-	}
-	ofPopStyle();
-	_fbo.end();
+	updateFbo();
 	_hash.buildIndex();
 }
 

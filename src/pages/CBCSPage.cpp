@@ -43,6 +43,7 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
+	_arrangeFolder->addButton("Normalize");
 	_arrangeFolder->collapse();
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("learn")->setName("controlLearn");
@@ -104,6 +105,10 @@ void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 	{
 		_dr.setParameter("--technique", 1);
 		if (!_dr.getRunning()) _dr.start();
+	}
+	if (e.target->getName() == "Normalize")
+	{
+		_map.normalize();
 	}
 }
 

@@ -13,6 +13,8 @@ public:
 	void update();
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
 
+	void updateFbo();
+
 	void addPoint(Point point);
 	void selectFeatures(string xFeature, string yFeature);
 	void setFeatures(vector<string> features);
@@ -28,6 +30,7 @@ public:
 	void setRadius(float radius);
 	float getRadius();
 
+	void normalize();
 	void build();
 	vector<int> getKnn(ofVec2f position, int max_n);
 	void removeSelection();
