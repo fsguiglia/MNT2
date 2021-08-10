@@ -149,6 +149,9 @@ void ofApp::setupColor()
 //--------------------------------------------------------------
 void ofApp::setupGui()
 {
+	_moduleColor = ofColor(30, 30, 30);
+	_generatorColor = ofColor(125, 30, 30);
+	_ioColor = ofColor(30, 125, 30);
 	_gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
 	_gui->addHeader("MNT");
 	_gui->addButton("NNI");
@@ -182,6 +185,15 @@ void ofApp::setupGui()
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
+	_gui->getButton("NNI")->setLabelColor(_moduleColor);
+	_gui->getButton("CBCS")->setLabelColor(_moduleColor);
+	_gui->getButton("Trigger")->setLabelColor(_moduleColor);
+	_gui->getButton("Draw")->setLabelColor(_moduleColor);
+	_gui->getButton("Gesture")->setLabelColor(_generatorColor);
+	_gui->getButton("Noise")->setLabelColor(_generatorColor);
+	_midiInFolder->setLabelColor(_ioColor);
+	_midiOutFolder->setLabelColor(_ioColor);
+	_oscFolder->setLabelColor(_ioColor);
 	_gui->setOpacity(0.8);
 }
 
@@ -196,6 +208,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("NNI", true);
+		node->setColor(_moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "CBCS")
@@ -206,6 +219,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("CBCS", true);
+		node->setColor(_moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Trigger")
@@ -216,6 +230,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("Trigger", true);
+		node->setColor(_moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Draw")
@@ -226,6 +241,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("Draw", true);
+		node->setColor(_moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Gesture")
@@ -236,6 +252,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("Gesture", true);
+		node->setColor(_generatorColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Noise")
@@ -246,6 +263,7 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 		node->setOutputs(1);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		node->setName("Noise", true);
+		node->setColor(_generatorColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "New") clear();
@@ -309,7 +327,7 @@ string ofApp::createMIDIInput(string port, int x, int y)
 	node.setup(x, y, 80, 30);
 	node.setName(name);
 	node.setAsInput(true);
-	node.setColor(ofColor(80, 200, 80));
+	node.setColor(_ioColor);
 	_inputNodes.push_back(node);
 	return name;
 }
@@ -355,7 +373,7 @@ string ofApp::createMIDIOutput(string port, int x, int y)
 	node.setup(x, y, 80, 30);
 	node.setName(name);
 	node.setAsOutput(true);
-	node.setColor(ofColor(80, 200, 80));
+	node.setColor(_ioColor);
 	_outputNodes.push_back(node);
 	return name;
 }
@@ -433,7 +451,7 @@ void ofApp::createOscInput(string port, int x, int y)
 	node.setup(x, y, 80, 30);
 	node.setName("osc:" + port);
 	node.setAsInput(true);
-	node.setColor(ofColor(80, 200, 80));
+	node.setColor(_ioColor);
 	_inputNodes.push_back(node);
 }
 
@@ -475,7 +493,7 @@ void ofApp::createOscOutput(string ip, string port, int x, int y)
 	node.setup(x, y, 80, 30);
 	node.setName("osc:" + name);
 	node.setAsOutput(true);
-	node.setColor(ofColor(80, 200, 80));
+	node.setColor(_ioColor);
 	_outputNodes.push_back(node);
 }
 
@@ -867,6 +885,7 @@ void ofApp::load()
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				node->setName(element["type"].get<string>(), true);
+				node->setColor(_moduleColor);
 				node->setPosition(element["x"], element["y"]);
 				ofJson data = element["data"];
 				node->load(data);
@@ -884,6 +903,7 @@ void ofApp::load()
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				node->setName(element["type"].get<string>(), true);
+				node->setColor(_moduleColor);
 				node->setPosition(element["x"], element["y"]);
 				ofJson data = element["data"];
 				node->load(data);
@@ -900,6 +920,7 @@ void ofApp::load()
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				node->setName(element["type"].get<string>(), true);
+				node->setColor(_moduleColor);
 				node->setPosition(element["x"], element["y"]);
 				ofJson data = element["data"];
 				node->load(data);
@@ -916,6 +937,7 @@ void ofApp::load()
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				node->setName(element["type"].get<string>(), true);
+				node->setColor(_moduleColor);
 				node->setPosition(element["x"], element["y"]);
 				ofJson data = element["data"];
 				node->load(data);
@@ -932,6 +954,7 @@ void ofApp::load()
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				node->setName(element["type"].get<string>(), true);
+				node->setColor(_generatorColor);
 				node->setPosition(element["x"], element["y"]);
 				ofJson data = element["data"];
 				node->load(data);
@@ -948,6 +971,7 @@ void ofApp::load()
 				node->setOutputs(element["outputs"]);
 				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				node->setName(element["type"].get<string>(), true);
+				node->setColor(_generatorColor);
 				node->setPosition(element["x"], element["y"]);
 				ofJson data = element["data"];
 				node->load(data);

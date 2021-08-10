@@ -106,6 +106,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofxDatGuiFolder* _midiInFolder;
 		ofxDatGuiFolder* _midiOutFolder;
 		ofxDatGuiFolder* _oscFolder;
+		ofColor _moduleColor, _generatorColor, _ioColor;
 
 		//IO
 		string _folder, _file;
