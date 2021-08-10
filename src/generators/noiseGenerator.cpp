@@ -8,10 +8,8 @@ NoiseGenerator::NoiseGenerator()
 
 	_xSpeed = 1;
 	_ySpeed = 1;
-	_minX = 0; 
-	_maxX = 1;
-	_minY = 0; 
-	_maxY = 1;
+	_center.set(0.5, 0.5); 
+	_radius.set(0.5, 0.5);
 	_active = false;
 	_visible = false;
 	_learn = false;
@@ -35,10 +33,10 @@ void NoiseGenerator::setupGui()
 	_gui->addToggle("Active");
 	_gui->addSlider("x speed", 0, 10, 1)->setName("x speed");
 	_gui->addSlider("y speed", 0, 10, 1)->setName("y speed");
-	_gui->addSlider("x min", 0, 1, 0)->setName("x min");
-	_gui->addSlider("x max", 0, 1, 1)->setName("x max");
-	_gui->addSlider("y min", 0, 1, 0)->setName("y min");
-	_gui->addSlider("y max", 0, 1, 1)->setName("y max");
+	_gui->addSlider("center x", 0, 1, 0)->setName("center x");
+	_gui->addSlider("center y", 0, 1, 1)->setName("center y");
+	_gui->addSlider("radius x", 0, 1, 0)->setName("radius x");
+	_gui->addSlider("radius y", 0, 1, 1)->setName("radius y");
 	_gui->addToggle("MIDI Learn")->setName("Learn");
 	_gui->addButton("Clear mappings");
 	_gui->onSliderEvent(this, &NoiseGenerator::sliderEvent);
@@ -77,14 +75,15 @@ void NoiseGenerator::update()
 void NoiseGenerator::draw(ofTrueTypeFont font)
 {
 	ofPushStyle();
-	ofSetColor(255);
+	ofSetColor(0);
 	ofDrawRectangle(_position);
 
-	ofSetColor(0);
-	ofDrawLine(_minX * _position.width, _position.y, _minX * _position.width, _position.y + _position.height);
-	ofDrawLine(_maxX * _position.width, _position.y, _maxX * _position.width, _position.y + _position.height);
-	ofDrawLine(_position.x, _minY * _position.height, _position.x + _position.width, _minY * _position.height);
-	ofDrawLine(_position.x, _maxY * _position.height, _position.x + _position.width, _maxY * _position.height);
+	ofSetColor(255);
+	ofDrawRectangle(
+		(_center.x - _radius.x) * _position.width, 
+		(_center.y - _radius.y) * _position.height,
+		_radius.x * 2 * _position.width, 
+		_radius.y * 2 * _position.height);
 	ofSetColor(255, 100, 100);
 	ofDrawEllipse(_cursor.x *_position.width + _position.x, _cursor.y * _position.height + _position.y, 10, 10);
 
@@ -139,10 +138,10 @@ void NoiseGenerator::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else
 	{
-		if (e.target->getName() == "x min") _minX = e.value;
-		if (e.target->getName() == "x max") _maxX = e.value;
-		if (e.target->getName() == "y min") _minY = e.value;
-		if (e.target->getName() == "y max") _maxY = e.value;
+		if (e.target->getName() == "center x") _center.x = e.value;
+		if (e.target->getName() == "center y") _center.y = e.value;
+		if (e.target->getName() == "radius x") _radius.x = e.value;
+		if (e.target->getName() == "radius y") _radius.y = e.value;
 		if (e.target->getName() == "x speed") _xSpeed = e.value;
 		if (e.target->getName() == "y speed") _ySpeed = e.value;
 	}
@@ -344,17 +343,17 @@ void NoiseGenerator::load(ofJson & json)
 		}
 	}
 
-	_minX = json["xMin"];
-	_maxX = json["xMax"];
-	_minY = json["yMin"];
-	_maxY = json["yMax"];
+	_center.x = json["center x"];
+	_center.y = json["center y"];
+	_radius.x = json["radius x"];
+	_radius.y = json["radius y"];
 	_xSpeed = json["xSpeed"];
 	_ySpeed = json["ySpeed"];
 
-	_gui->getSlider("x min")->setValue(_minX, false);
-	_gui->getSlider("x max")->setValue(_maxX, false);
-	_gui->getSlider("y min")->setValue(_minY, false);
-	_gui->getSlider("y max")->setValue(_maxY, false);
+	_gui->getSlider("center x")->setValue(_center.x, false);
+	_gui->getSlider("center y")->setValue(_center.y, false);
+	_gui->getSlider("radius x")->setValue(_radius.x, false);
+	_gui->getSlider("radius y")->setValue(_radius.y, false);
 	_gui->getSlider("x speed")->setValue(_xSpeed, false);
 	_gui->getSlider("y speed")->setValue(_ySpeed, false);
 }
@@ -371,10 +370,10 @@ ofJson NoiseGenerator::save()
 		save["midi"].push_back(mapping);
 	}
 
-	save["xMin"] = _minX;
-	save["xMax"] = _maxX;
-	save["yMin"] = _minY;
-	save["yMax"] = _maxY;
+	save["center x"] = _center.x;
+	save["center y"] = _center.y;
+	save["radius x"] = _radius.x;
+	save["radius y"] = _radius.y;
 	save["xSpeed"] = _xSpeed;
 	save["ySpeed"] = _ySpeed;
 
@@ -402,6 +401,10 @@ ofRectangle NoiseGenerator::centerSquarePosition(int w, int h)
 
 void NoiseGenerator::generate()
 {
-	_cursor.x = ofMap(ofNoise(_xFrame), 0, 1, _minX, _maxX);
-	_cursor.y = ofMap(ofNoise(_yFrame), 0, 1, _minY, _maxY);
+	_cursor.x = ofMap(ofNoise(_xFrame), 0, 1, _center.x - _radius.x, _center.x + _radius.x);
+	if (_cursor.x < 0) _cursor.x = 0;
+	if (_cursor.x > 1) _cursor.x = 1;
+	_cursor.y = ofMap(ofNoise(_yFrame), 0, 1, _center.y - _radius.y, _center.y + _radius.y);
+	if (_cursor.y < 0) _cursor.y = 0;
+	if (_cursor.y > 1) _cursor.y = 1;
 }

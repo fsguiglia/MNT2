@@ -57,7 +57,7 @@ private:
 	ofxDatGui* _gui;
 	ofRectangle _position;
 	float _xSpeed, _ySpeed;
-	float _minX, _maxX, _minY, _maxY;
+	ofVec2f _center, _radius;
 	int _guiWidth;
 	bool _visible, _active;
 
