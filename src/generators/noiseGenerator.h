@@ -24,11 +24,20 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
+	void setMidiOutput(bool midiOutput);
+	void setOscOutput(bool oscOutput);
+	void setStringOutput(bool stringOutput);
+	bool getMidiOutput();
+	bool getOscOutput();
+	bool getStringOutput();
+
+	string getAddress();
 	void MIDIIn(string port, int control, int channel, float value);
 	map<string, float> getMidiOut();
 	map<string, float> getMidiDump();
 	void OSCIn(string address, float value);
 	map<string, float> getOscOut();
+	vector<string> getStringOut();
 	void clearMessages();
 	void clearMappings();
 
@@ -56,5 +65,6 @@ private:
 	string _lastControl;
 	bool _learn;
 
-	map<string, float> _oscOutput;
+	bool _midiOutput, _oscOutput, _stringOutput;
+	map<string, float> _output;
 };

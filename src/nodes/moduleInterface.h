@@ -16,11 +16,17 @@ public:
 	virtual void mouseReleased(int x, int y, int button) = 0;
 	virtual void mouseScrolled(int scroll) = 0;
 
+	virtual bool getMidiOutput() = 0;
+	virtual bool getOscOutput() = 0;
+	virtual bool getStringOutput() = 0;
+
 	virtual void MIDIIn(string port, int control, int channel, float value) = 0;
 	virtual void OSCIn(string address, float value) = 0;
 	virtual map<string, float> getOSCOut() = 0;
 	virtual map<string, float> getMidiOut() = 0;
 	virtual map<string, float> getMidiDump() = 0;
+	virtual string getAddress() = 0;
+	virtual vector<string> getStringOut() = 0;
 	virtual void clearMessages() = 0;
 
 	virtual void setVisible(bool visible) = 0;

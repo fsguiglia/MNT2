@@ -2,9 +2,11 @@
 
 CBCSPage::CBCSPage()
 {
-	_useGlobalParameters = false;
-	_oscOutput = true;
-	_address = "cbcs/";
+	setUseGlobalParameters(false);
+	setMidiOutput(false);
+	setOscOutput(false);
+	setStringOutput(true);
+	setAddress("cbcs/");
 }
 
 void CBCSPage::setup(int width, int height, int guiWidth, int maxMessages)
@@ -49,7 +51,7 @@ void CBCSPage::setupGui()
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
 	_controlFolder->collapse();
 	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
-	_gui->addTextInput("address", "cbcs/");
+	_gui->addTextInput("address", getAddress());
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
 	_gui->onToggleEvent(this, &CBCSPage::toggleEvent);
 	_gui->onSliderEvent(this, &CBCSPage::sliderEvent);

@@ -2,8 +2,11 @@
 
 TriggerPage::TriggerPage()
 {
-	_useGlobalParameters = false;
-	_oscOutput = false;
+	setUseGlobalParameters(false);
+	setMidiOutput(true);
+	setOscOutput(false);
+	setStringOutput(false);
+	setAddress("cbcs/");
 }
 
 void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)

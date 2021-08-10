@@ -19,11 +19,17 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
+	bool getMidiOutput();
+	bool getOscOutput();
+	bool getStringOutput();
+
 	void MIDIIn(string port, int control, int channel, float value);
 	void OSCIn(string address, float value);
 	map<string, float> getOSCOut();
 	map<string, float> getMidiOut();
 	map<string, float> getMidiDump();
+	string getAddress();
+	vector<string> getStringOut();
 	void clearMessages();
 
 	void setVisible(bool visible);
@@ -114,6 +120,24 @@ inline void ModuleNode<T>::mouseScrolled(int scroll)
 }
 
 template<typename T>
+inline bool ModuleNode<T>::getMidiOutput()
+{
+	return _page->getMidiOutput();
+}
+
+template<typename T>
+inline bool ModuleNode<T>::getOscOutput()
+{
+	return _page->getOscOutput();
+}
+
+template<typename T>
+inline bool ModuleNode<T>::getStringOutput()
+{
+	return _page->getStringOutput();
+}
+
+template<typename T>
 inline void ModuleNode<T>::MIDIIn(string port, int control, int channel, float value)
 {
 	_page->MIDIIn(port, control, channel, value);
@@ -141,6 +165,18 @@ template<typename T>
 inline map<string, float> ModuleNode<T>::getMidiDump()
 {
 	return _page->getMidiDump();
+}
+
+template<typename T>
+inline string ModuleNode<T>::getAddress()
+{
+	return _page->getAddress();
+}
+
+template<typename T>
+inline vector<string> ModuleNode<T>::getStringOut()
+{
+	return _page->getStringOut();
 }
 
 template<typename T>

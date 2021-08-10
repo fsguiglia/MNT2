@@ -2,8 +2,11 @@
 
 RGBPage::RGBPage()
 {
-	_useGlobalParameters = false;
-	_oscOutput = false;
+	setUseGlobalParameters(false);
+	setMidiOutput(true);
+	setOscOutput(false);
+	setStringOutput(false);
+	setAddress("");
 }
 
 void RGBPage::setup(int width, int height, int guiWidth, int maxMessages)

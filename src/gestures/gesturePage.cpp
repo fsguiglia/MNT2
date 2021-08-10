@@ -2,6 +2,10 @@
 
 GesturePage::GesturePage()
 {
+	setMidiOutput(false);
+	setOscOutput(true);
+	setStringOutput(false);
+
 	_visible = false;
 	_recording = false;
 	_playing = false;
@@ -74,8 +78,8 @@ void GesturePage::update()
 	{
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_oscOutput["control/x"] = _cursor.x;
-			_oscOutput["control/y"] = _cursor.y;
+			_output["control/x"] = _cursor.x;
+			_output["control/y"] = _cursor.y;
 		}
 	}
 	_prevCursor = _cursor;
@@ -360,6 +364,36 @@ void GesturePage::mouseScrolled(int scroll)
 {
 }
 
+void GesturePage::setMidiOutput(bool midiOutput)
+{
+	_midiOutput = midiOutput;
+}
+
+void GesturePage::setOscOutput(bool oscOutput)
+{
+	_oscOutput = oscOutput;
+}
+
+void GesturePage::setStringOutput(bool stringOutput)
+{
+	_stringOutput = stringOutput;
+}
+
+bool GesturePage::getMidiOutput()
+{
+	return _midiOutput;
+}
+
+bool GesturePage::getOscOutput()
+{
+	return _oscOutput;
+}
+
+bool GesturePage::getStringOutput()
+{
+	return _stringOutput;
+}
+
 void GesturePage::MIDIIn(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
@@ -460,12 +494,22 @@ void GesturePage::OSCIn(string address, float value)
 
 map<string, float> GesturePage::getOscOut()
 {
-	return _oscOutput;
+	return _output;
+}
+
+string GesturePage::getAddress()
+{
+	return string();
+}
+
+vector<string> GesturePage::getStringOut()
+{
+	return vector<string>();
 }
 
 void GesturePage::clearMessages()
 {
-	_oscOutput.clear();
+	_output.clear();
 }
 
 void GesturePage::clearMappings()

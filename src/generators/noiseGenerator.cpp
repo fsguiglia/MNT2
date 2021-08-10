@@ -2,6 +2,10 @@
 
 NoiseGenerator::NoiseGenerator()
 {
+	setMidiOutput(false);
+	setOscOutput(true);
+	setStringOutput(false);
+
 	_xSpeed = 1;
 	_ySpeed = 1;
 	_minX = 0; 
@@ -58,8 +62,8 @@ void NoiseGenerator::update()
 		generate();
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_oscOutput["control/x"] = _cursor.x;
-			_oscOutput["control/y"] = _cursor.y;
+			_output["control/x"] = _cursor.x;
+			_output["control/y"] = _cursor.y;
 		}
 		_xFrame += _xSpeed * 0.02;
 		_yFrame += _ySpeed * 0.02;
@@ -164,6 +168,41 @@ void NoiseGenerator::mouseScrolled(int scroll)
 {
 }
 
+void NoiseGenerator::setMidiOutput(bool midiOutput)
+{
+	_midiOutput = midiOutput;
+}
+
+void NoiseGenerator::setOscOutput(bool oscOutput)
+{
+	_oscOutput = oscOutput;
+}
+
+void NoiseGenerator::setStringOutput(bool stringOutput)
+{
+	_stringOutput = stringOutput;
+}
+
+bool NoiseGenerator::getMidiOutput()
+{
+	return _midiOutput;
+}
+
+bool NoiseGenerator::getOscOutput()
+{
+	return _oscOutput;
+}
+
+bool NoiseGenerator::getStringOutput()
+{
+	return _stringOutput;
+}
+
+string NoiseGenerator::getAddress()
+{
+	return string();
+}
+
 void NoiseGenerator::MIDIIn(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
@@ -239,12 +278,17 @@ void NoiseGenerator::OSCIn(string address, float value)
 
 map<string, float> NoiseGenerator::getOscOut()
 {
-	return _oscOutput;
+	return _output;
+}
+
+vector<string> NoiseGenerator::getStringOut()
+{
+	return vector<string>();
 }
 
 void NoiseGenerator::clearMessages()
 {
-	_oscOutput.clear();
+	_output.clear();
 }
 
 void NoiseGenerator::clearMappings()

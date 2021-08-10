@@ -28,6 +28,5 @@ public:
 	void load(ofJson& json);
 	ofJson save();
 private:
-	string _address;
 	DimensionalityReduction _dr;
 };

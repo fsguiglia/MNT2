@@ -18,10 +18,24 @@ public:
 	void resize(int w, int h);
 	ofRectangle centerSquarePosition(int w, int h);
 
+	void setAddress(string address);
+	string getAddress();
+
+	void setMidiOutput(bool midiOutput);
+	void setOscOutput(bool oscOutput);
+	void setStringOutput(bool stringOutput);
+	bool getMidiOutput();
+	bool getOscOutput();
+	bool getStringOutput();
+
+	void setUseGlobalParameters(bool globalParameters);
+	bool getUseGlobalParameters();
+
 	void MIDIIn(string port, int channel, int control, float value);
 	void OSCIn(string address, float value);
 
 	map<string, float> getOscOut(bool clear = false);
+	vector<string> getStringOut(bool clear = false);
 	map<string, float> getMidiDump(bool clear = false);
 	map<string, float> getMidiOut(bool clear = false);
 	
@@ -33,18 +47,21 @@ public:
 
 protected:
 	void addMessages(map<string, float> messages, map<string, float>& queue);
+	void setStringMessages(vector<string> messages);
 	void clearMessages(map<string, float>& queue);
 
 	T _map;
 	ScrollGui* _gui;
 	ofxDatGuiFolder* _controlFolder;
 	ofxDatGuiFolder* _arrangeFolder;
-	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters, _oscOutput;
+	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters;
+	bool _midiOutput, _oscOutput, _stringOutput;
 	int _guiWidth, _maxMessages;
-	string _lastSelectedControl;
+	string _lastSelectedControl, _address;
 	string _CCXY[2];
 	ofRectangle _position;
 	map<string, float> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
+	vector<string> _stringMessages;
 };
 #endif
 
@@ -67,8 +84,14 @@ inline void BasePage<T>::update()
 	{
 		if (_map.getOutput() != _previousOutput)
 		{
-			if(_oscOutput) addMessages(_map.getOutput(), _OSCOutMessages);
-			else addMessages(_map.getOutput(), _MIDIOutMessages);
+			if (_stringOutput)
+			{
+				vector<string> curOutput;
+				for (auto element : _map.getOutput()) curOutput.push_back(element.first + ofToString(element.second));
+				setStringMessages(curOutput);
+			}
+			if (_oscOutput) addMessages(_map.getOutput(), _OSCOutMessages);
+			if (_midiOutput) addMessages(_map.getOutput(), _MIDIOutMessages);
 			_previousOutput = _map.getOutput();
 		}
 	}
@@ -115,6 +138,66 @@ inline ofRectangle BasePage<T>::centerSquarePosition(int w, int h)
 	rect.setY(float(h - min) * 0.5);
 
 	return rect;
+}
+
+template<typename T>
+inline void BasePage<T>::setAddress(string address)
+{
+	_address = address;
+}
+
+template<typename T>
+inline string BasePage<T>::getAddress()
+{
+	return _address;
+}
+
+template<typename T>
+inline void BasePage<T>::setMidiOutput(bool midiOutput)
+{
+	_midiOutput = midiOutput;
+}
+
+template<typename T>
+inline void BasePage<T>::setOscOutput(bool oscOutput)
+{
+	_oscOutput = oscOutput;
+}
+
+template<typename T>
+inline void BasePage<T>::setStringOutput(bool stringOutput)
+{
+	_stringOutput = stringOutput;
+}
+
+template<typename T>
+inline bool BasePage<T>::getMidiOutput()
+{
+	return _midiOutput;
+}
+
+template<typename T>
+inline bool BasePage<T>::getOscOutput()
+{
+	return _oscOutput;
+}
+
+template<typename T>
+inline bool BasePage<T>::getStringOutput()
+{
+	return _stringOutput;
+}
+
+template<typename T>
+inline void BasePage<T>::setUseGlobalParameters(bool globalParameters)
+{
+	_useGlobalParameters = globalParameters;
+}
+
+template<typename T>
+inline bool BasePage<T>::getUseGlobalParameters()
+{
+	return _useGlobalParameters;
 }
 
 template<typename T>
@@ -231,6 +314,14 @@ inline map<string, float> BasePage<T>::getOscOut(bool clear)
 }
 
 template<typename T>
+inline vector<string> BasePage<T>::getStringOut(bool clear)
+{
+	vector<string> out = _stringMessages;
+	if (clear) _stringMessages.clear();
+	return out;
+}
+
+template<typename T>
 inline map<string, float> BasePage<T>::getMidiDump(bool clear)
 {
 	map<string, float> out = _MIDIDumpMessages;
@@ -266,6 +357,7 @@ inline void BasePage<T>::clearMessages()
 	_MIDIOutMessages.clear();
 	_MIDIDumpMessages.clear();
 	_OSCOutMessages.clear();
+	_stringMessages.clear();
 }
 
 template<typename T>
@@ -273,6 +365,12 @@ inline void BasePage<T>::addMessages(map<string, float> messages, map<string, fl
 {
 	queue.insert(messages.begin(), messages.end());
 	while (queue.size() > _maxMessages) queue.erase(queue.begin());;
+}
+
+template<typename T>
+inline void BasePage<T>::setStringMessages(vector<string> messages)
+{
+	_stringMessages = messages;
 }
 
 template<typename T>

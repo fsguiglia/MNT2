@@ -579,6 +579,7 @@ void ofApp::updateConnections()
 	for (auto& connection : _connections)
 	{
 		map<string, float> MIDIMessages, OSCMessages;
+		vector <pair<string, vector<string>>> stringMessages;
 		
 		//input
 		if (connection.fromInputNode)
@@ -628,15 +629,25 @@ void ofApp::updateConnections()
 					if (connection.isDump) MIDIMessages = node->getMidiDump();
 					else
 					{
-						MIDIMessages = node->getMidiOut();
-						OSCMessages = node->getOSCOut();
+						if(node->getMidiOutput()) MIDIMessages = node->getMidiOut();
+						if(node->getOscOutput()) OSCMessages = node->getOSCOut();
+						if (node->getStringOutput())
+						{
+							vector<string> vOutput = node->getStringOut();
+							if (vOutput.size() > 0)
+							{
+								pair<string, vector<string>> curOutput;
+								curOutput.first = node->getAddress();
+								curOutput.second = vOutput;
+								stringMessages.push_back(curOutput);
+							}
+						}
 					}
 					break;
 				}
 			}
 		}
 		
-
 		//output
 		if (connection.toOutputNode)
 		{
@@ -669,6 +680,17 @@ void ofApp::updateConnections()
 					ofxOscMessage m;
 					m.setAddress(channel + "/" + control);
 					m.addFloatArg(element.second);
+					if (_oscSenders.find(name) != _oscSenders.end())
+					{
+						_oscSenders[name].sendMessage(m);
+					}
+				}
+				for (auto& element : stringMessages)
+				{
+					string name = split[1] + ":" + split[2];
+					ofxOscMessage m;
+					m.setAddress(element.first);
+					for (auto message : element.second) m.addStringArg(message);
 					if (_oscSenders.find(name) != _oscSenders.end())
 					{
 						_oscSenders[name].sendMessage(m);

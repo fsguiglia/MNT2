@@ -2,8 +2,11 @@
 
 NNIPage::NNIPage()
 {
-	_useGlobalParameters = true;
-	_oscOutput = false;
+	setUseGlobalParameters(true);
+	setMidiOutput(false);
+	setOscOutput(false);
+	setStringOutput(false);
+	setAddress("");
 }
 
 void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)

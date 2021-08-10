@@ -38,10 +38,13 @@ void CBCS::update()
 			if (_cursor.x > 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 			{
 				_selection = getKnn(_cursor, _maxN);
-				for (auto index : _selection)
+				map<string, float> curOutput;
+				for (int i = 0; i < _selection.size(); i++)
 				{
-					_output[_points[index].getName()] = _points[index].getValue("position");
+					string curValue = ofToString(i) + ";" + _points[_selection[i]].getName();
+					curOutput[curValue] = _points[_selection[i]].getValue("position");
 				}
+				_output = curOutput;
 			}
 		}
 		_prevCursor = _cursor;

@@ -33,6 +33,7 @@ public:
 	void removeSelection();
 
 	map<string, float> getOutput();
+
 private:	
 	vector<string> _features;
 	pair<string, string> _selectedFeatures;
