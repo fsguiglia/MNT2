@@ -121,6 +121,9 @@ void GesturePage::draw(ofTrueTypeFont font)
 	playPolylne.draw();
 
 	ofSetColor(50);
+	font.drawString("Gesture: " + _curGestureName, _position.x + 10, _position.y + _position.height - 10);
+
+	ofSetColor(50);
 	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
 	_scrollView->draw();
 	_gui->draw();

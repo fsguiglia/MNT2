@@ -71,6 +71,8 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 		curPos.y += y;
 		ofDrawEllipse(curPos, 10, 10);
 	}
+	ofSetColor(50);
+	if (_selection.size() > 0) font.drawString(_points[_selection[0]].getName(), x + 10, y + w - 10);
 	ofPopStyle();
 }
 
