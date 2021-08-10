@@ -170,6 +170,11 @@ void CBCSPage::mouseDragged(int x, int y, int button)
 
 void CBCSPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
+	
+}
+
+void CBCSPage::mouseReleased(int x, int y, int button)
+{
 	_inside = _position.inside(x, y);
 	if (_inside)
 	{
@@ -178,10 +183,6 @@ void CBCSPage::mousePressed(int x, int y, int button, bool doubleClick)
 			_map.removeSelection();
 		}
 	}
-}
-
-void CBCSPage::mouseReleased(int x, int y, int button)
-{
 }
 
 void CBCSPage::mouseScrolled(int scroll)

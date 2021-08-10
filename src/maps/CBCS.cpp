@@ -173,8 +173,13 @@ void CBCS::removeSelection()
 	{
 		vector<int> sorted = _selection;
 		sort(sorted.begin(), sorted.end());
-		for (int i = sorted.size() - 1; i >= 0; i--) _points.erase(_points.begin() + i);
+		for (int i = sorted.size() - 1; i >= 0; i--)
+		{
+			_positions.erase(_positions.begin() + sorted[i]);
+			_points.erase(_points.begin() + sorted[i]);
+		}
 		_selection.clear();
+		_searchResults.clear();
 		build();
 	}
 }
