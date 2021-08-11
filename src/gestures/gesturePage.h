@@ -27,6 +27,8 @@ public:
 	void random();
 	void startPlaying();
 
+	void getCursorAtPercent(float position);
+
 	void scrollViewEvent(ofxDatGuiScrollViewEvent e);
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
@@ -73,12 +75,12 @@ private:
 	bool _recording;
 	
 	Gesture _playGesture;
-	ofPolyline _playPoly;
+	ofPolyline _playPoly, _scrubPoly;
+	float _scrubPolySpacing;
 	int _playGestureIndex;
 	int _lastPointTime;
 	bool _playing;
-	
-	
+
 	ofxDatGui* _gui;
 	ofxDatGuiFolder* _transportFolder;
 	ofxDatGuiFolder* _controlFolder;

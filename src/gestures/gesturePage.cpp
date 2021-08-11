@@ -15,6 +15,7 @@ GesturePage::GesturePage()
 	_cursor.set(-1, -1);
 	_lastControl = "";
 	_index = 0;
+	_scrubPolySpacing = 0.02;
 }
 
 void GesturePage::setup(int w, int h, int guiWidth)
@@ -34,6 +35,7 @@ void GesturePage::setupGui()
 	_transportFolder->addButton("Next")->setName("Next");
 	_transportFolder->addButton("Previous")->setName("Previous");
 	_transportFolder->addButton("Random")->setName("Random");
+	_transportFolder->addSlider("Scrub", 0, 1, 0)->setName("Scrub");
 	_transportFolder->addButton("Delete");
 	_transportFolder->collapse();
 	_generateFolder = _gui->addFolder("Generate");
@@ -210,6 +212,7 @@ void GesturePage::next()
 			_curGestureIndex++;
 			if (_curGestureIndex > _gestureNames.size() - 1) _curGestureIndex = 0;
 			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
+			_scrubPoly = _curGesture.getPolyline().getResampledByCount(20);
 		}
 	}
 }
@@ -223,6 +226,7 @@ void GesturePage::previous()
 			_curGestureIndex--;
 			if (_curGestureIndex < 0) _curGestureIndex = _gestureNames.size() - 1;
 			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
+			_scrubPoly = _curGesture.getPolyline().getResampledBySpacing(_scrubPolySpacing);
 		}
 	}
 }
@@ -233,6 +237,7 @@ void GesturePage::random()
 	{
 		int index = (int)ofRandom(0, _gestureNames.size() - 1);
 		_curGesture = _gestures[_gestureNames[index]];
+		_scrubPoly = _curGesture.getPolyline().getResampledBySpacing(_scrubPolySpacing);
 	}
 }
 
@@ -248,6 +253,15 @@ void GesturePage::startPlaying()
 	}
 }
 
+void GesturePage::getCursorAtPercent(float position)
+{
+	if (position >= 0 && position <= 1)
+	{
+		float index = position * (_scrubPoly.size() - 1);
+		_cursor = _scrubPoly.getPointAtIndexInterpolated(index);
+	}
+}
+
 void GesturePage::scrollViewEvent(ofxDatGuiScrollViewEvent e)
 {
 	string sIndex = ofSplitString(e.target->getLabel(), " ")[1];
@@ -255,6 +269,7 @@ void GesturePage::scrollViewEvent(ofxDatGuiScrollViewEvent e)
 	{
 		_curGestureName = sIndex;
 		_curGesture = _gestures[sIndex];
+		_scrubPoly = _curGesture.getPolyline().getResampledBySpacing(_scrubPolySpacing);
 	}
 }
 
@@ -264,6 +279,7 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 	{
 		removeGesture(_curGestureName);
 		_curGesture.clear();
+		_scrubPoly.clear();
 	}
 	if (e.target->getName() == "Play")
 	{
@@ -315,13 +331,14 @@ void GesturePage::toggleEvent(ofxDatGuiToggleEvent e)
 void GesturePage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
-	if (name == "x" || name == "y")
+	if (name == "x" || name == "y" || name == "Scrub")
 	{
 		if (_learn) _lastControl = "slider/" + name;
 		else
 		{
 			if (name == "x") _cursor.x = e.value;
 			if (name == "y") _cursor.y = e.value;
+			if (name == "Scrub") getCursorAtPercent(e.value);
 		}
 	}
 }
@@ -465,6 +482,7 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 						_gui->getSlider(name[1])->setValue(value, false);
 						if (name[1] == "x") _cursor.x = value;
 						else if(name[1] == "y") _cursor.y = value;
+						else if (name[1] == "Scrub") getCursorAtPercent(value);
 					}
 				}
 			}
