@@ -22,9 +22,9 @@ public:
 	void endRecording();
 	
 	void play();
-	void playNext();
-	void playPrev();
-	void playRandom();
+	void next();
+	void previous();
+	void random();
 	void startPlaying();
 
 	void scrollViewEvent(ofxDatGuiScrollViewEvent e);

@@ -31,9 +31,9 @@ void GesturePage::setupGui()
 	_transportFolder = _gui->addFolder("Transport");
 	_transportFolder->addToggle("Record")->setName("Record");
 	_transportFolder->addButton("Play")->setName("Play");
-	_transportFolder->addButton("Play next")->setName("Play next");
-	_transportFolder->addButton("Play prev")->setName("Play prev");
-	_transportFolder->addButton("Play random")->setName("Play random");
+	_transportFolder->addButton("Next")->setName("Next");
+	_transportFolder->addButton("Previous")->setName("Previous");
+	_transportFolder->addButton("Random")->setName("Random");
 	_transportFolder->addButton("Delete");
 	_transportFolder->collapse();
 	_generateFolder = _gui->addFolder("Generate");
@@ -201,7 +201,7 @@ void GesturePage::play()
 	}
 }
 
-void GesturePage::playNext()
+void GesturePage::next()
 {
 	if (_gestureNames.size() > 0)
 	{
@@ -210,12 +210,11 @@ void GesturePage::playNext()
 			_curGestureIndex++;
 			if (_curGestureIndex > _gestureNames.size() - 1) _curGestureIndex = 0;
 			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
-			startPlaying();
 		}
 	}
 }
 
-void GesturePage::playPrev()
+void GesturePage::previous()
 {
 	if (_gestureNames.size() > 0)
 	{
@@ -224,18 +223,16 @@ void GesturePage::playPrev()
 			_curGestureIndex--;
 			if (_curGestureIndex < 0) _curGestureIndex = _gestureNames.size() - 1;
 			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
-			startPlaying();
 		}
 	}
 }
 
-void GesturePage::playRandom()
+void GesturePage::random()
 {
 	if (_gestureNames.size() > 0)
 	{
 		int index = (int)ofRandom(0, _gestureNames.size() - 1);
 		_curGesture = _gestures[_gestureNames[index]];
-		startPlaying();
 	}
 }
 
@@ -273,20 +270,20 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 		if(_learn) _lastControl = "button/Play";
 		else startPlaying();
 	}
-	if (e.target->getName() == "Play next")
+	if (e.target->getName() == "Next")
 	{
-		if (_learn) _lastControl = "button/Play next";
-		else playNext();
+		if (_learn) _lastControl = "button/Next";
+		else next();
 	}
-	if (e.target->getName() == "Play prev")
+	if (e.target->getName() == "Previous")
 	{
-		if (_learn) _lastControl = "button/Play prev";
-		else playPrev();
+		if (_learn) _lastControl = "button/Previous";
+		else previous();
 	}
-	if (e.target->getName() == "Play random")
+	if (e.target->getName() == "Random")
 	{
 		if (_learn) _lastControl = "button/Play random";
-		else playRandom();
+		else random();
 	}
 	if (e.target->getName() == "Clear mappings")
 	{
@@ -415,30 +412,24 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 			if (_lastControl != "")
 			{
 				vector<string> vLastControl = ofSplitString(_lastControl, "/");
-				bool mapExists = false;
-				for (auto element : _midiMap)
+				_midiMap[_lastControl] = controlName;
+				
+				if (vLastControl[0] == "toggle")
 				{
-					if (element.second == controlName) mapExists = true;
+					string newName = vLastControl[1] + "(" + controlLabel + ")";
+					_gui->getToggle(vLastControl[1])->setLabel(newName);
 				}
-				if (!mapExists)
+				else if (vLastControl[0] == "button")
 				{
-					_midiMap[_lastControl] = controlName;
-					if (vLastControl[0] == "toggle")
-					{
-						string newName = vLastControl[1] + "(" + controlLabel + ")";
-						_gui->getToggle(vLastControl[1])->setLabel(newName);
-					}
-					else if (vLastControl[0] == "button")
-					{
-						string newName = vLastControl[1] + "(" + controlLabel + ")";
-						_gui->getButton(vLastControl[1])->setLabel(newName);
-					}
-					else if (vLastControl[0] == "slider")
-					{
-						string newName = vLastControl[1] + "(" + controlLabel + ")";
-						_gui->getSlider(vLastControl[1])->setLabel(newName);
-					}
+					string newName = vLastControl[1] + "(" + controlLabel + ")";
+					_gui->getButton(vLastControl[1])->setLabel(newName);
 				}
+				else if (vLastControl[0] == "slider")
+				{
+					string newName = vLastControl[1] + "(" + controlLabel + ")";
+					_gui->getSlider(vLastControl[1])->setLabel(newName);
+				}
+				
 			}
 
 		}
@@ -463,10 +454,10 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 					{
 						if (value >= 0.75)
 						{
+							if (name[1] == "Next") next();
+							if (name[1] == "Previous") previous();
+							if (name[1] == "Random") random();
 							if (name[1] == "Play") startPlaying();
-							if (name[1] == "Play next") playNext();
-							if (name[1] == "Play prev") playPrev();
-							if (name[1] == "Play random") playRandom();
 						}
 					}
 					else if (name[0] == "slider")
