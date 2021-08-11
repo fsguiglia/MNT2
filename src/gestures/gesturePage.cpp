@@ -116,7 +116,7 @@ void GesturePage::draw(ofTrueTypeFont font)
 	curPolyline.scale(_position.width, _position.height);
 	curPolyline.draw();
 	
-	ofSetColor(100, 255, 100);
+	ofSetColor(100, 20, 20);
 	ofDrawEllipse(_cursor.x *_position.width + _position.x, _cursor.y * _position.height + _position.y, 10, 10);
 	ofPolyline playPolylne = _playPoly;
 	playPolylne.scale(_position.width, _position.height);

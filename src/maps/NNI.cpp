@@ -85,7 +85,7 @@ void NNI::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 	ofPushStyle();
 	ofSetColor(255);
 	_colorFbo.draw(x, y, w, h);
-
+	ofSetColor(0);
 	for (int i = 0; i < _points.size(); i++)
 	{
 		ofVec2f pos = _points[i].getPosition() * ofVec2f(w, h);

@@ -56,7 +56,7 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 	ofSetColor(255);
 	ofDrawRectangle(x, y, w, h);
 	_fbo.draw(x, y, w, h);
-	ofSetColor(255, 0, 0, 100);
+	ofSetColor(150, 150, 255, 100);
 	ofSetCircleResolution(100);
 	ofVec2f scaledCursor = _cursor * ofVec2f(w, h);
 	scaledCursor.x += x;
@@ -65,7 +65,7 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 
 	for (int i = 0; i < _selection.size(); i++)
 	{
-		ofSetColor(_colorPallete[i % _colorPallete.size()]);
+		ofSetColor(150,150,255);
 		ofVec2f curPos = _points[_selection[i]].getPosition() * ofVec2f(w, h);
 		curPos.x += x;
 		curPos.y += y;
@@ -80,13 +80,26 @@ void CBCS::updateFbo()
 {
 	_fbo.begin();
 	ofPushStyle();
+	ofSetCircleResolution(100);
 	ofSetColor(255);
 	ofDrawRectangle(0, 0, _fbo.getWidth(), _fbo.getHeight());
-	ofSetColor(50, 50, 100);
-	ofSetCircleResolution(100);
+	
+	ofSetColor(160);
 	for (auto point : _points)
 	{
 		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);
+		_mesh.addVertex(ofVec3f(curPos.x, curPos.y));
+	}
+	_mesh.drawWireframe();
+	
+	for (auto point : _points)
+	{
+		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);
+		ofSetColor(255);
+		ofDrawEllipse(curPos, 18, 18);
+		ofSetColor(0);
+		ofDrawEllipse(curPos, 16, 16);
+		ofSetColor(50, 50, 100);
 		ofDrawEllipse(curPos, 15, 15);
 	}
 	ofPopStyle();
@@ -183,6 +196,7 @@ void CBCS::normalize()
 
 void CBCS::build()
 {
+	_mesh.clear();
 	updateFbo();
 	_hash.buildIndex();
 }

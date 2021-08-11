@@ -36,7 +36,7 @@ void TriggerMap::draw(int x, int y, int w, int h, ofTrueTypeFont & font)
 	ofPushStyle();
 	ofSetColor(255);
 	_fbo.draw(x, y, w, h);
-	
+	ofSetColor(0);
 	for (int i = 0; i < _points.size(); i++)
 	{
 		ofVec2f pos = _points[i].getPosition() * ofVec2f(w, h);
@@ -116,8 +116,8 @@ void TriggerMap::updateFbo()
 {
 	ofPushStyle();
 	_fbo.begin();
-	ofClear(255);
-	ofSetColor(255);
+	ofClear(80);
+	ofSetColor(80);
 	ofSetCircleResolution(100);
 	ofDrawRectangle(0, 0, _width, _height);
 	for (auto point : _points)
@@ -128,12 +128,22 @@ void TriggerMap::updateFbo()
 		float threshold = point.getThreshold();
 
 		if (point.getState()) inColor.set(255, 50, 50, 0);
-		else inColor = point.getColor();
-		outColor = inColor;
-		outColor.a = 100;
+		else
+		{
+			inColor = point.getColor();
+			inColor.r = inColor.r * 0.4 + 150;
+			inColor.g = inColor.g * 0.4 + 150;
+			inColor.b = inColor.b * 0.4 + 150;
+		}
+		
+		outColor = ofColor(200);
 
+		ofSetColor(0);
+		ofDrawCircle(position, radius + 2);
 		ofSetColor(outColor);
 		ofDrawCircle(position, radius);
+		ofSetColor(0);
+		ofDrawCircle(position, radius * threshold + 2);
 		ofSetColor(inColor);
 		ofDrawCircle(position, radius * threshold);
 	}

@@ -149,7 +149,7 @@ void ofApp::setupColor()
 //--------------------------------------------------------------
 void ofApp::setupGui()
 {
-	_moduleColor = ofColor(30, 30, 30);
+	_moduleColor = ofColor(30, 30, 70);
 	_generatorColor = ofColor(125, 30, 30);
 	_ioColor = ofColor(30, 125, 30);
 	_gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);

@@ -45,6 +45,7 @@ private:
 	vector<int> _selection;
 	ofx::KDTree<ofVec2f> _hash;
 	ofx::KDTree<ofVec2f>::SearchResults _searchResults;
+	ofMesh _mesh;
 
 	ofFbo _fbo;
 	ofVec2f _cursor, _prevCursor;
