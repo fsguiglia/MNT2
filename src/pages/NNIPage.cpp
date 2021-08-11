@@ -63,7 +63,7 @@ void NNIPage::setupGui()
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
 	_gui->setWidth(_guiWidth, 0.3);
-	_gui->setPosition(ofGetWidth() - _guiWidth, 0);
+	_gui->setPosition(_position.x + _position.getWidth(), 0);
 	_gui->setMaxHeight(ofGetHeight());
 	_gui->setEnabled(false);
 	_gui->setVisible(false);

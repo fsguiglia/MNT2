@@ -48,13 +48,12 @@ void GesturePage::setupGui()
 	_gui->onSliderEvent(this, &GesturePage::sliderEvent);
 	_gui->onButtonEvent(this, &GesturePage::buttonEvent);
 	_gui->onToggleEvent(this, &GesturePage::toggleEvent);
-
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
 	_gui->getToggle("Record")->setLabelColor(ofColor(255, 100, 100));
 	_gui->setWidth(_guiWidth, 0.3);
-	_gui->setPosition(ofGetWidth() - _guiWidth, 0);
+	_gui->setPosition(_position.x + _position.getWidth(), 0);
 	_gui->setEnabled(false);
 	_gui->setVisible(false);
 	_gui->update();
@@ -64,9 +63,10 @@ void GesturePage::setupGui()
 	_scrollView->onScrollViewEvent(this, &GesturePage::scrollViewEvent);
 	_scrollView->setOpacity(0.5);
 	//_scrollView->setTheme(new ofxDatGuiThemeWireframe());
-	_scrollView->setWidth(_guiWidth, 0.3);
-	_scrollView->setPosition(ofGetWidth() - _guiWidth, _guiHeight);
+	_scrollView->setWidth(_guiWidth -1, 0.3);
+	_scrollView->setPosition(_gui->getPosition().x + 1, _guiHeight);
 	_scrollView->setHeight(_position.height - _guiHeight);
+	_scrollView->setBackgroundColor(50);
 	_scrollView->setEnabled(false);
 	_scrollView->setVisible(false);
 	_scrollView->update();
@@ -97,7 +97,7 @@ void GesturePage::updateGui()
 	if (_gui->getHeight() != _guiHeight)
 	{
 		_guiHeight = _gui->getHeight();
-		_scrollView->setPosition(ofGetWidth() - _guiWidth, _guiHeight);
+		_scrollView->setPosition(_gui->getPosition().x + 1, _guiHeight);
 	}
 
 	_scrollView->setVisible(_visible);
