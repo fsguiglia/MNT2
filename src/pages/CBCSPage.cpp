@@ -70,7 +70,7 @@ void CBCSPage::setupGui()
 
 void CBCSPage::setupTsne()
 {
-	_dr.setup("../../analysis/tsne_audio.py", "cbcs"); //ver valores por defecto
+	_dr.setup("../../analysis/analysis_cbcs.py", "cbcs"); //ver valores por defecto
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;
