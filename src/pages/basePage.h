@@ -18,6 +18,8 @@ public:
 	void resize(int w, int h);
 	ofRectangle centerSquarePosition(int w, int h);
 
+	void setMinClickDistance(float distance);
+
 	void setAddress(string address);
 	string getAddress();
 
@@ -57,6 +59,7 @@ protected:
 	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters;
 	bool _midiOutput, _oscOutput, _stringOutput;
 	int _guiWidth, _maxMessages, _lastSelectedPoint;
+	float _minClickDistance;
 	string _lastSelectedControl, _address;
 	string _CCXY[2];
 	ofRectangle _position;
@@ -69,6 +72,7 @@ template<typename T>
 inline BasePage<T>::BasePage()
 {
 	_lastSelectedPoint = -1;
+	_minClickDistance = 0.1;
 }
 
 template<typename T>
@@ -139,6 +143,12 @@ inline ofRectangle BasePage<T>::centerSquarePosition(int w, int h)
 	rect.setY(float(h - min) * 0.5);
 
 	return rect;
+}
+
+template<typename T>
+inline void BasePage<T>::setMinClickDistance(float distance)
+{
+	_minClickDistance = distance;
 }
 
 template<typename T>

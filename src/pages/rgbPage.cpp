@@ -249,7 +249,7 @@ void RGBPage::mousePressed(int x, int y, int button, bool doubleClick)
 		{
 			int lastSelected = _map.getLastSelected();
 			array<float, 2> selection = _map.getClosest(pos, true);
-			if (selection[1] < 0.1)
+			if (selection[1] < _minClickDistance)
 			{
 				_lastSelectedPoint = int(selection[0]);
 				if (int(selection[0]) != lastSelected)
