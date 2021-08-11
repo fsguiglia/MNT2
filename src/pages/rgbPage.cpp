@@ -224,7 +224,7 @@ void RGBPage::mouseDragged(int x, int y, int button)
 	_inside = _position.inside(x, y);
 	if (button < 2 && _inside && !insideGui) {
 		ofVec2f normPosition = normalize(ofVec2f(x, y), _position);
-		_map.movePoint(_map.getLastSelected(), normPosition);
+		if(_lastSelectedPoint >= 0) _map.movePoint(_lastSelectedPoint, normPosition);
 	}
 }
 
@@ -248,12 +248,17 @@ void RGBPage::mousePressed(int x, int y, int button, bool doubleClick)
 		if (button < 2)
 		{
 			int lastSelected = _map.getLastSelected();
-			int curSelected = _map.getClosest(pos, true)[0];
-			if (curSelected != lastSelected)
+			array<float, 2> selection = _map.getClosest(pos, true);
+			if (selection[1] < 0.1)
 			{
-				RGBPoint point = _map.getPoint(curSelected);
-				updateSelected(curSelected, point);
+				_lastSelectedPoint = int(selection[0]);
+				if (int(selection[0]) != lastSelected)
+				{
+					RGBPoint point = _map.getPoint(int(selection[0]));
+					updateSelected(int(selection[0]), point);
+				}
 			}
+			else _lastSelectedPoint = -1;
 		}
 	}
 }
@@ -299,6 +304,7 @@ void RGBPage::mouseReleased(int x, int y, int button)
 		RGBPoint point = _map.getPoint(_map.getLastSelected());
 		updateSelected(_map.getLastSelected(), point);
 	}
+	_lastSelectedPoint = -1;
 }
 
 void RGBPage::mouseScrolled(int scroll)

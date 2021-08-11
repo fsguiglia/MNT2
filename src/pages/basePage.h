@@ -56,7 +56,7 @@ protected:
 	ofxDatGuiFolder* _arrangeFolder;
 	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters;
 	bool _midiOutput, _oscOutput, _stringOutput;
-	int _guiWidth, _maxMessages;
+	int _guiWidth, _maxMessages, _lastSelectedPoint;
 	string _lastSelectedControl, _address;
 	string _CCXY[2];
 	ofRectangle _position;
@@ -68,6 +68,7 @@ protected:
 template<typename T>
 inline BasePage<T>::BasePage()
 {
+	_lastSelectedPoint = -1;
 }
 
 template<typename T>
