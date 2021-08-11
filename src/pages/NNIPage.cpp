@@ -36,13 +36,11 @@ void NNIPage::setupGui()
 	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("arrange");
 	_arrangeFolder->addButton("PCA")->setName("pca");
-	_arrangeFolder->addButton("t-SNE")->setName("tsne");
-	_arrangeFolder->addButton("t-SNE")->setName("tsne_audio");
-	_arrangeFolder->addSlider("perplexity", 5, 50, _tsne.getParameter("--perplexity"))->setName("--perplexity");
-	_arrangeFolder->addSlider("learning rate", 10, 1000, _tsne.getParameter("--learning_rate"))->setName("--learning_rate");
-	_arrangeFolder->addSlider("iterations", 250, 2500, _tsne.getParameter("--iterations"))->setName("--iterations");
-	_arrangeFolder->addBreak();
-	_arrangeFolder->addButton("PCA")->setName("pca");
+	_arrangeFolder->addButton("PCA (Audio)")->setName("pca_audio");
+	_arrangeFolder->addButton("t-SNE (Audio)")->setName("tsne_audio");
+	_arrangeFolder->addSlider("perplexity", 5, 50, _audioDr.getParameter("--perplexity"))->setName("--perplexity");
+	_arrangeFolder->addSlider("learning rate", 10, 1000, _audioDr.getParameter("--learning_rate"))->setName("--learning_rate");
+	_arrangeFolder->addSlider("iterations", 250, 2500, _audioDr.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addBreak();
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->collapse();
@@ -74,25 +72,25 @@ void NNIPage::setupGui()
 
 void NNIPage::setupTsne()
 {
-	_tsne.setup("../../analysis/tsne.py", "tsne"); //ver valores por defecto
-	map<string, float> tsneParameters;
-	tsneParameters["--perplexity"] = 5;
-	tsneParameters["--learning_rate"] = 15;
-	tsneParameters["--iterations"] = 1000;
-	_tsne.setParameters(tsneParameters);
+	_audioDr.setup("../../analysis/analysis_nni.py", "tsne"); //ver valores por defecto
+	map<string, float> audioDrParameters;
+	audioDrParameters["--perplexity"] = 5;
+	audioDrParameters["--learning_rate"] = 15;
+	audioDrParameters["--iterations"] = 1000;
+	_audioDr.setParameters(audioDrParameters);
 }
 
 void NNIPage::setupPca()
 {
-	_pca.setup("../../analysis/pca.py", "pca"); //ver valores por defecto
+	_pca.setup("../../analysis/pca_nni.py", "pca"); //ver valores por defecto
 }
 
 void NNIPage::update()
 {
-	if (_tsne.getRunning())
+	if (_audioDr.getRunning())
 	{
-		if (_tsne.getCompleted()) load(_tsne.getData());
-		else _tsne.check();
+		if (_audioDr.getCompleted()) load(_audioDr.getData());
+		else _audioDr.check();
 	}
 	
 	if (_pca.getRunning())
@@ -106,13 +104,19 @@ void NNIPage::update()
 
 void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
-	if (e.target->getName() == "tsne")
-	{
-		if (!_tsne.getRunning()) _tsne.start(save());
-	}
-	else if (e.target->getName() == "pca")
+	if (e.target->getName() == "pca")
 	{
 		if (!_pca.getRunning()) _pca.start(save());
+	}
+	else if (e.target->getName() == "tsne_audio")
+	{
+		_audioDr.setParameter("--technique", 0);
+		if (!_audioDr.getRunning()) _audioDr.start(save());
+	}
+	else if (e.target->getName() == "pca_audio")
+	{
+		_audioDr.setParameter("--technique", 1);
+		if (!_audioDr.getRunning()) _audioDr.start(save());
 	}
 }
 
@@ -121,7 +125,7 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 	string name = e.target->getName();
 	if (name == "perplexity" || name == "learning rate" || name == "iterations")
 	{
-		_tsne.setParameter(name, e.value);
+		_audioDr.setParameter(name, e.value);
 	}
 	else if (name == "x" || name == "y")
 	{

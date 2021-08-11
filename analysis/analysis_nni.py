@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
+#!/usr/bin/env python
+
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
-
 import numpy as np
 import librosa
 
+from time import sleep
 import progressbar
-
 import os
 import easygui
 import argparse
@@ -16,7 +17,8 @@ import json
 
 def main():
 	args = process_arguments(sys.argv)
-	output_folder = args['output_folder']
+	json_path =	args['input_file']
+	audio_path = args['audio_files']
 	sample_rate = int(args['sample_rate'])
 	window_size = int(args['window_size'])
 	hop_length = int(args['hop_length'])
@@ -25,61 +27,98 @@ def main():
 	iterations = int(args['iterations'])
 	mode = int(args['mode'])
 	technique = int(args['technique'])
-	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
-	file_position = list()
-	Y = np.array([])
 	
-	if args['input'] is None:
+	#exit if no file is provided
+	if args['input_file'] is None: 
+		print("no input file, exiting")
+		sleep(1)
+		exit()
+		
+	new_path = json_path[:json_path.rfind('.')] + '_o.tmp'
+	data = dict()
+	parameters = []
+	
+	with open(json_path) as f:
+		data = json.load(f)
+	for point in data['points']:
+		cur_parameters = []
+		if "parameters" not in point:
+			print("zones need to have parameters before analysisi, exiting")
+			save(data, new_path)
+			sleep(1)
+			exit()
+		for parameter in point['parameters'].values():
+			cur_parameters.append(parameter)
+		parameters.append(cur_parameters)
+		
+	#save json and exit if no audio files are provided
+	if args['audio_files'] is None:
 		init_path = os.environ['USERPROFILE'] + '//Desktop//'
-		args['input'] = (easygui.diropenbox(default = init_path))
-		if args['input'] is None:
-			save(Y, file_position, new_path)
+		args['audio_files'] = (easygui.diropenbox(default = init_path))
+		if args['audio_files'] is None:
+			save(data, new_path)
+			sleep(1)
 			exit()
 
-	files = getListOfFiles(args['input'], ['.wav'])
+	files = getListOfFiles(args['audio_files'], ['.wav'])
+	validFiles = list()
+	#save json and exit if files dont match zones
+	for point in data["points"]:
+		zone_id = point["id"]
+		id_audio_file_exists = False
+		for file in files:
+			fileName = os.path.basename(file)
+			if fileName[:-4] == str(zone_id):
+				id_audio_file_exists = True
+				validFiles.append(file)
+				break
+		if id_audio_file_exists == False:
+			print("file missing: " + str(zone_id) + ".wav, exiting") 
+			save(data, new_path)
+			sleep(1)
+			exit()
 	
-	if len(files) < 5:
-		save(y, file_position, new_path)
-		exit()
+	X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
 	
-	X = np.array([]).reshape(0, int(sample_rate * 0.5))
-	
+	#load audio files and get features
 	print('loading ' + str(len(files)) + ' files')
 	bar = progressbar.ProgressBar(maxval=len(files), \
     widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 	bar.start()
-	for index, file in enumerate(files):
-		cur_file_position, cur_X = getFilePosition(file, sample_rate, mode)
-		file_position.append(cur_file_position)
+	for index, file in enumerate(validFiles):
+		cur_X = getFilePosition(file, sample_rate)
 		X = np.concatenate((X, cur_X))
 		bar.update(index + 1)
 	bar.finish()
 	D = getFeatures(X, window_size, hop_length)
-	Y = np.zeros((len(file_position),2))
+	y = np.zeros((len(files),2))
 	
+	#pca or pca+tsne (0.8 variance needs to be tested)
 	if technique == 1:
-		Y = getPCA(D, 2)
+		y = getPCA(D, 2)
 	elif technique == 0:
 		pca = getPCA(D, 0.8)
-		Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
+		y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
 	
-	Y = min_max_normalize(Y)
+	y = min_max_normalize(y)
+	for point, pos in zip(data['points'],y):
+		point['pos']['x'] = float(pos[0])
+		point['pos']['y'] = float(pos[1])
 	
-	
-	save(Y, file_position, new_path)
+	save(data, new_path)
 	exit()
 		
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='CBCS t-SNE')
+
+	parser.add_argument('-f', '--input_file',
+						action='store',
+						help='path to the output directory')
 	
-	parser.add_argument('-i', '--input',
+	parser.add_argument('-a', '--audio_files',
 						action='store',
 						help='path to the input directory')
 	
-	parser.add_argument('-f', '--output_folder',
-						action='store',
-						help='path to the output directory')
-
 	parser.add_argument('-d', '--dimentions',
 						action='store',
 						default=2,
@@ -144,31 +183,21 @@ def getListOfFiles(dirName, extensions):
 				allFiles.append(fullPath)
 	return allFiles
 
-def getFilePosition(file, sample_rate, mode=0):
+def getFilePosition(file, sample_rate):
 	y, sr = librosa.load(file, sample_rate)
 	y = librosa.to_mono(y)
 	shape = int(sample_rate * 0.5)
-
-	windows = int(y.shape[0] / shape)
-	if mode == 0: 
-		windows = 0
-	X = list()
-	D = np.array([]).reshape(0, shape)
-	
-	for i in range(windows + 1):
-		start = int(shape * i)
-		end = int(shape * (i + 1))
-		if end > y.shape[0]: 
-			end = y.shape[0]
-		X.append((file, i * 500))
-		padded = np.zeros(shape)
-		padded[:end] = y[start:end]
-		padded = padded.reshape(1, shape)
-		D = np.concatenate((D,padded))
-	
-	return X, D
+	#pad with zeros if file is shorter than 0.5 seconds, this needs to be tested
+	padded = np.zeros(shape)
+	y_lenght = y.shape[0]
+	if y_lenght > shape:
+		y_lenght = shape
+	padded[:y_lenght] = y[:y_lenght]
+	padded = padded.reshape(1, shape)
+	return padded
 	
 def getFeatures(samples, window_size, hop_length):
+	#size of stft result is  (window size / 2 + 1) * (samples / hop length + 1)
 	shape = int((1 + window_size * 0.5))
 	shape *= int(samples[1].shape[0] / hop_length) + 1
 	D = np.array([]).reshape(0, shape)
@@ -209,22 +238,11 @@ def min_max_normalize(a):
 	norm = (a - min_values) / (max_values - min_values)
 	return norm
 
-def save(data, files, output_file):
-	out = dict()
-	points = dict()
-	for i in range(len(files)):
-		curOut = dict()
-		curOut['name'] = files[i][0][0]
-		curOut['pos'] = files[i][0][1]
-		curOut['x'] = float(data[i][0])
-		curOut['y'] = float(data[i][1])
-		points[i] = curOut
-	
-	out['points'] = points
-	with open(output_file, 'w+') as f:
-		json.dump(out, f, indent = 4)
+def save(data, path):
+	with open(path, 'w+') as f:
+		json.dump(data, f, indent = 4)
 		
 		
 	
 
-main()
+main()	

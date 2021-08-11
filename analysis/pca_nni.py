@@ -17,7 +17,7 @@ def main():
 	path = args['input_file']
 	dimentions = int(args['dimentions'])
 	
-	with open(path) as f:
+	with open(path) as f:	
 		data = json.load(f)
 	#extract parameters from json
 	for point in data['points']:
@@ -39,9 +39,7 @@ def main():
 	
 	#save data
 	new_path = path[:path.rfind('.')] + '_o.tmp'
-	
-	with open(new_path, 'w+') as f:
-		json.dump(data, f, indent = 4)
+	save(data, new_path)
 	
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='CBCS t-SNE')
@@ -64,7 +62,9 @@ def min_max_normalize(a):
 	a = np.transpose(a)
 	norm = (a - min_values) / (max_values - min_values)
 	return norm
-
 	
-		 
+def save(data, path):
+	with open(path, 'w+') as f:
+		json.dump(data, f, indent = 4)
+	
 main()

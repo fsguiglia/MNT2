@@ -31,7 +31,7 @@ public:
 	ofJson save();
 
 private:
-		DimensionalityReduction _tsne;
 		DimensionalityReduction _pca;
+		DimensionalityReduction _audioDr;
 };
 #endif
