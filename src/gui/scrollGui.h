@@ -1,5 +1,4 @@
-#ifndef _SCROLLGUI
-#define _SCROLLGUI
+#pragma once
 #include "ofMain.h"
 #include "ofxDatGui.h"
 class ScrollGui : public ofxDatGui
@@ -16,4 +15,3 @@ private:
 	int _maxHeight;
 	map<string, ofRectangle> _removableSliders;
 };
-#endif

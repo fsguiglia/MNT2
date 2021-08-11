@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _BASEPAGE
-#define _BASEPAGE
 #include "ofMain.h"
 #include "../gui/scrollGui.h"
 #include "../utils/mntUtils.h"
@@ -66,7 +64,6 @@ protected:
 	map<string, float> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
 	vector<string> _stringMessages;
 };
-#endif
 
 template<typename T>
 inline BasePage<T>::BasePage()

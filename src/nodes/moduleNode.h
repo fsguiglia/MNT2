@@ -1,5 +1,4 @@
-#ifndef _MODULENODE
-#define _MODULENODE
+#pragma once
 #include "ofMain.h"
 #include "moduleInterface.h"
 
@@ -43,7 +42,6 @@ private:
 	bool _visible;
 	static int ID;
 };
-#endif
 
 template<typename T>
 int ModuleNode<T>::ID = 0;

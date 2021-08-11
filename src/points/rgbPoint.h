@@ -1,5 +1,4 @@
-#ifndef _RGB
-#define _RGB
+#pragma once
 #include "ofMain.h"
 #include "point.h"
 
@@ -27,5 +26,3 @@ private:
 	ofImage _img;
 	string _imgPath;
 };
-
-#endif

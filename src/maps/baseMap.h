@@ -1,5 +1,4 @@
-#ifndef _BASEMAP
-#define _BASEMAP
+#pragma once
 #include "ofMain.h"
 
 template<typename T> class BaseMap {
@@ -56,6 +55,7 @@ BaseMap<T>::BaseMap()
 	_width = 100;
 	_height = 100;
 
+	//default colors
 	_colorPallete = {
 		ofColor(207,42,42),
 		ofColor(255,77,77),
@@ -312,5 +312,3 @@ void BaseMap<T>::drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, 
 	font.drawString(sPosition, drawPos.x, drawPos.y);
 	ofPopStyle();
 }
-
-#endif

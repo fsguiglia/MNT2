@@ -1,5 +1,4 @@
-#ifndef _NNI
-#define _NNI
+#pragma once
 #include "ofMain.h"
 #include "BaseMap.h"
 #include "../points/point.h"
@@ -41,5 +40,3 @@ private:
 	ofFbo _colorFbo, _idFbo, _interpolateFbo;
 	ofPixels _curState, _nniPixels;
 };
-
-#endif // !_NNI

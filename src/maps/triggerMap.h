@@ -1,5 +1,4 @@
-#ifndef _TRIGGERMAP
-#define _TRIGGERMAP
+#pragma once
 #include "ofMain.h"
 #include "../points/trigger.h"
 #include "BaseMap.h"
@@ -31,4 +30,3 @@ private:
 	vector<int> _triggered;
 	ofFbo _fbo;
 };
-#endif

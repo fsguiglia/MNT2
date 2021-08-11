@@ -1,5 +1,4 @@
-#ifndef _RGBMAP
-#define _RGBMAP
+#pragma once
 #include "ofMain.h"
 #include "../points/rgbPoint.h"
 #include "BaseMap.h"
@@ -30,5 +29,3 @@ private:
 	vector<ofVec2f> _cursors;
 	ofFbo _fbo;
 };
-
-#endif

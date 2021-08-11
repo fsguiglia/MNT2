@@ -1,5 +1,4 @@
-#ifndef _NODE
-#define _NODE
+#pragma once
 #include "ofMain.h"
 
 class Node
@@ -39,7 +38,4 @@ private:
 	string _name;
 	static int ID;
 	int _id;
-
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _GESTURE
-#define _GESTURE
+#pragma once
 #include "ofMain.h"
 #include "../points/point.h"
 
@@ -29,5 +28,3 @@ private:
 	float _lastInputMs;
 	ofPolyline _polyline;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _NNIPAGE
-#define _NNIPAGE
+#pragma once
 #include "ofMain.h"
 #include "basePage.h"
 #include "../ML/dimensionalityReduction.h"
@@ -34,4 +33,3 @@ private:
 		DimensionalityReduction _pca;
 		DimensionalityReduction _audioDr;
 };
-#endif

@@ -1,5 +1,4 @@
-#ifndef _RGBPAGES
-#define _RGBPAGES
+#pragma once
 #include "ofMain.h"
 #include "basePage.h"
 #include "../maps/RGBMap.h"
@@ -27,4 +26,3 @@ public:
 private:
 	float _radius;
 };
-#endif

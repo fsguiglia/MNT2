@@ -600,6 +600,7 @@ void ofApp::updateConnections()
 		vector <pair<string, vector<string>>> stringMessages;
 		
 		//input
+		//from input
 		if (connection.fromInputNode)
 		{
 			string input = connection.fromId;
@@ -607,6 +608,7 @@ void ofApp::updateConnections()
 			bool osc = false;
 			if (split.size() > 0)
 			{
+				//osc input
 				if (split[0] == "osc")
 				{
 					for (auto& receiver : _oscReceivers)
@@ -621,6 +623,7 @@ void ofApp::updateConnections()
 						}
 					}
 				}
+				//midi input
 				else
 				{
 					for (auto msg : curMessages)
@@ -638,6 +641,7 @@ void ofApp::updateConnections()
 				}
 			}
 		}
+		//from module
 		else
 		{
 			for (auto& node : _moduleNodes)
@@ -667,6 +671,7 @@ void ofApp::updateConnections()
 		}
 		
 		//output
+		//output node
 		if (connection.toOutputNode)
 		{
 			string output = connection.toId;
@@ -676,6 +681,7 @@ void ofApp::updateConnections()
 			{
 				if (split[0] == "osc") osc = true;
 			}
+			//osc output
 			if (osc)
 			{
 				for (auto& element : OSCMessages)
@@ -689,6 +695,7 @@ void ofApp::updateConnections()
 						_oscSenders[name].sendMessage(m);
 					}
 				}
+				//midi to osc
 				for (auto& element : MIDIMessages)
 				{
 					string name = split[1] + ":" + split[2];
@@ -703,6 +710,7 @@ void ofApp::updateConnections()
 						_oscSenders[name].sendMessage(m);
 					}
 				}
+				//string to osc
 				for (auto& element : stringMessages)
 				{
 					string name = split[1] + ":" + split[2];
@@ -715,6 +723,7 @@ void ofApp::updateConnections()
 					}
 				}
 			}
+			//midi
 			else
 			{
 				for (auto& element : MIDIMessages)
@@ -729,6 +738,7 @@ void ofApp::updateConnections()
 				}
 			}
 		}
+		//to module
 		else
 		{
 			for (auto& node : _moduleNodes)

@@ -1,5 +1,4 @@
-#ifndef _POINT
-#define _POINT
+#pragma once
 #include "ofMain.h"
 
 class Point
@@ -25,4 +24,3 @@ protected:
 	ofVec2f _position;
 	string _name;
 };
-#endif

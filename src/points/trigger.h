@@ -1,5 +1,4 @@
-#ifndef _TRIGGER
-#define _TRIGGER
+#pragma once
 #include "ofMain.h"
 #include "point.h"
 
@@ -26,4 +25,3 @@ private:
 	bool _state, _switch;
 	ofColor _color;
 };
-#endif

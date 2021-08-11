@@ -1,5 +1,4 @@
-#ifndef _TRIGGERPAGE
-#define _TRIGGERPAGE
+#pragma once
 #include "ofMain.h"
 #include "basePage.h"
 #include "../maps/triggerMap.h"
@@ -27,5 +26,3 @@ public:
 private:
 	float _radius, _threshold;
 };
-
-#endif

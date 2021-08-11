@@ -1,5 +1,4 @@
-#ifndef _MODULEINTERFACE
-#define _MODULEINTERFACE
+#pragma once
 #include "ofMain.h"
 #include "node.h"
 
@@ -35,4 +34,3 @@ public:
 	virtual void load(ofJson& json) = 0;
 	virtual ofJson save() = 0;
 };
-#endif
