@@ -110,21 +110,26 @@ void GesturePage::draw(ofTrueTypeFont font)
 	ofPushStyle();
 	ofSetColor(255);
 	ofDrawRectangle(_position);
-	
+	//draw current gesture polyline
 	ofSetColor(_colorPallete[0]);
 	ofPolyline curPolyline = _curGesture.getPolyline();
 	curPolyline.scale(_position.width, _position.height);
+	curPolyline.translate(ofVec2f(_position.x, _position.y));
 	curPolyline.draw();
-	
+	//draw played polyline
 	ofSetColor(100, 20, 20);
 	ofDrawEllipse(_cursor.x *_position.width + _position.x, _cursor.y * _position.height + _position.y, 10, 10);
-	ofPolyline playPolylne = _playPoly;
-	playPolylne.scale(_position.width, _position.height);
-	playPolylne.draw();
-
+	ofPolyline playPolyline = _playPoly;
+	playPolyline.scale(_position.width, _position.height);
+	playPolyline.translate(ofVec2f(_position.x, _position.y));
+	playPolyline.draw();
+	//draw gesture name
 	ofSetColor(50);
-	font.drawString("Gesture: " + _curGestureName, _position.x + 10, _position.y + _position.height - 10);
-
+	if (_curGestureName != "")
+	{
+		font.drawString("Gesture: " + _curGestureName, _position.x + 10, _position.y + _position.height - 10);
+	}
+	//draw gui
 	ofSetColor(50);
 	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
 	_scrollView->draw();
