@@ -78,15 +78,32 @@ void NoiseGenerator::draw(ofTrueTypeFont font)
 	ofSetColor(0);
 	ofDrawRectangle(_position);
 
-	ofSetColor(255);
-	ofDrawRectangle(
-		(_center.x - _radius.x) * _position.width, 
-		(_center.y - _radius.y) * _position.height,
-		_radius.x * 2 * _position.width, 
-		_radius.y * 2 * _position.height);
-	ofSetColor(255, 100, 100);
-	ofDrawEllipse(_cursor.x *_position.width + _position.x, _cursor.y * _position.height + _position.y, 10, 10);
+	//scale center, radius and cursor for drawing
+	ofVec2f scaledCenter = _center * ofVec2f(_position.width, _position.height);
+	scaledCenter += ofVec2f(_position.x, _position.y);
+	ofVec2f scaledRadius = _radius * ofVec2f(_position.width, _position.height);
+	ofVec3f scaledCursor = _cursor * ofVec2f(_position.width, _position.height);
+	scaledCursor += ofVec2f(_position.x, _position.y);
 
+	//draw movement area
+	ofSetColor(255); 
+	ofDrawRectangle(scaledCenter - scaledRadius, scaledRadius.x * 2, scaledRadius.y * 2);
+
+	//draw black rectangle to mask movement area
+	ofSetColor(0);
+	ofDrawRectangle(0, 0, _position.x, ofGetHeight());
+	ofDrawRectangle(_position.x + _position.width + _guiWidth, 0, ofGetWidth(), ofGetHeight());
+
+	//draw cross on center
+	ofSetColor(160);
+	ofDrawLine(scaledCenter.x - 10, scaledCenter.y, scaledCenter.x + 10, scaledCenter.y);
+	ofDrawLine(scaledCenter.x, scaledCenter.y - 10, scaledCenter.x, scaledCenter.y + 10);
+
+	//draw cursor
+	ofSetColor(255, 100, 100);
+	ofDrawEllipse(scaledCursor, 10, 10);
+
+	//draw gui
 	ofSetColor(50);
 	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
 	_gui->draw();
