@@ -10,6 +10,15 @@ Node::Node()
 	_id = 0;
 }
 
+void Node::setup(int x, int y, int w, int h, int inputs, int outputs, string name, ofColor color)
+{
+	setup(x, y, w, h);
+	setInputs(inputs);
+	setOutputs(outputs);
+	setName(name, true);
+	setColor(color);
+}
+
 void Node::setup(int x, int y, int w, int h)
 {
 	_rect.setPosition(x, y);

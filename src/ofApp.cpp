@@ -218,67 +218,37 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 	if (label == "Interpolate")
 	{
 		ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 95, 30);
-		node->setInputs(1);
-		node->setOutputs(1);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Interpolate", true);
-		node->setColor(_moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Interpolate", _moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Concatenate")
 	{
 		ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 100, 30);
-		node->setInputs(1);
-		node->setOutputs(1);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Concatenate", true);
-		node->setColor(_moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Concatenate", _moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Trigger")
 	{
 		ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-		node->setInputs(1);
-		node->setOutputs(1);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Trigger", true);
-		node->setColor(_moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Trigger", _moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Draw")
 	{
 		ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-		node->setInputs(1);
-		node->setOutputs(1);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Draw", true);
-		node->setColor(_moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Draw", _moduleColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Gesture")
 	{
 		ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-		node->setInputs(1);
-		node->setOutputs(1);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Gesture", true);
-		node->setColor(_generatorColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Gesture", _generatorColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Noise")
 	{
 		ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-		node->setInputs(1);
-		node->setOutputs(1);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		node->setName("Noise", true);
-		node->setColor(_generatorColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Noise", _generatorColor);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "New") clear();
@@ -909,112 +879,56 @@ void ofApp::load()
 		ofJson jModules = jLoad["Modules"];
 		for (auto& element : jModules)
 		{
-			
 			if (element["type"].get<string>() == "Interpolate")
 			{
-				
+
 				ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 95, 30);
-				node->setInputs(element["inputs"]);
-				node->setOutputs(element["outputs"]);
-				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-				node->setName(element["type"].get<string>(), true);
-				node->setColor(_moduleColor);
-				node->setPosition(element["x"], element["y"]);
-				ofJson data = element["data"];
-				node->load(data);
 				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
-				string newName = node->getName();
-				names[oldName] = newName;
 			}
 			if (element["type"].get<string>() == "Concatenate")
 			{
 
 				ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 100, 30);
-				node->setInputs(element["inputs"]);
-				node->setOutputs(element["outputs"]);
-				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-				node->setName(element["type"].get<string>(), true);
-				node->setColor(_moduleColor);
-				node->setPosition(element["x"], element["y"]);
-				ofJson data = element["data"];
-				node->load(data);
 				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
-				string newName = node->getName();
-				names[oldName] = newName;
 			}
 			else if (element["type"].get<string>() == "Trigger")
 			{
 				ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-				node->setInputs(element["inputs"]);
-				node->setOutputs(element["outputs"]);
-				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-				node->setName(element["type"].get<string>(), true);
-				node->setColor(_moduleColor);
-				node->setPosition(element["x"], element["y"]);
-				ofJson data = element["data"];
-				node->load(data);
 				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
-				string newName = node->getName();
-				names[oldName] = newName;
 			}
 			else if (element["type"].get<string>() == "Draw")
 			{
 				ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-				node->setInputs(element["inputs"]);
-				node->setOutputs(element["outputs"]);
-				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-				node->setName(element["type"].get<string>(), true);
-				node->setColor(_moduleColor);
-				node->setPosition(element["x"], element["y"]);
-				ofJson data = element["data"];
-				node->load(data);
 				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
-				string newName = node->getName();
-				names[oldName] = newName;
 			}
 			else if (element["type"].get<string>() == "Gesture")
 			{
 				ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-				node->setInputs(element["inputs"]);
-				node->setOutputs(element["outputs"]);
-				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-				node->setName(element["type"].get<string>(), true);
-				node->setColor(_generatorColor);
-				node->setPosition(element["x"], element["y"]);
-				ofJson data = element["data"];
-				node->load(data);
 				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
-				string newName = node->getName();
-				names[oldName] = newName;
 			}
 			else if (element["type"].get<string>() == "Noise")
 			{
 				ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
-				node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30);
-				node->setInputs(element["inputs"]);
-				node->setOutputs(element["outputs"]);
-				node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-				node->setName(element["type"].get<string>(), true);
-				node->setColor(_generatorColor);
-				node->setPosition(element["x"], element["y"]);
-				ofJson data = element["data"];
-				node->load(data);
 				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
-				string newName = node->getName();
-				names[oldName] = newName;
 			}
+
+			_moduleNodes[_moduleNodes.size() - 1]->setup(
+				element["x"],
+				element["y"],
+				80,
+				30,
+				element["inputs"],
+				element["outputs"],
+				element["type"].get<string>(),
+				_moduleColor);
+
+			ofJson data = element["data"];
+			_moduleNodes[_moduleNodes.size() - 1]->load(data);
+			string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+			string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
+			names[oldName] = newName;
 		}
+			
 		//CONNECTIONS
 		ofJson jConnections = jLoad["Connections"];
 		for (auto& element : jConnections)

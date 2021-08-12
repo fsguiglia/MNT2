@@ -5,6 +5,7 @@ class Node
 {
 public:
 	Node();
+	void Node::setup(int x, int y, int w, int h, int inputs, int outputs, string name, ofColor color);
 	void setup(int x, int y, int w, int h);
 	void setInputs(int inputs);
 	void setOutputs(int outputs);
