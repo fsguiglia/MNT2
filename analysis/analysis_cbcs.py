@@ -167,7 +167,8 @@ def getFilePosition(file, sample_rate, mode=0):
 		X.append((file, i * 500))
 		#pad with zeros if file is shorter than 0.5 seconds, this needs to be tested
 		padded = np.zeros(shape)
-		padded[:end] = y[start:end]
+		padded[:end-start] = y[start:end]
+		
 		padded = padded.reshape(1, shape)
 		D = np.concatenate((D,padded))
 	

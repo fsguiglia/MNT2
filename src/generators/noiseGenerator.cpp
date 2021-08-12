@@ -33,10 +33,10 @@ void NoiseGenerator::setupGui()
 	_gui->addToggle("Active");
 	_gui->addSlider("x speed", 0, 10, 1)->setName("x speed");
 	_gui->addSlider("y speed", 0, 10, 1)->setName("y speed");
-	_gui->addSlider("center x", 0, 1, 0)->setName("center x");
-	_gui->addSlider("center y", 0, 1, 1)->setName("center y");
-	_gui->addSlider("radius x", 0, 1, 0)->setName("radius x");
-	_gui->addSlider("radius y", 0, 1, 1)->setName("radius y");
+	_gui->addSlider("center x", 0, 1, _center.x)->setName("center x");
+	_gui->addSlider("center y", 0, 1, _center.y)->setName("center y");
+	_gui->addSlider("radius x", 0, 1, _radius.x)->setName("radius x");
+	_gui->addSlider("radius y", 0, 1, _radius.y)->setName("radius y");
 	_gui->addToggle("MIDI Learn")->setName("Learn");
 	_gui->addButton("Clear mappings");
 	_gui->onSliderEvent(this, &NoiseGenerator::sliderEvent);

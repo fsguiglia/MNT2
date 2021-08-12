@@ -20,7 +20,8 @@ void ofApp::setup(){
 	_shift = false;
 	_mode = false;
 	_selected = "";
-	_shiftSelected = { "",-1,-1 };
+	_selectionOffset.set(0, 0);
+	_shiftSelected = { "",-1,-1, ofVec2f(-1,-1) };
 }
 
 void ofApp::update() {
@@ -218,37 +219,43 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 	if (label == "Interpolate")
 	{
 		ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Interpolate", _moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Interpolate", _moduleColor);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Concatenate")
 	{
 		ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Concatenate", _moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Concatenate", _moduleColor);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Trigger")
 	{
 		ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Trigger", _moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Trigger", _moduleColor);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Draw")
 	{
 		ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Draw", _moduleColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Draw", _moduleColor);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Gesture")
 	{
 		ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Gesture", _generatorColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Gesture", _generatorColor);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Noise")
 	{
 		ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 80, 30, 1, 1, "Noise", _generatorColor);
+		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Noise", _generatorColor);
+		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "New") clear();
@@ -520,43 +527,46 @@ void ofApp::deleteOscOutput(string ip, string port)
 }
 
 
-tuple<string, int, int> ofApp::selectNode(int x, int y)
+tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
 {
-	tuple<string, int, int> parameters = { "", -1, -1 };
-	for (auto &node : _moduleNodes)
+	tuple<string, int, int, ofVec2f> parameters = { "", -1, -1, ofVec2f(-1, -1)};
+	for (int i = _moduleNodes.size() - 1; i >= 0; i--)
 	{
-		if (node->inside(x, y))
+		if (_moduleNodes[i]->inside(x, y))
 		{
-			get<0>(parameters) = node->getName();
-			get<1>(parameters) = node->getInputs();
-			get<2>(parameters) = node->getOutputs();
+			get<0>(parameters) = _moduleNodes[i]->getName();
+			get<1>(parameters) = _moduleNodes[i]->getInputs();
+			get<2>(parameters) = _moduleNodes[i]->getOutputs();
+			get<3>(parameters) = ofVec2f(x - _moduleNodes[i]->getPosition().x, y - _moduleNodes[i]->getPosition().y);
 			break;
 		}
 	}
-	for (auto &node : _inputNodes)
+	for (int i = _inputNodes.size() - 1; i >= 0; i--)
 	{
-		if (node.inside(x, y))
+		if (_inputNodes[i].inside(x, y))
 		{
-			get<0>(parameters) = node.getName();
-			get<1>(parameters) = node.getInputs();
-			get<2>(parameters) = node.getOutputs();
+			get<0>(parameters) = _inputNodes[i].getName();
+			get<1>(parameters) = _inputNodes[i].getInputs();
+			get<2>(parameters) = _inputNodes[i].getOutputs();
+			get<3>(parameters) = ofVec2f(x - _inputNodes[i].getPosition().x, y - _inputNodes[i].getPosition().y);
 			break;
 		}
 	}
-	for (auto &node : _outputNodes)
+	for (int i = _outputNodes.size() - 1; i >= 0; i--)
 	{
-		if (node.inside(x, y))
+		if (_outputNodes[i].inside(x, y))
 		{
-			get<0>(parameters) = node.getName();
-			get<1>(parameters) = node.getInputs();
-			get<2>(parameters) = node.getOutputs();
+			get<0>(parameters) = _outputNodes[i].getName();
+			get<1>(parameters) = _outputNodes[i].getInputs();
+			get<2>(parameters) = _outputNodes[i].getOutputs();
+			get<3>(parameters) = ofVec2f(x - _outputNodes[i].getPosition().x, y - _outputNodes[i].getPosition().y);
 			break;
 		}
 	}
 	return parameters;
 }
 
-void ofApp::createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in, bool dump)
+void ofApp::createDeleteConnection(tuple<string, int, int, ofVec2f> out, tuple<string, int, int, ofVec2f> in, bool dump)
 {
 	bool connectionExists = false;
 	for (int i = 0; i < _connections.size(); i++)
@@ -915,15 +925,17 @@ void ofApp::load()
 			_moduleNodes[_moduleNodes.size() - 1]->setup(
 				element["x"],
 				element["y"],
-				80,
+				90,
 				30,
 				element["inputs"],
 				element["outputs"],
 				element["type"].get<string>(),
 				_moduleColor);
 
+			_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
 			ofJson data = element["data"];
 			_moduleNodes[_moduleNodes.size() - 1]->load(data);
+
 			string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
 			string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
 			names[oldName] = newName;
@@ -1077,7 +1089,7 @@ void ofApp::keyReleased(int key){
 		break;
 	case(OF_KEY_SHIFT):
 		_shift = false;
-		_shiftSelected = { "",-1,-1 };
+		_shiftSelected = { "",-1,-1, ofVec2f(-1, -1) };
 		break;
 	case(OF_KEY_CONTROL):
 		_control = false;
@@ -1116,15 +1128,15 @@ void ofApp::mouseDragged(int x, int y, int button){
 	{
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getName() == _selected) node->setPosition(x, y);
+			if (node->getName() == _selected) node->setPosition(x - _selectionOffset.x, y - _selectionOffset.y);
 		}
 		for (auto& node : _inputNodes)
 		{
-			if (node.getName() == _selected) node.setPosition(x, y);
+			if (node.getName() == _selected) node.setPosition(x - _selectionOffset.x, y - _selectionOffset.y);
 		}
 		for (auto& node : _outputNodes)
 		{
-			if (node.getName() == _selected) node.setPosition(x, y);
+			if (node.getName() == _selected) node.setPosition(x - _selectionOffset.x, y - _selectionOffset.y);
 		}
 	}
 }
@@ -1139,23 +1151,25 @@ void ofApp::mousePressed(int x, int y, int button){
 				_selected = "";
 				if (get<0>(_shiftSelected) == "")
 				{
-					tuple<string, int, int> curSelected = selectNode(x, y);
+					tuple<string, int, int, ofVec2f> curSelected = selectNode(x, y);
 					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
-					else _shiftSelected = { "", -1 , -1 };
+					else _shiftSelected = { "", -1 , -1, ofVec2f(-1, -1) };
 				}
 				else
 				{
-					tuple<string, int, int> curSelected = selectNode(x, y);
+					tuple<string, int, int, ofVec2f> curSelected = selectNode(x, y);
 					bool keep = get<0>(curSelected) != get<0>(_shiftSelected) && get<1>(curSelected) > 0;
 					if (keep) createDeleteConnection(_shiftSelected, curSelected, _control);
 					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
-					else _shiftSelected = { "", -1 , -1 };
+					else _shiftSelected = { "", -1 , -1, ofVec2f(-1, -1) };
 				}
 			}
 			else
 			{
 				string lastSelected = _selected;
-				_selected = get<0>(selectNode(x,y));
+				auto curSelected = selectNode(x, y);
+				_selected = get<0>(curSelected);
+				_selectionOffset = get<3>(curSelected);
 				bool doubleClick = _selected != "" && lastSelected == _selected;
 				doubleClick = doubleClick && ofGetElapsedTimeMillis() - _lastClick < 500;
 				if (doubleClick)
@@ -1202,7 +1216,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 		{
 			if (node->getVisible()) node->mouseReleased(x, y, button);
 		}
-		if (x < _pageMarginLeft || x > _pageMarginRight)
+		if (x < _pageMarginLeft - 15 || x > _pageMarginRight + 15)
 		{
 			if (x < _pageMarginLeft)
 			{
@@ -1289,6 +1303,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 				}
 			}
 			_selected = "";
+			_selectionOffset.set(0, 0);
 		}
 	}
 }

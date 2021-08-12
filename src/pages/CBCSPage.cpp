@@ -142,8 +142,8 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "active") _map.setActive(e.checked);
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 	if (e.target->getName() == "Analize complete files") {
-		if (e.checked) _dr.setParameter("mode", 1);
-		else _dr.setParameter("mode", 0);
+		if (e.checked) _dr.setParameter("--mode", 1);
+		else _dr.setParameter("--mode", 0);
 	}
 }
 

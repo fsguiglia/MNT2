@@ -14,6 +14,9 @@ public:
 
 	void setSize(int w, int h);
 	void setPosition(int x, int y);
+	ofVec2f getPosition();
+	int getWidth();
+	int getHeight();
 	int getInputs();
 	int getOutputs();
 	ofRectangle getInputConnector(int index);

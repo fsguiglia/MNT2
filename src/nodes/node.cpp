@@ -90,6 +90,21 @@ void Node::setPosition(int x, int y)
 	_rect.setPosition(x, y);
 }
 
+ofVec2f Node::getPosition()
+{
+	return _rect.getPosition();
+}
+
+int Node::getWidth()
+{
+	return _rect.width;
+}
+
+int Node::getHeight()
+{
+	return _rect.height;
+}
+
 int Node::getInputs()
 {
 	return _inputs;

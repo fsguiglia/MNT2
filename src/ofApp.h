@@ -19,17 +19,7 @@
 #include "utils/mntUtils.h"
 
 /*
-en vez de map<string, float> podría hacer un struct controlchange, pero ojo que ofxmidiout ya tiene
-
-osc va a tener dos problemas: por un lado el control esta todo pensado para midi (como se reflejan las 
-direcciones en el control de parámetros en los mapas?) y por el otro, no preví una manera de reflejar
-la ip de destino en los outputs
-
-quiza osc tiene que ser un módulo en el que uno hace doble click y puede configurar las entradas y salidas?
-
-hay un quilombo porque los mensajes midi llegan en otro thread. no puedo limpiar la lista una vez que los recibo.
-pero si pongo un mutex, a veces dos mensajes llegan al mismo tiempo y no necesariamente se mantiene el orden de
-llegada
+revisar toda la estructura point->map->page y resolver para que gesture y noise no estén ahí colgados
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -64,8 +54,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void createOscOutput(string ip, string port, int x, int y);
 		void deleteOscOutput(string ip, string port);
 		//--------------------------------------------------------------
-		tuple<string, int, int> selectNode(int x, int y);
-		void createDeleteConnection(tuple<string, int, int> out, tuple<string, int, int> in, bool dump);
+		tuple<string, int, int, ofVec2f> selectNode(int x, int y);
+		void createDeleteConnection(tuple<string, int, int, ofVec2f> out, tuple<string, int, int, ofVec2f> in, bool dump);
 		void updateConnections();
 		//--------------------------------------------------------------
 		void clear();
@@ -92,8 +82,9 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		vector<Node> _outputNodes;
 		vector<Connection> _connections;
 		string _selected = ""; 
+		ofVec2f _selectionOffset;
 		int _lastClick = 0;
-		tuple<string, int, int> _shiftSelected;
+		tuple<string, int, int, ofVec2f> _shiftSelected;
 		bool _shift, _control;
 		
 		//GUI
