@@ -9,6 +9,10 @@ public:
 	virtual void drawPage(ofTrueTypeFont& font) = 0;
 	virtual void resizePage(int w, int h) = 0;
 
+	virtual ofVec2f getPagePosition() = 0;
+	virtual int getPageHeight() = 0;
+	virtual int getPageWidth() = 0;
+
 	virtual void mouseMoved(int x, int y) = 0;
 	virtual void mouseDragged(int x, int y, int button) = 0;
 	virtual void mousePressed(int x, int y, int button, bool doubleClick = false) = 0;

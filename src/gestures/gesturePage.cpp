@@ -137,6 +137,21 @@ void GesturePage::draw(ofTrueTypeFont font)
 	ofPopStyle();
 }
 
+ofVec2f GesturePage::getPosition()
+{
+	return ofVec2f(_position.x, _position.y);
+}
+
+int GesturePage::getHeight()
+{
+	return _position.height;
+}
+
+int GesturePage::getWidth()
+{
+	return _position.width + _guiWidth;
+}
+
 void GesturePage::resize(int w, int h)
 {
 	_position = centerSquarePosition(w - _guiWidth, h);

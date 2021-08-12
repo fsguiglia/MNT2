@@ -10,6 +10,9 @@ public:
 	void update();
 	void draw(ofTrueTypeFont font);
 
+	ofVec2f getPosition();
+	int getHeight();
+	int getWidth();
 	void resize(int w, int h);
 	void setColorPallete(vector<ofColor> colorPalette);
 	void setVisible(bool visible);

@@ -45,6 +45,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void setupGui();
 		void buttonEvent(ofxDatGuiButtonEvent e);
 		//--------------------------------------------------------------
+		void changePage(int page);
+		//--------------------------------------------------------------
 		void setupMIDI();
 		string removePortNumber(string name);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
@@ -89,7 +91,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		vector<Node> _inputNodes;
 		vector<Node> _outputNodes;
 		vector<Connection> _connections;
-		string _selected;
+		string _selected = ""; 
 		int _lastClick = 0;
 		tuple<string, int, int> _shiftSelected;
 		bool _shift, _control;
@@ -98,6 +100,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		const size_t _maxPages = 1;
 		const size_t _guiWidth = 300;
 		int _lastWidth, _lastHeight;
+		int _pageMarginLeft, _pageMarginRight;
 		int _page;
 		bool _mode;
 		vector<ofColor> _colorPallete;

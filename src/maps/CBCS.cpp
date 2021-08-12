@@ -69,7 +69,7 @@ void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 		ofVec2f curPos = _points[_selection[i]].getPosition() * ofVec2f(w, h);
 		curPos.x += x;
 		curPos.y += y;
-		ofDrawEllipse(curPos, 10, 10);
+		ofDrawEllipse(curPos, 8, 8);
 	}
 	ofSetColor(50);
 	if (_selection.size() > 0) font.drawString(_points[_selection[0]].getName(), x + 10, y + w - 10);
@@ -96,11 +96,11 @@ void CBCS::updateFbo()
 	{
 		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);
 		ofSetColor(255);
-		ofDrawEllipse(curPos, 18, 18);
+		ofDrawEllipse(curPos, 10, 10);
 		ofSetColor(0);
-		ofDrawEllipse(curPos, 16, 16);
+		ofDrawEllipse(curPos, 9, 9);
 		ofSetColor(50, 50, 100);
-		ofDrawEllipse(curPos, 15, 15);
+		ofDrawEllipse(curPos, 8, 8);
 	}
 	ofPopStyle();
 	_fbo.end();

@@ -11,7 +11,7 @@ void ofApp::setup(){
 	setupMIDI();
 	
 	//GUI
-	_page = 0;
+	_page = -1;
 	setupGui();
 	_verdana.load("Verdana2.ttf", 8);
 	_lastWidth = ofGetWidth();
@@ -33,23 +33,38 @@ void ofApp::update() {
 
 void ofApp::draw(){
 	ofClear(255);
-
 	if (_mode)
 	{
+		//draw selected page
 		ofSetColor(0);
 		ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-		ofSetColor(0);
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getVisible())
-			{
-				ofSetColor(0);
-				node->drawPage(_verdana);
-			}
-		}
+			if (node->getVisible()) node->drawPage(_verdana);
+		};
+		//draw prev next areas
+		if (mouseX < _pageMarginLeft) ofSetColor(35);
+		else ofSetColor(0);
+		ofDrawRectangle(0, 0, _pageMarginLeft, ofGetHeight());
+		if (mouseX > _pageMarginRight) ofSetColor(35);
+		else ofSetColor(0);
+		ofDrawRectangle(_pageMarginRight, 0, ofGetWidth() - _pageMarginRight, ofGetHeight());
+		//draw prev next icons
+		ofSetColor(60);
+		ofDrawTriangle(
+			ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
+			ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
+			ofVec2f(2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
+		);
+		ofDrawTriangle(
+			ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
+			ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
+			ofVec2f(_pageMarginRight + 2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
+		);
 	}
 	else
 	{
+		//draw nodes and connections
 		for (auto connection : _connections) drawConnection(connection);
 		for (auto& node : _moduleNodes) node->draw(_verdana);
 		for (auto& node : _inputNodes) node.draw(_verdana);
@@ -269,6 +284,15 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 	if (label == "New") clear();
 	if (label == "Load") load();
 	if (label == "Save") save();
+}
+
+void ofApp::changePage(int page)
+{
+	if (page >= 0 && page <= _moduleNodes.size())
+	{
+		for (auto& node : _moduleNodes) node->setVisible(false);
+		_moduleNodes[page]->setVisible(true);
+	}
 }
 
 void ofApp::setupMIDI()
@@ -1122,8 +1146,12 @@ void ofApp::keyReleased(int key){
 	switch (key)
 	{
 	case(OF_KEY_TAB):
-		_page += 1;
-		if (_page > _maxPages) _page = 0;
+		if (_mode)
+		{
+			_page += 1;
+			if (_page >= _moduleNodes.size()) _page = 0;
+			changePage(_page);
+		}
 		break;
 	case('S'):
 	case('s'):
@@ -1142,7 +1170,11 @@ void ofApp::keyReleased(int key){
 		break;
 	case(OF_KEY_ESC):
 		_mode = false;
-		for (auto& node : _moduleNodes) node->setVisible(false);
+		for (auto& node : _moduleNodes)
+		{
+			_page = -1;
+			node->setVisible(false);
+		}
 		break;
 	}
 }
@@ -1214,14 +1246,21 @@ void ofApp::mousePressed(int x, int y, int button){
 				doubleClick = doubleClick && ofGetElapsedTimeMillis() - _lastClick < 500;
 				if (doubleClick)
 				{
-					for (auto& node : _moduleNodes)
+					for (int i = 0; i < _moduleNodes.size(); i++)
 					{
-						if (node->getName() == _selected)
+						if (_moduleNodes[i]->getName() == _selected)
 						{
 							_mode = true;
-							node->setVisible(true);
+							_moduleNodes[i]->setVisible(true);
+							_page = i;
+							_pageMarginLeft = _moduleNodes[i]->getPagePosition().x;
+							_pageMarginRight = _pageMarginLeft + _moduleNodes[i]->getPageWidth();
 						}
-						else node->setVisible(false);
+						else
+						{
+							_page = -1;
+							_moduleNodes[i]->setVisible(false);
+						}
 					}
 				}
 			}
@@ -1248,6 +1287,20 @@ void ofApp::mouseReleased(int x, int y, int button){
 		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mouseReleased(x, y, button);
+		}
+		if (x < _pageMarginLeft || x > _pageMarginRight)
+		{
+			if (x < _pageMarginLeft)
+			{
+				_page--;
+				if (_page < 0) _page = _moduleNodes.size() - 1;
+			}
+			if (x > _pageMarginRight)
+			{
+				_page++;
+				if (_page >= _moduleNodes.size()) _page = 0;
+			}
+			changePage(_page);
 		}
 	}
 	else
@@ -1353,6 +1406,11 @@ void ofApp::windowResized(int w, int h){
 		int x = w * float(node->getBox().x) / _lastWidth;
 		int y = h * float(node->getBox().y) / _lastHeight;
 		node->setPosition(x, y);
+	}
+	if (_moduleNodes.size() > 0)
+	{
+		_pageMarginLeft = _moduleNodes[0]->getPagePosition().x;
+		_pageMarginRight = _pageMarginLeft + _moduleNodes[0]->getPageWidth();
 	}
 	_lastWidth = w;
 	_lastHeight = h;

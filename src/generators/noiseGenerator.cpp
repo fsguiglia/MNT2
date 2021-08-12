@@ -110,6 +110,21 @@ void NoiseGenerator::draw(ofTrueTypeFont font)
 	ofPopStyle();
 }
 
+ofVec2f NoiseGenerator::getPosition()
+{
+	return ofVec2f(_position.x, _position.y);
+}
+
+int NoiseGenerator::getHeight()
+{
+	return _position.height;
+}
+
+int NoiseGenerator::getWidth()
+{
+	return (_position.width + _guiWidth);
+}
+
 void NoiseGenerator::resize(int w, int h)
 {
 	_position = centerSquarePosition(w - _guiWidth, h);

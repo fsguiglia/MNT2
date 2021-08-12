@@ -13,6 +13,9 @@ public:
 	void update();
 	void draw(ofTrueTypeFont font);
 
+	ofVec2f getPosition();
+	int getHeight();
+	int getWidth();
 	void resize(int w, int h);
 	ofRectangle centerSquarePosition(int w, int h);
 
@@ -111,6 +114,24 @@ inline void BasePage<T>::draw(ofTrueTypeFont font)
 	ofDrawRectangle(_position.x + _position.getWidth(), 0, _guiWidth, _position.getHeight());
 	_gui->draw();
 	ofPopStyle();
+}
+
+template<typename T>
+inline ofVec2f BasePage<T>::getPosition()
+{
+	return ofVec2f(_position.getPosition());
+}
+
+template<typename T>
+inline int BasePage<T>::getHeight()
+{
+	return _position.getHeight();
+}
+
+template<typename T>
+inline int BasePage<T>::getWidth()
+{
+	return (_position.getWidth() + _guiWidth);
 }
 
 template<typename T>

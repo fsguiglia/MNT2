@@ -12,6 +12,10 @@ public:
 	void drawPage(ofTrueTypeFont& font);
 	void resizePage(int w, int h);
 
+	ofVec2f getPagePosition();
+	int getPageHeight();
+	int getPageWidth();
+
 	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);
 	void mousePressed(int x, int y, int button, bool doubleClick = false);
@@ -85,6 +89,24 @@ template<typename T>
 inline void ModuleNode<T>::resizePage(int w, int h)
 {
 	_page->resize(w, h);
+}
+
+template<typename T>
+inline ofVec2f ModuleNode<T>::getPagePosition()
+{
+	return _page->getPosition();
+}
+
+template<typename T>
+inline int ModuleNode<T>::getPageHeight()
+{
+	return _page->getHeight();
+}
+
+template<typename T>
+inline int ModuleNode<T>::getPageWidth()
+{
+	return _page->getWidth();
 }
 
 template<typename T>
