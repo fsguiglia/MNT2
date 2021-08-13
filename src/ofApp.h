@@ -20,6 +20,7 @@
 
 /*
 revisar toda la estructura point->map->page y resolver para que gesture y noise no estén ahí colgados
+-> un modulo preprocessor como tenía mnt1, para escalar, normalizar, invertir, mapear a una curva, lpf, etc.
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {

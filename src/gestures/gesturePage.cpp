@@ -195,6 +195,7 @@ void GesturePage::endRecording()
 		_index++;
 		_recording = false;
 		_cursor.set(-1, -1);
+		_scrubPoly = _curGesture.getPolyline().getResampledByCount(20);
 	}
 }
 
@@ -610,6 +611,7 @@ void GesturePage::load(ofJson & json)
 		if (ofToInt(name) > _index) _index = ofToInt(name);
 		
 		addGesture(gesture, name);
+		next();
 	}
 
 	_index++;
@@ -667,6 +669,7 @@ void GesturePage::removeGesture(string name)
 	}
 	if (index != -1) _gestureNames.erase(_gestureNames.begin() + index);
 	_curGestureIndex = _gestureNames.size() - 1;
+	previous();
 }
 
 ofRectangle GesturePage::centerSquarePosition(int w, int h)
