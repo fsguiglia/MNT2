@@ -2,10 +2,10 @@
 #include "ofMain.h"
 
 
-class DimensionalityReduction : public ofThread
+class PythonML : public ofThread
 {
 public:
-	DimensionalityReduction();
+	PythonML ();
 	void setup(string scriptPath, string name);
 	void setParameters(map<string, float> parameters);
 	map<string, float> getParameters();
@@ -17,9 +17,9 @@ public:
 	bool getRunning();
 	bool getCompleted();
 	ofJson getData();
+	void end();
 
 private:
-	void end();
 	map<string, float> _parameters;
 	bool _running, _completed;
 	string _name, _scriptPath, _inputFilePath, _outputFilePath;

@@ -32,7 +32,7 @@ def main():
 	#save empty json and exit if no file is provided
 	if args['input'] is None:
 		init_path = os.environ['USERPROFILE'] + '//Desktop//'
-		args['input'] = (easygui.diropenbox(default = init_path))
+		args['input'] = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
 		if args['input'] is None:
 			save(Y, file_position, new_path)
 			exit()

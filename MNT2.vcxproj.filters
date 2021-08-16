@@ -31,9 +31,6 @@
     <ClCompile Include="src\maps\triggerMap.cpp">
       <Filter>src\maps</Filter>
     </ClCompile>
-    <ClCompile Include="src\ML\dimensionalityReduction.cpp">
-      <Filter>src\ML</Filter>
-    </ClCompile>
     <ClCompile Include="src\nodes\node.cpp">
       <Filter>src\nodes</Filter>
     </ClCompile>
@@ -168,6 +165,9 @@
     </ClCompile>
     <ClCompile Include="src\pages\CBCSPage.cpp">
       <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ML\pythonML.cpp">
+      <Filter>src\ML</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -331,9 +331,6 @@
     </ClInclude>
     <ClInclude Include="src\maps\triggerMap.h">
       <Filter>src\maps</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ML\dimensionalityReduction.h">
-      <Filter>src\ML</Filter>
     </ClInclude>
     <ClInclude Include="src\nodes\connection.h">
       <Filter>src\nodes</Filter>
@@ -577,6 +574,9 @@
     </ClInclude>
     <ClInclude Include="src\pages\CBCSPage.h">
       <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ML\pythonML.h">
+      <Filter>src\ML</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

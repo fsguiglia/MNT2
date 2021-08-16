@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "gesture.h"
 #include "ofxDatGui.h"
+#include "../ML/pythonML.h"
 #include "../utils/mntUtils.h"
 
 class GesturePage {
@@ -9,6 +10,8 @@ public:
 	GesturePage();
 	void setup(int w, int h, int guiWidth);
 	void setupGui();
+	void setupLSTM();
+
 	void update();
 	void updateGui();
 	void draw(ofTrueTypeFont font);
@@ -64,6 +67,7 @@ public:
 	ofJson save();
 
 private:
+	void selectGesture(int index);
 	void addGesture(Gesture gesture, string name);
 	void removeGesture(string name);
 	ofRectangle centerSquarePosition(int w, int h);
@@ -100,4 +104,6 @@ private:
 	bool _midiOutput, _oscOutput, _stringOutput;
 
 	ofVec2f _cursor, _prevCursor;
+
+	PythonML _lstmTrain, _lstmGen;
 };

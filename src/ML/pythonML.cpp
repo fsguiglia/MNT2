@@ -1,12 +1,12 @@
-#include "dimensionalityReduction.h"
+#include "pythonML.h"
 
-DimensionalityReduction::DimensionalityReduction()
+PythonML::PythonML()
 {
 	_running = false;
 	_completed = false;
 }
 
-void DimensionalityReduction::setup(string scriptPath, string name)
+void PythonML::setup(string scriptPath, string name)
 {
 	_scriptPath = ofFilePath::getAbsolutePath(scriptPath);
 	string folder = _scriptPath.substr(0, _scriptPath.find_last_of("\\/")) + "/tmp/";
@@ -15,33 +15,33 @@ void DimensionalityReduction::setup(string scriptPath, string name)
 
 }
 
-void DimensionalityReduction::setParameters(map<string, float> parameters)
+void PythonML::setParameters(map<string, float> parameters)
 {
 	_parameters = parameters;
 }
 
-map<string, float> DimensionalityReduction::getParameters()
+map<string, float> PythonML::getParameters()
 {
 	return _parameters;
 }
 
-void DimensionalityReduction::setParameter(string parameter, float value)
+void PythonML::setParameter(string parameter, float value)
 {
 	_parameters[parameter] = value;
 }
 
-float DimensionalityReduction::getParameter(string parameter)
+float PythonML::getParameter(string parameter)
 {
 	return _parameters[parameter];
 }
 
-void DimensionalityReduction::start(ofJson data)
+void PythonML::start(ofJson data)
 {
 	ofSavePrettyJson(_inputFilePath, data);
 	start();
 }
 
-void DimensionalityReduction::start()
+void PythonML::start()
 {
 	string command = "python " + _scriptPath;
 	command += " -f " + _inputFilePath;
@@ -50,29 +50,29 @@ void DimensionalityReduction::start()
 	_running = true;
 }
 
-void DimensionalityReduction::check()
+void PythonML::check()
 {
 	if (ofFile::doesFileExist(_outputFilePath)) _completed = true;
 }
 
-bool DimensionalityReduction::getRunning()
+bool PythonML::getRunning()
 {
 	return _running;
 }
 
-bool DimensionalityReduction::getCompleted()
+bool PythonML::getCompleted()
 {
 	return _completed;
 }
 
-ofJson DimensionalityReduction::getData()
+ofJson PythonML::getData()
 {
 	ofJson data = ofLoadJson(_outputFilePath);
 	end();
 	return data;
 }
 
-void DimensionalityReduction::end()
+void PythonML::end()
 {
 	ofFile::removeFile(_inputFilePath);
 	ofFile::removeFile(_outputFilePath);

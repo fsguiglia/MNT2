@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "basePage.h"
-#include "../ML/dimensionalityReduction.h"
+#include "../ML/pythonML.h"
 #include "../maps/CBCS.h"
 
 class CBCSPage : public BasePage<CBCS>
@@ -28,5 +28,5 @@ public:
 	void load(ofJson& json);
 	ofJson save();
 private:
-	DimensionalityReduction _dr;
+	PythonML _dr;
 };

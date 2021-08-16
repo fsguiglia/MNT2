@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "basePage.h"
-#include "../ML/dimensionalityReduction.h"
+#include "../ML/pythonML.h"
 #include "../maps/NNI.h"
 
 class NNIPage : public BasePage<NNI> {
@@ -30,6 +30,6 @@ public:
 	ofJson save();
 
 private:
-		DimensionalityReduction _pca;
-		DimensionalityReduction _audioDr;
+		PythonML _pca;
+		PythonML _audioDr;
 };

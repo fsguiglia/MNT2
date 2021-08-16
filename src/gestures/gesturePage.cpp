@@ -22,6 +22,7 @@ void GesturePage::setup(int w, int h, int guiWidth)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
+	setupLSTM();
 	setupGui();
 }
 
@@ -39,7 +40,10 @@ void GesturePage::setupGui()
 	_transportFolder->addButton("Delete");
 	_transportFolder->collapse();
 	_generateFolder = _gui->addFolder("Generate");
-	_generateFolder->addButton("Generate (not implemented)");
+	_generateFolder->addButton("Generate neural network model")->setName("Train");
+	_generateFolder->addBreak();
+	_generateFolder->addButton("Load model and generate gestures")->setName("Generate");
+	_generateFolder->addSlider("Temperature", 0, 1, _lstmGen.getParameter("--temperature"));
 	_generateFolder->collapse();
 	_gui->addSlider("x", 0, 1, 0)->setName("x");
 	_gui->addSlider("y", 0, 1, 0)->setName("y");
@@ -51,7 +55,7 @@ void GesturePage::setupGui()
 	_gui->setAutoDraw(false);
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
-	_gui->getToggle("Record")->setLabelColor(ofColor(255, 100, 100));
+	_gui->getToggle("Record")->setLabelColor(ofColor(125, 30, 30));
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(_position.x + _position.getWidth(), 0);
 	_gui->setEnabled(false);
@@ -59,7 +63,7 @@ void GesturePage::setupGui()
 	_gui->update();
 
 	_guiHeight = _gui->getHeight();
-	_scrollView = new ofxDatGuiScrollView("Gestures", 15);
+	_scrollView = new ofxDatGuiScrollView("Gestures", 10);
 	_scrollView->onScrollViewEvent(this, &GesturePage::scrollViewEvent);
 	_scrollView->setOpacity(0.5);
 	//_scrollView->setTheme(new ofxDatGuiThemeWireframe());
@@ -72,8 +76,29 @@ void GesturePage::setupGui()
 	_scrollView->update();
 }
 
+void GesturePage::setupLSTM()
+{
+	_lstmTrain.setup("../../analysis/lstm_train.py", "gest");
+	
+	_lstmGen.setup("../../analysis/lstm_generate.py", "gest");
+	map<string, float> genParameters;
+	genParameters["--temperature"] = 0.1;
+	_lstmGen.setParameters(genParameters);
+}
+
 void GesturePage::update()
 {
+	if (_lstmTrain.getRunning())
+	{
+		if (_lstmTrain.getCompleted()) _lstmTrain.end();
+		else _lstmTrain.check();
+	}
+	if (_lstmGen.getRunning())
+	{
+		if (_lstmGen.getCompleted()) load(_lstmGen.getData());
+		else _lstmGen.check();
+	}
+
 	if (_playing) play();
 	else if (_recording) record();
 	if (_cursor != _prevCursor)
@@ -127,7 +152,9 @@ void GesturePage::draw(ofTrueTypeFont font)
 	ofSetColor(50);
 	if (_curGestureName != "")
 	{
-		font.drawString("Gesture: " + _curGestureName, _position.x + 10, _position.y + _position.height - 10);
+		string text = "Gesture: " + _curGestureName;
+		text += ": " + ofToString(_curGesture.getPoints().size()) + " points";
+		font.drawString(text, _position.x + 10, _position.y + _position.height - 10);
 	}
 	//draw gui
 	ofSetColor(50);
@@ -190,6 +217,7 @@ void GesturePage::endRecording()
 	if (_curGesture.size() > 1)
 	{
 		string name = ofToString(_index);
+		if (name.size() == 1) name = "0" + name;
 		_curGesture.sort();
 		addGesture(_curGesture, name);
 		_index++;
@@ -232,8 +260,7 @@ void GesturePage::next()
 		{
 			_curGestureIndex++;
 			if (_curGestureIndex > _gestureNames.size() - 1) _curGestureIndex = 0;
-			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
-			_scrubPoly = _curGesture.getPolyline().getResampledByCount(20);
+			selectGesture(_curGestureIndex);
 		}
 	}
 }
@@ -246,8 +273,7 @@ void GesturePage::previous()
 		{
 			_curGestureIndex--;
 			if (_curGestureIndex < 0) _curGestureIndex = _gestureNames.size() - 1;
-			_curGesture = _gestures[_gestureNames[_curGestureIndex]];
-			_scrubPoly = _curGesture.getPolyline().getResampledBySpacing(_scrubPolySpacing);
+			selectGesture(_curGestureIndex);
 		}
 	}
 }
@@ -256,9 +282,8 @@ void GesturePage::random()
 {
 	if (_gestureNames.size() > 0)
 	{
-		int index = (int)ofRandom(0, _gestureNames.size() - 1);
-		_curGesture = _gestures[_gestureNames[index]];
-		_scrubPoly = _curGesture.getPolyline().getResampledBySpacing(_scrubPolySpacing);
+		_curGestureIndex = std::rand() % _gestureNames.size();
+		selectGesture(_curGestureIndex);
 	}
 }
 
@@ -286,12 +311,8 @@ void GesturePage::getCursorAtPercent(float position)
 void GesturePage::scrollViewEvent(ofxDatGuiScrollViewEvent e)
 {
 	string sIndex = ofSplitString(e.target->getLabel(), " ")[1];
-	if (_gestures.find(sIndex) != _gestures.end())
-	{
-		_curGestureName = sIndex;
-		_curGesture = _gestures[sIndex];
-		_scrubPoly = _curGesture.getPolyline().getResampledBySpacing(_scrubPolySpacing);
-	}
+	if (_gestures.find(sIndex) != _gestures.end()) selectGesture(ofToInt(sIndex));
+
 }
 
 void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
@@ -326,6 +347,9 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 	{
 		clearMappings();
 	}
+	//------------------------------
+	if (e.target->getName() == "Train") _lstmTrain.start(save());
+	if (e.target->getName() == "Generate") _lstmGen.start(save());
 }
 
 void GesturePage::toggleEvent(ofxDatGuiToggleEvent e)
@@ -361,6 +385,10 @@ void GesturePage::sliderEvent(ofxDatGuiSliderEvent e)
 			if (name == "y") _cursor.y = e.value;
 			if (name == "Scrub") getCursorAtPercent(e.value);
 		}
+	}
+	if (name == "Temperature")
+	{
+		_lstmGen.setParameter("--temperature", e.value);
 	}
 }
 
@@ -568,9 +596,7 @@ void GesturePage::clearMappings()
 
 void GesturePage::load(ofJson & json)
 {
-	_scrollView->clear();
 	_midiMap.clear();
-	_gestures.clear();
 	_index = 0;
 
 	for (auto element : json["midi"])
@@ -638,6 +664,17 @@ ofJson GesturePage::save()
 	}
 	
 	return save;
+}
+
+void GesturePage::selectGesture(int index)
+{
+	if (index >= 0 && index < _gestureNames.size())
+	{
+		_curGestureIndex = index;
+		_curGestureName = _gestureNames[_curGestureIndex];
+		_curGesture = _gestures[_curGestureName];
+		_scrubPoly = _curGesture.getPolyline().getResampledByCount(20);
+	}
 }
 
 void GesturePage::addGesture(Gesture gesture, string name)

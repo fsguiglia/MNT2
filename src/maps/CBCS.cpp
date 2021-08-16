@@ -84,7 +84,7 @@ void CBCS::updateFbo()
 	ofSetColor(255);
 	ofDrawRectangle(0, 0, _fbo.getWidth(), _fbo.getHeight());
 	
-	ofSetColor(125);
+	ofSetColor(175);
 	for (auto point : _points)
 	{
 		ofVec2f curPos = point.getPosition() * ofVec2f(_width, _height);

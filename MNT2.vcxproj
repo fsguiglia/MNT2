@@ -194,7 +194,7 @@
     <ClCompile Include="src\maps\NNI.cpp" />
     <ClCompile Include="src\maps\RGBMap.cpp" />
     <ClCompile Include="src\maps\triggerMap.cpp" />
-    <ClCompile Include="src\ML\dimensionalityReduction.cpp" />
+    <ClCompile Include="src\ML\pythonML.cpp" />
     <ClCompile Include="src\nodes\node.cpp" />
     <ClCompile Include="src\pages\CBCSPage.cpp" />
     <ClCompile Include="src\pages\NNIPage.cpp" />
@@ -250,7 +250,7 @@
     <ClInclude Include="src\maps\NNI.h" />
     <ClInclude Include="src\maps\RGBMap.h" />
     <ClInclude Include="src\maps\triggerMap.h" />
-    <ClInclude Include="src\ML\dimensionalityReduction.h" />
+    <ClInclude Include="src\ML\pythonML.h" />
     <ClInclude Include="src\nodes\connection.h" />
     <ClInclude Include="src\nodes\moduleInterface.h" />
     <ClInclude Include="src\nodes\moduleNode.h" />

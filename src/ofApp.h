@@ -19,8 +19,18 @@
 #include "utils/mntUtils.h"
 
 /*
-revisar toda la estructura point->map->page y resolver para que gesture y noise no estén ahí colgados
--> un modulo preprocessor como tenía mnt1, para escalar, normalizar, invertir, mapear a una curva, lpf, etc.
+implementar:
+	*lstm para gesto
+	*cbcs note out (0.wav - 127.wav)
+	*borrar tmp en exit()?
+
+corregir:
+	*basePage->mapPage->modules
+	|   \
+	V	 L>gesture
+	noise
+
+podria haber una clase que maneje la gui general, para descargar un poco ofApp
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
