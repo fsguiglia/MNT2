@@ -11,6 +11,10 @@ import mdn
 import easygui
 
 def main():
+	print('-----------------------------------------------------')
+	print('----------------go do something else-----------------')
+	print('----------this is going to take a LONG time----------')
+	print('-----------------------------------------------------')
 	args = process_arguments(sys.argv)
 	#exit if no file is provided
 	if args['input_file'] is None: 
@@ -27,7 +31,7 @@ def main():
 	mdn_components = -1
 	learning_rate = 0.001
 	
-	with open('lstm_hyperparameters.json') as f:
+	with open('../analysis/lstm_hyperparameters.ini') as f:
 		hp = json.load(f)
 		if length == -1: length = hp['sequence_length']
 		if h1_n == -1: h1_n = hp['h1']
@@ -43,7 +47,7 @@ def main():
 	with open(path) as f:	
 		data = json.load(f)
 	
-	gesture_list,t, max_name = get_gestures(data)
+	gesture_list,t = get_gestures(data)
 	mean, std = get_mean_std(gesture_list)
 	
 	#define model
@@ -57,7 +61,7 @@ def main():
 	for i in range(epochs):
 		cur_epoch = "epoch " + str(i + 1) + "/" + str(epochs)
 		for j, gesture in enumerate(gesture_list):
-			print(cur_epoch + ', gesture ' + str(j) + "/" + str(len(gesture_list)) ": ", end = " ")
+			print(cur_epoch + ', gesture ' + str(j) + "/" + str(len(gesture_list)) + ": ", end = " ")
 			X,y = get_examples(gesture, length)
 			X -= mean
 			X /= std
@@ -74,7 +78,7 @@ def main():
 	model_file = easygui.filesavebox(msg=None, title="Save model", default=default_path, filetypes=None)
 	if model_file != None:
 		model.save(model_file)
-	print('saved as: ' + model_file)
+		print('saved as: ' + model_file)
 
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='gesture LSTM')
