@@ -56,6 +56,7 @@ void GesturePage::setupGui()
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
 	_gui->getToggle("Record")->setLabelColor(ofColor(125, 30, 30));
+	_gui->getButton("Train")->setLabelColor(ofColor(125, 30, 30));
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(_position.x + _position.getWidth(), 0);
 	_gui->setEnabled(false);

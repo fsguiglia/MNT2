@@ -50,14 +50,6 @@ def main():
 		exit()
 	print('loading model...')
 	
-	#set number of gestures
-	n_gestures = input('number of gestures to generate: ')
-	try:
-		n_gestures = int(n_gestures)
-	except:
-		print("that's not an number, generating 10 gestures")
-		n_gestures = 10
-	
 	#load model
 	try:
 		model = keras.models.load_model(model_path)
@@ -77,6 +69,14 @@ def main():
 		exit()
 	print('done!')
 	
+	#set number of gestures
+	n_gestures = input('number of gestures to generate: ')
+	try:
+		n_gestures = int(n_gestures)
+	except:
+		print("that's not an number, generating 10 gestures")
+		n_gestures = 10
+	
 	#generate
 	print('generating gestures: ')
 	new_sequences = generate(model, n_gestures, gesture_list, temperature)
@@ -94,7 +94,7 @@ def main():
 			cur_gesture_data.append(cur_point)
 		cur_gesture['name'] = str(max_name + 1 + i)
 		if len(cur_gesture['name']) == 1:
-			cur_gesture['name'] = str(0) + cur_gesture_name
+			cur_gesture['name'] = str(0) + cur_gesture['name']
 		cur_gesture['data'] = cur_gesture_data
 		data['gestures'].append(cur_gesture)
 	
@@ -187,17 +187,17 @@ def generate(model, n, gesture_list, temperature):
 	#prepare first sequences
 	mean, std = get_mean_std(gesture_list)
 	indexes = list()
-	indexes_length = n / len(gesture_list)
+	indexes_length = int(n / len(gesture_list))
 	if indexes_length < 1 : indexes_length = 1
 	for i in range(indexes_length):
-		indexes.append(list(range(len(gesture_list))))
-	indexes = indexes[0]
+		for j in range(len(gesture_list)):
+			indexes.append(j)
 	random.shuffle(indexes)
 	indexes = indexes[:n]
 	l = 0
 	for i in range(n):
-		l += len(gesture_list[i])
-	
+		l += len(gesture_list[indexes[i]])
+	l -= length * n
 	#progress bar
 	bar_pos = 0
 	bar = progressbar.ProgressBar(maxval=l, \
