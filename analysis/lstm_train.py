@@ -12,8 +12,10 @@ import easygui
 
 def main():
 	print('-----------------------------------------------------')
+	print('-----------------------------------------------------')
 	print('----------------go do something else-----------------')
 	print('----------this is going to take a LONG time----------')
+	print('-----------------------------------------------------')
 	print('-----------------------------------------------------')
 	args = process_arguments(sys.argv)
 	#exit if no file is provided
@@ -61,12 +63,12 @@ def main():
 	for i in range(epochs):
 		cur_epoch = "epoch " + str(i + 1) + "/" + str(epochs)
 		for j, gesture in enumerate(gesture_list):
-			print(cur_epoch + ', gesture ' + str(j) + "/" + str(len(gesture_list)) + ": ", end = " ")
+			print(cur_epoch + ', gesture ' + str(j+1) + "/" + str(len(gesture_list)) + ": ", end = " ")
 			X,y = get_examples(gesture, length)
-			X -= mean
-			X /= std
-			y -= mean
-			y /= std
+			#X -= mean
+			#X /= std
+			#y -= mean
+			#y /= std
 			history = model.fit(X, y, epochs=1, batch_size=1, verbose=2, shuffle=False)
 			model.reset_states()
 

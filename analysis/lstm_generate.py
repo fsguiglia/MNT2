@@ -23,21 +23,10 @@ def main():
 	json_path = args['input_file']
 	new_path = json_path[:json_path.rfind('.')] + '_o.tmp'
 	args = process_arguments(sys.argv)
-	length = int(args['window_size'])
-	batch_size = int(args['batch_size'])
 	temperature = float(args['temperature'])  
 	mode = -1
 	mdn_components = -1
 	data = dict()
-	
-	with open('../analysis/lstm_hyperparameters.json') as f:
-		hp = json.load(f)
-		if length == -1: length = hp['sequence_length']
-		if batch_size == -1: batch_size = hp['batch_size']
-		if mode == -1: mode = hp['mode']
-		if mdn_components == -1: mdn_components = hp['mdn_components']
-		if temperature == -1: temperature = hp['temperature']
-		learning_rate = hp['learning_rate']
 	
 	print('select model file')
 	#get model path
@@ -107,17 +96,7 @@ def process_arguments(args):
 	parser.add_argument('-f', '--input_file',
 						action='store',
 						help='path to the input file')
-	
-	parser.add_argument('-ws', '--window_size',
-						action='store',
-						default=-1,
-						help='window size')
-	
-	parser.add_argument('-b', '--batch_size',
-						action='store',
-						default=-1,
-						help='batch size')
-	
+
 	parser.add_argument('-t', '--temperature',
 						action='store',
 						default=-1,
@@ -211,8 +190,8 @@ def generate(model, n, gesture_list, temperature):
 		sequences, y = get_examples(gesture_list[index], length)
 		cur_length = len(gesture_list[index])
 		sequence = sequences[0]
-		sequence -= mean
-		sequence /= std
+		#sequence -= mean
+		#sequence /= std
 		predicted = np.zeros((cur_length, 2))
 		predicted[:length] = sequence
 
@@ -227,8 +206,8 @@ def generate(model, n, gesture_list, temperature):
 			bar_pos += 1
 			bar.update(bar_pos)
 		
-		predicted *= std
-		predicted += mean
+		#predicted *= std
+		#predicted += mean
 		gen_sequences.append(predicted.tolist())
 		
 	bar.finish()
