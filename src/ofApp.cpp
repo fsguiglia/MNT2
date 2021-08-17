@@ -809,174 +809,187 @@ void ofApp::load()
 		clear();
 		path = loadFile.getPath();
 		ofJson jLoad = ofLoadJson(path);
-		map<string, string> names;
-
-		//MIDI/OSC
-		ofJson jIn = jLoad["in"];
-		for (auto& element : jIn)
+		auto obj = jLoad.get<ofJson::object_t>();
+		bool mntFile = false;
+		for (auto element : obj)
 		{
-			string curPort = element["port"].get<string>();
-			bool osc = false;
-			vector<string> split = ofSplitString(curPort, ":");
-			if (split.size() > 0)
+			if (element.first == "MNT_Version")
 			{
-				if (split[0] == "osc") osc = true;
+				mntFile = true;
+				break;
 			}
-			if (osc)
+		}
+		if (mntFile)
+		{
+			map<string, string> names;
+
+			//MIDI/OSC
+			ofJson jIn = jLoad["in"];
+			for (auto& element : jIn)
 			{
-				bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
-				if (_oscReceivers.find(curPort) == _oscReceivers.end() && isNumber)
+				string curPort = element["port"].get<string>();
+				bool osc = false;
+				vector<string> split = ofSplitString(curPort, ":");
+				if (split.size() > 0)
 				{
-					createOscInput(curPort, element["x"], element["y"]);
-					names[curPort] = curPort;
+					if (split[0] == "osc") osc = true;
 				}
-			}
-			else
-			{
-				bool portAvailable = false;
-				for (auto port : _MIDIInPorts) {
-					if (port.first == split[1])
+				if (osc)
+				{
+					bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
+					if (_oscReceivers.find(curPort) == _oscReceivers.end() && isNumber)
 					{
-						portAvailable = true;
-						break;
+						createOscInput(curPort, element["x"], element["y"]);
+						names[curPort] = curPort;
 					}
 				}
-				if (portAvailable)
+				else
 				{
-					string name = createMIDIInput(split[1], element["x"], element["y"]);
-					names[name] = name;
-				}
-			}
-		}
-		ofJson jOut = jLoad["out"];
-		for (auto& element : jOut)
-		{
-			string curPort = element["port"].get<string>();
-			bool osc = false;
-			vector<string> split = ofSplitString(curPort, ":");
-			if (split.size() == 3)
-			{
-				if (split[0] == "osc") osc = true;
-			}
-			if (osc)
-			{
-				bool isNumber = (split[2].find_first_not_of("0123456789") == std::string::npos);
-				if (isNumber)
-				{
-					createOscOutput(split[1], split[2], element["x"], element["y"]);
-					names[curPort] = curPort;
-				}
-			}
-			else
-			{
-				bool portAvailable = false;
-				for (auto port : _MIDIOutPorts) {
-					if (port.first == split[1])
+					bool portAvailable = false;
+					for (auto port : _MIDIInPorts) {
+						if (port.first == split[1])
+						{
+							portAvailable = true;
+							break;
+						}
+					}
+					if (portAvailable)
 					{
-						portAvailable = true;
-						break;
+						string name = createMIDIInput(split[1], element["x"], element["y"]);
+						names[name] = name;
 					}
 				}
-				if (portAvailable)
+			}
+			ofJson jOut = jLoad["out"];
+			for (auto& element : jOut)
+			{
+				string curPort = element["port"].get<string>();
+				bool osc = false;
+				vector<string> split = ofSplitString(curPort, ":");
+				if (split.size() == 3)
 				{
-					string name = createMIDIOutput(split[1], element["x"], element["y"]);
-					names[name] = name;
+					if (split[0] == "osc") osc = true;
+				}
+				if (osc)
+				{
+					bool isNumber = (split[2].find_first_not_of("0123456789") == std::string::npos);
+					if (isNumber)
+					{
+						createOscOutput(split[1], split[2], element["x"], element["y"]);
+						names[curPort] = curPort;
+					}
+				}
+				else
+				{
+					bool portAvailable = false;
+					for (auto port : _MIDIOutPorts) {
+						if (port.first == split[1])
+						{
+							portAvailable = true;
+							break;
+						}
+					}
+					if (portAvailable)
+					{
+						string name = createMIDIOutput(split[1], element["x"], element["y"]);
+						names[name] = name;
+					}
 				}
 			}
+
+			//Modules
+			ofJson jModules = jLoad["Modules"];
+			for (auto& element : jModules)
+			{
+				if (element["type"].get<string>() == "Interpolate")
+				{
+
+					ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
+					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				}
+				if (element["type"].get<string>() == "Concatenate")
+				{
+
+					ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
+					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				}
+				else if (element["type"].get<string>() == "Trigger")
+				{
+					ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
+					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				}
+				else if (element["type"].get<string>() == "Draw")
+				{
+					ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
+					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				}
+				else if (element["type"].get<string>() == "Gesture")
+				{
+					ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
+					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				}
+				else if (element["type"].get<string>() == "Noise")
+				{
+					ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
+					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
+				}
+
+				_moduleNodes[_moduleNodes.size() - 1]->setup(
+					element["x"],
+					element["y"],
+					90,
+					30,
+					element["inputs"],
+					element["outputs"],
+					element["type"].get<string>(),
+					_moduleColor);
+
+				_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
+				ofJson data = element["data"];
+				_moduleNodes[_moduleNodes.size() - 1]->load(data);
+
+				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+				string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
+				names[oldName] = newName;
+			}
+
+			//CONNECTIONS
+			ofJson jConnections = jLoad["Connections"];
+			for (auto& element : jConnections)
+			{
+				Connection connection;
+				connection.fromId = names[element["fromId"].get<string>()];
+				connection.toId = names[element["toId"].get<string>()];
+				connection.fromOutput = element["fromOutput"];
+				connection.toInput = element["toInput"];
+				connection.fromInputNode = element["fromInputNode"];
+				connection.toOutputNode = element["toOutputNode"];
+				connection.isDump = element["isDump"];
+
+				bool validConnection = true;
+				if (connection.fromInputNode)
+				{
+					bool inputExists = false;
+					for (auto port : _MIDIInPorts) if ("in:" + port.first == connection.fromId) inputExists = true;
+					for (auto port : _oscReceivers) if (port.first == connection.fromId) inputExists = true;
+					validConnection = validConnection && inputExists;
+				}
+
+				if (connection.toOutputNode)
+				{
+					bool outputExists = false;
+					for (auto port : _MIDIOutPorts) if ("out:" + port.first == connection.toId) outputExists = true;
+					for (auto port : _oscSenders) if ("osc:" + port.first == connection.toId) outputExists = true;
+					validConnection = validConnection && outputExists;
+				}
+
+				if (validConnection) _connections.push_back(connection);
+			}
+			//LOAD
+			_file = loadFile.getName();
+			_folder = ofSplitString(path, _file)[0];
+			setWindowTitle(_file);
 		}
-		
-		//Modules
-		ofJson jModules = jLoad["Modules"];
-		for (auto& element : jModules)
-		{
-			if (element["type"].get<string>() == "Interpolate")
-			{
-
-				ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-			}
-			if (element["type"].get<string>() == "Concatenate")
-			{
-
-				ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-			}
-			else if (element["type"].get<string>() == "Trigger")
-			{
-				ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
-				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-			}
-			else if (element["type"].get<string>() == "Draw")
-			{
-				ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
-				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-			}
-			else if (element["type"].get<string>() == "Gesture")
-			{
-				ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
-				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-			}
-			else if (element["type"].get<string>() == "Noise")
-			{
-				ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
-				_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-			}
-
-			_moduleNodes[_moduleNodes.size() - 1]->setup(
-				element["x"],
-				element["y"],
-				90,
-				30,
-				element["inputs"],
-				element["outputs"],
-				element["type"].get<string>(),
-				_moduleColor);
-
-			_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
-			ofJson data = element["data"];
-			_moduleNodes[_moduleNodes.size() - 1]->load(data);
-
-			string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
-			string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
-			names[oldName] = newName;
-		}
-			
-		//CONNECTIONS
-		ofJson jConnections = jLoad["Connections"];
-		for (auto& element : jConnections)
-		{
-			Connection connection;
-			connection.fromId = names[element["fromId"].get<string>()];
-			connection.toId = names[element["toId"].get<string>()];
-			connection.fromOutput = element["fromOutput"];
-			connection.toInput = element["toInput"];
-			connection.fromInputNode = element["fromInputNode"];
-			connection.toOutputNode = element["toOutputNode"];
-			connection.isDump = element["isDump"];
-
-			bool validConnection = true;
-			if (connection.fromInputNode)
-			{
-				bool inputExists = false;
-				for (auto port : _MIDIInPorts) if ("in:" + port.first == connection.fromId) inputExists = true;
-				for (auto port : _oscReceivers) if (port.first == connection.fromId) inputExists = true;
-				validConnection = validConnection && inputExists;
-			}
-			
-			if (connection.toOutputNode)
-			{
-				bool outputExists = false;
-				for (auto port : _MIDIOutPorts) if ("out:" + port.first == connection.toId) outputExists = true;
-				for (auto port : _oscSenders) if ("osc:" + port.first == connection.toId) outputExists = true;
-				validConnection = validConnection && outputExists;
-			}
-			
-			if(validConnection) _connections.push_back(connection);
-		}
-		//LOAD
-		_file = loadFile.getName();
-		_folder = ofSplitString(path, _file)[0];
-		setWindowTitle(_file);
 	}
 }
 
@@ -986,12 +999,15 @@ void ofApp::save()
 	openframeworks has an old bug that makes default name do nothing in ofSystemSaveDialog on Windows
 	*/
 	string path;
-	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.json", "Save MNT set");
+	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.mnt", "Save MNT set");
 	if (saveFile.bSuccess)
 	{
 		//MIDI/OSC
 		path = saveFile.getPath();
+		path = ofSplitString(path, ".")[0];
+		path += ".mnt";
 		ofJson jSave;
+		jSave["MNT_Version"] = 2;
 		ofJson jIn, jOut;
 		for (auto& node : _inputNodes)
 		{

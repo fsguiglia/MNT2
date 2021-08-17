@@ -263,4 +263,4 @@ __pycache__/
 
 # De este proyecto
 analysis/tmp
-*.[Ii]ni
+analysis/lstm_hyperparameters.ini
