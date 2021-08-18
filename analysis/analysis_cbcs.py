@@ -34,17 +34,12 @@ def main():
 		init_path = os.environ['USERPROFILE'] + '//Desktop//'
 		args['input'] = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
 		if args['input'] is None:
-			save(Y, file_position, new_path)
+			error = 'no file to analize'
+			print(error)
+			save_empty_file(error, new_path)
 			exit()
 
 	files = getListOfFiles(args['input'], ['.wav'])
-
-	#save empty json and exit if less than 5 files are provided
-	'''
-	if len(files) < 5:
-		save(y, file_position, new_path)
-		exit()
-	'''
 	
 	X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
 	
@@ -60,6 +55,14 @@ def main():
 		X = np.concatenate((X, cur_X))
 		bar.update(index + 1)
 	bar.finish()
+	#save empty json and exit if less than 5 files are provided
+	
+	if len(file_position) < 2:
+		error = 'not enough data to create map, exiting'
+		print(error)
+		save_empty_file(error, new_path)
+		exit()
+
 	D = getFeatures(X, window_size, hop_length)
 	Y = np.zeros((len(file_position),2))
 	
@@ -154,7 +157,7 @@ def getFilePosition(file, sample_rate, mode=0):
 	y, sr = librosa.load(file, sample_rate)
 	y = librosa.to_mono(y)
 	shape = int(sample_rate * 0.5)
-
+	#maybe more windows?
 	windows = int(y.shape[0] / shape)
 	if mode == 0: 
 		windows = 0
@@ -177,7 +180,7 @@ def getFilePosition(file, sample_rate, mode=0):
 def getFeatures(samples, window_size, hop_length):
 	#size of stft result is  (window size / 2 + 1) * (samples / hop length + 1)
 	shape = int((1 + window_size * 0.5))
-	shape *= int(samples[1].shape[0] / hop_length) + 1
+	shape *= int(samples[0].shape[0] / hop_length) + 1
 	D = np.array([]).reshape(0, shape)
 	for sample in samples:
 		sample = sample.T
@@ -228,6 +231,12 @@ def save(data, files, output_file):
 		points[i] = curOut
 	
 	out['points'] = points
+	with open(output_file, 'w+') as f:
+		json.dump(out, f, indent = 4)
+
+def save_empty_file(error, output_file):
+	out = dict()
+	out["error"] = error
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
 main()

@@ -25,6 +25,7 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
+	void exportFileList();
 	void load(ofJson& json);
 	ofJson save();
 private:

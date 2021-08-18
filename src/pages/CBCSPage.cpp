@@ -53,6 +53,7 @@ void CBCSPage::setupGui()
 	_controlFolder->collapse();
 	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
 	_gui->addTextInput("address", getAddress());
+	_gui->addButton("Export file list")->setName("Export");
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
 	_gui->onToggleEvent(this, &CBCSPage::toggleEvent);
 	_gui->onSliderEvent(this, &CBCSPage::sliderEvent);
@@ -109,6 +110,10 @@ void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 	if (e.target->getName() == "Normalize")
 	{
 		_map.normalize();
+	}
+	if (e.target->getName() == "Export")
+	{
+		exportFileList();
 	}
 }
 
@@ -193,6 +198,38 @@ void CBCSPage::mouseReleased(int x, int y, int button)
 void CBCSPage::mouseScrolled(int scroll)
 {
 	//zoom
+}
+
+void CBCSPage::exportFileList()
+{
+	//exports list of filenames to load in synth
+	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.cbcs", "Export list of files");
+	if (saveFile.bSuccess)
+	{
+		ofJson jFiles;
+		vector<Point> points = _map.getPoints();
+		for (auto point : points)
+		{
+			bool pathExists = false;
+			string curPath = point.getName();
+			for (string path : jFiles["files"])
+			{
+				if (path == curPath)
+				{
+					pathExists = true;
+					break;
+				}
+			}
+			if (!pathExists)
+			{
+				jFiles["files"].push_back(curPath);
+			}
+		}
+		string path = saveFile.getPath();
+		path = ofSplitString(path, ".")[0];
+		path += ".cbcs";
+		ofSavePrettyJson(path, jFiles);
+	}
 }
 
 void CBCSPage::load(ofJson & json)
