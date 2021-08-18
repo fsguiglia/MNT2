@@ -92,7 +92,7 @@ inline void BasePage<T>::update()
 			if (_stringOutput)
 			{
 				vector<string> curOutput;
-				for (auto element : _map.getOutput()) curOutput.push_back(element.first + ofToString(element.second));
+				for (auto element : _map.getOutput()) curOutput.push_back(element.first + ";" + ofToString(element.second));
 				setStringMessages(curOutput);
 			}
 			if (_oscOutput) addMessages(_map.getOutput(), _OSCOutMessages);

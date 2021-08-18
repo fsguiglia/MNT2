@@ -38,11 +38,13 @@ def main():
 			exit()
 
 	files = getListOfFiles(args['input'], ['.wav'])
-	
+
 	#save empty json and exit if less than 5 files are provided
+	'''
 	if len(files) < 5:
 		save(y, file_position, new_path)
 		exit()
+	'''
 	
 	X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
 	
@@ -53,7 +55,8 @@ def main():
 	bar.start()
 	for index, file in enumerate(files):
 		cur_file_position, cur_X = getFilePosition(file, sample_rate, mode)
-		file_position.append(cur_file_position)
+		for file in cur_file_position:
+			file_position.append(file)
 		X = np.concatenate((X, cur_X))
 		bar.update(index + 1)
 	bar.finish()
@@ -68,7 +71,6 @@ def main():
 		Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
 	
 	Y = min_max_normalize(Y)
-	
 	
 	save(Y, file_position, new_path)
 	exit()
@@ -168,10 +170,8 @@ def getFilePosition(file, sample_rate, mode=0):
 		#pad with zeros if file is shorter than 0.5 seconds, this needs to be tested
 		padded = np.zeros(shape)
 		padded[:end-start] = y[start:end]
-		
 		padded = padded.reshape(1, shape)
 		D = np.concatenate((D,padded))
-	
 	return X, D
 	
 def getFeatures(samples, window_size, hop_length):
@@ -221,8 +221,8 @@ def save(data, files, output_file):
 	points = dict()
 	for i in range(len(files)):
 		curOut = dict()
-		curOut['name'] = files[i][0][0]
-		curOut['pos'] = files[i][0][1]
+		curOut['name'] = files[i][0]
+		curOut['pos'] = files[i][1]
 		curOut['x'] = float(data[i][0])
 		curOut['y'] = float(data[i][1])
 		points[i] = curOut
@@ -230,8 +230,4 @@ def save(data, files, output_file):
 	out['points'] = points
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
-		
-		
-	
-
 main()
