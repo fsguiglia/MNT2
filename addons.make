@@ -1,6 +1,4 @@
-ofxSpatialHash
 ofxDatGui
 ofxMidi
-ofxNetwork
 ofxOsc
-ofxXmlSettings
+ofxSpatialHash

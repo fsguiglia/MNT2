@@ -100,7 +100,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\ML;src\generators;src\gestures;src\gui;src\maps;src\nodes;src\pages;src\points;src\utils;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src;..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNetwork\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <PreprocessorDefinitions>OSC_HOST_LITTLE_ENDIAN</PreprocessorDefinitions>
@@ -121,7 +121,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\ML;src\generators;src\gestures;src\gui;src\maps;src\nodes;src\pages;src\points;src\utils;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src;..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNetwork\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -142,7 +142,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\ML;src\generators;src\gestures;src\gui;src\maps;src\nodes;src\pages;src\points;src\utils;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src;..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNetwork\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -166,7 +166,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\ML;src\generators;src\gestures;src\gui;src\maps;src\nodes;src\pages;src\points;src\utils;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src;..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxNetwork\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxDatGui\src;..\..\..\addons\ofxDatGui\src\components;..\..\..\addons\ofxDatGui\src\core;..\..\..\addons\ofxDatGui\src\libs;..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont;..\..\..\addons\ofxDatGui\src\themes;..\..\..\addons\ofxMidi\libs;..\..\..\addons\ofxMidi\libs\pgmidi;..\..\..\addons\ofxMidi\libs\rtmidi;..\..\..\addons\ofxMidi\src;..\..\..\addons\ofxMidi\src\desktop;..\..\..\addons\ofxMidi\src\ios;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxSpatialHash\libs;..\..\..\addons\ofxSpatialHash\libs\nanoflann;..\..\..\addons\ofxSpatialHash\libs\nanoflann\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include;..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx;..\..\..\addons\ofxSpatialHash\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <PreprocessorDefinitions>OSC_HOST_LITTLE_ENDIAN</PreprocessorDefinitions>
@@ -174,7 +174,7 @@
     <Link>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -184,26 +184,18 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\maps\CBCS.cpp" />
-    <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\generators\noiseGenerator.cpp" />
     <ClCompile Include="src\gestures\gesture.cpp" />
     <ClCompile Include="src\gestures\gesturePage.cpp" />
     <ClCompile Include="src\gui\scrollGui.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\maps\CBCS.cpp" />
     <ClCompile Include="src\maps\NNI.cpp" />
     <ClCompile Include="src\maps\RGBMap.cpp" />
     <ClCompile Include="src\maps\triggerMap.cpp" />
     <ClCompile Include="src\ML\pythonML.cpp" />
     <ClCompile Include="src\nodes\node.cpp" />
-    <ClCompile Include="src\pages\CBCSPage.cpp" />
-    <ClCompile Include="src\pages\NNIPage.cpp" />
-    <ClCompile Include="src\pages\rgbPage.cpp" />
-    <ClCompile Include="src\pages\triggerPage.cpp" />
-    <ClCompile Include="src\points\point.cpp" />
-    <ClCompile Include="src\points\rgbPoint.cpp" />
-    <ClCompile Include="src\points\trigger.cpp" />
-    <ClCompile Include="src\utils\mntUtils.cpp" />
+    <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\core\ofxDatGuiComponent.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont\ofxSmartFont.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\ofxDatGui.cpp" />
@@ -217,11 +209,6 @@
     <ClCompile Include="..\..\..\addons\ofxMidi\src\ofxMidiOut.cpp" />
     <ClCompile Include="..\..\..\addons\ofxMidi\src\ofxMidiTimecode.cpp" />
     <ClCompile Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPManager.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPServer.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxUDPManager.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscMessage.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscParameterSync.cpp" />
@@ -234,19 +221,23 @@
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp" />
+    <ClCompile Include="src\pages\CBCSPage.cpp" />
+    <ClCompile Include="src\pages\NNIPage.cpp" />
+    <ClCompile Include="src\pages\rgbPage.cpp" />
+    <ClCompile Include="src\pages\triggerPage.cpp" />
+    <ClCompile Include="src\points\point.cpp" />
+    <ClCompile Include="src\points\rgbPoint.cpp" />
+    <ClCompile Include="src\points\trigger.cpp" />
+    <ClCompile Include="src\utils\mntUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\maps\CBCS.h" />
-    <ClInclude Include="src\ofApp.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\generators\noiseGenerator.h" />
     <ClInclude Include="src\gestures\gesture.h" />
     <ClInclude Include="src\gestures\gesturePage.h" />
     <ClInclude Include="src\gui\scrollGui.h" />
     <ClInclude Include="src\maps\baseMap.h" />
+    <ClInclude Include="src\maps\CBCS.h" />
     <ClInclude Include="src\maps\NNI.h" />
     <ClInclude Include="src\maps\RGBMap.h" />
     <ClInclude Include="src\maps\triggerMap.h" />
@@ -255,18 +246,7 @@
     <ClInclude Include="src\nodes\moduleInterface.h" />
     <ClInclude Include="src\nodes\moduleNode.h" />
     <ClInclude Include="src\nodes\node.h" />
-    <ClInclude Include="src\pages\basePage.h" />
-    <ClInclude Include="src\pages\CBCSPage.h" />
-    <ClInclude Include="src\pages\NNIpage.h" />
-    <ClInclude Include="src\pages\rgbPage.h" />
-    <ClInclude Include="src\pages\triggerPage.h" />
-    <ClInclude Include="src\points\point.h" />
-    <ClInclude Include="src\points\rgbPoint.h" />
-    <ClInclude Include="src\points\trigger.h" />
-    <ClInclude Include="src\utils\mntUtils.h" />
-    <ClInclude Include="..\..\..\addons\ofxSpatialHash\src\ofxSpatialHash.h" />
-    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\nanoflann\include\nanoflann.hpp" />
-    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx\KDTree.h" />
+    <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGui2dPad.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGuiButton.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGuiColorPicker.h" />
@@ -300,14 +280,6 @@
     <ClInclude Include="..\..\..\addons\ofxMidi\src\ofxMidiTimecode.h" />
     <ClInclude Include="..\..\..\addons\ofxMidi\src\ofxMidiTypes.h" />
     <ClInclude Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetwork.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPManager.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPServer.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPSettings.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxUDPManager.h" />
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxUDPSettings.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOsc.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscArg.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.h" />
@@ -328,8 +300,18 @@
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscPrintReceivedElements.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscReceivedElements.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h" />
-    <ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h" />
-    <ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h" />
+    <ClInclude Include="..\..\..\addons\ofxSpatialHash\src\ofxSpatialHash.h" />
+    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\nanoflann\include\nanoflann.hpp" />
+    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx\KDTree.h" />
+    <ClInclude Include="src\pages\basePage.h" />
+    <ClInclude Include="src\pages\CBCSPage.h" />
+    <ClInclude Include="src\pages\NNIpage.h" />
+    <ClInclude Include="src\pages\rgbPage.h" />
+    <ClInclude Include="src\pages\triggerPage.h" />
+    <ClInclude Include="src\points\point.h" />
+    <ClInclude Include="src\points\rgbPoint.h" />
+    <ClInclude Include="src\points\trigger.h" />
+    <ClInclude Include="src\utils\mntUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
@@ -342,6 +324,11 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bin\data\MNT.ico" />
+    <Image Include="bin\data\MNT.png" />
+    <Image Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

@@ -38,6 +38,7 @@ void CBCS::update()
 			{
 				_selection = getKnn(_cursor, _maxN);
 				map<string, float> curOutput;
+				cout << _points.size() << endl;
 				for (int i = 0; i < _selection.size(); i++)
 				{
 					string curValue = ofToString(i) + ";" + _points[_selection[i]].getName();
@@ -110,6 +111,12 @@ void CBCS::addPoint(Point point)
 {
 	_positions.push_back(point.getPosition());
 	BaseMap::addPoint(point);
+}
+
+void CBCS::clearPoints()
+{
+	_positions.clear();
+	BaseMap::clearPoints();
 }
 
 void CBCS::selectFeatures(string xFeature, string yFeature)

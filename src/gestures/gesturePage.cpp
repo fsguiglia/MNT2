@@ -63,13 +63,13 @@ void GesturePage::setupGui()
 	_gui->update();
 
 	_guiHeight = _gui->getHeight();
-	_scrollView = new ofxDatGuiScrollView("Gestures", 10);
+	_scrollView = new ofxDatGuiScrollView("Gestures", 15);
 	_scrollView->onScrollViewEvent(this, &GesturePage::scrollViewEvent);
 	_scrollView->setOpacity(0.5);
 	//_scrollView->setTheme(new ofxDatGuiThemeWireframe());
 	_scrollView->setWidth(_guiWidth -1, 0.3);
 	_scrollView->setPosition(_gui->getPosition().x + 1, _guiHeight);
-	_scrollView->setHeight(_position.height - _guiHeight);
+	//_scrollView->setHeight(40);
 	_scrollView->setBackgroundColor(50);
 	_scrollView->setEnabled(false);
 	_scrollView->setVisible(false);

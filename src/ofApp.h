@@ -2,8 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxDatGui.h"
-#include "ofxXmlSettings.h"
-#include "ofxNetwork.h"
 #include "ofxOsc.h"
 #include "ofxMidi.h"
 #include "nodes/node.h"
@@ -19,18 +17,18 @@
 #include "utils/mntUtils.h"
 
 /*
-implementar:
-	*lstm para gesto
-	*cbcs note out (0.wav - 127.wav)
-	*borrar tmp en exit()?
+cosas para hacer:
 
-corregir:
-	*basePage->mapPage->modules
+*cbcs note out (0.wav - 127.wav) -> esto es medio un quilombo por como funciona page la salida es MIDI o OSC, no las dos
+
+*escribi gesture y noise a las corridas, en realidad debería repensar la estructura asi:
+
+	basePage->mapPage->modules
 	|   \
 	V	 L>gesture
 	noise
 
-podria haber una clase que maneje la gui general, para descargar un poco ofApp
+* podria haber una clase que maneje la gui general, para descargar un poco ofApp y que quede todo mas claro
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {

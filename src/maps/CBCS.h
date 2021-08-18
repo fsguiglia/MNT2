@@ -16,6 +16,7 @@ public:
 	void updateFbo();
 
 	void addPoint(Point point);
+	void clearPoints();
 	void selectFeatures(string xFeature, string yFeature);
 	void setFeatures(vector<string> features);
 	vector<string> getFeatures();

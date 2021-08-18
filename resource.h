@@ -1,6 +1,6 @@
 ﻿//{{NO_DEPENDENCIES}}
-// Archivo de inclusión generado de Microsoft Visual C++.
-// Usado por icon.rc
+// Microsoft Visual C++ generated include file.
+// Used by icon.rc
 //
 #define SW_HIDE                         0
 #define HIDE_WINDOW                     0
@@ -789,7 +789,9 @@
 #define IDI_ICON1                       101
 #define VK_NUMPAD5                      0x65
 #define LANG_DIVEHI                     0x65
+#define MAIN_ICON                       102
 #define VK_NUMPAD6                      0x66
+#define IDB_PNG1                        102
 #define VK_NUMPAD7                      0x67
 #define LANG_FULAH                      0x67
 #define LANG_PULAR                      0x67
@@ -1606,7 +1608,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        102
+#define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101

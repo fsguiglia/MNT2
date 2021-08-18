@@ -7,57 +7,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\generators\noiseGenerator.cpp">
-      <Filter>src\generators</Filter>
-    </ClCompile>
-    <ClCompile Include="src\gestures\gesture.cpp">
-      <Filter>src\gestures</Filter>
-    </ClCompile>
-    <ClCompile Include="src\gestures\gesturePage.cpp">
-      <Filter>src\gestures</Filter>
-    </ClCompile>
-    <ClCompile Include="src\gui\scrollGui.cpp">
-      <Filter>src\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\maps\NNI.cpp">
-      <Filter>src\maps</Filter>
-    </ClCompile>
-    <ClCompile Include="src\maps\RGBMap.cpp">
-      <Filter>src\maps</Filter>
-    </ClCompile>
-    <ClCompile Include="src\maps\triggerMap.cpp">
-      <Filter>src\maps</Filter>
-    </ClCompile>
-    <ClCompile Include="src\nodes\node.cpp">
-      <Filter>src\nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ofApp.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pages\NNIPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pages\rgbPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pages\triggerPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\points\point.cpp">
-      <Filter>src\points</Filter>
-    </ClCompile>
-    <ClCompile Include="src\points\rgbPoint.cpp">
-      <Filter>src\points</Filter>
-    </ClCompile>
-    <ClCompile Include="src\points\trigger.cpp">
-      <Filter>src\points</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utils\mntUtils.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\core\ofxDatGuiComponent.cpp">
       <Filter>addons\ofxDatGui\src\core</Filter>
     </ClCompile>
@@ -97,21 +46,6 @@
     <ClCompile Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.cpp">
       <Filter>addons\ofxMidi\libs\rtmidi</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.cpp">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.cpp">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPManager.cpp">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPServer.cpp">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxUDPManager.cpp">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.cpp">
       <Filter>addons\ofxOsc\src</Filter>
     </ClCompile>
@@ -148,85 +82,67 @@
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp">
       <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.cpp">
-      <Filter>addons\ofxXmlSettings\src</Filter>
+    <ClCompile Include="src\generators\noiseGenerator.cpp">
+      <Filter>src\generators</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp">
-      <Filter>addons\ofxXmlSettings\libs</Filter>
+    <ClCompile Include="src\gestures\gesture.cpp">
+      <Filter>src\gestures</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp">
-      <Filter>addons\ofxXmlSettings\libs</Filter>
+    <ClCompile Include="src\gestures\gesturePage.cpp">
+      <Filter>src\gestures</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp">
-      <Filter>addons\ofxXmlSettings\libs</Filter>
+    <ClCompile Include="src\gui\scrollGui.cpp">
+      <Filter>src\gui</Filter>
     </ClCompile>
     <ClCompile Include="src\maps\CBCS.cpp">
       <Filter>src\maps</Filter>
     </ClCompile>
-    <ClCompile Include="src\pages\CBCSPage.cpp">
-      <Filter>src\pages</Filter>
+    <ClCompile Include="src\maps\NNI.cpp">
+      <Filter>src\maps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\maps\RGBMap.cpp">
+      <Filter>src\maps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\maps\triggerMap.cpp">
+      <Filter>src\maps</Filter>
     </ClCompile>
     <ClCompile Include="src\ML\pythonML.cpp">
       <Filter>src\ML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nodes\node.cpp">
+      <Filter>src\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\CBCSPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\NNIPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\rgbPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\triggerPage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\points\point.cpp">
+      <Filter>src\points</Filter>
+    </ClCompile>
+    <ClCompile Include="src\points\rgbPoint.cpp">
+      <Filter>src\points</Filter>
+    </ClCompile>
+    <ClCompile Include="src\points\trigger.cpp">
+      <Filter>src\points</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\mntUtils.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
       <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\generators">
-      <UniqueIdentifier>{8A6BE911-653A-7CF1-2A55-587D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\gestures">
-      <UniqueIdentifier>{EAD71A87-042C-4813-5914-BB9D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\gui">
-      <UniqueIdentifier>{A7F2D870-EEB9-68A7-0DA0-CEB2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\maps">
-      <UniqueIdentifier>{D8C8D5FC-21DC-3597-064D-5E1A}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\ML">
-      <UniqueIdentifier>{D0BD9646-E46F-03EF-6DF3-121A}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\nodes">
-      <UniqueIdentifier>{33114672-754D-1512-4F1C-94AE}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\pages">
-      <UniqueIdentifier>{645075F3-0E54-5C57-149E-E3D2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\points">
-      <UniqueIdentifier>{F0F162E5-A79A-3ADE-25F7-0682}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\utils">
-      <UniqueIdentifier>{FF53B027-68B2-4010-4AB2-068A}</UniqueIdentifier>
-    </Filter>
     <Filter Include="addons">
       <UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash">
-      <UniqueIdentifier>{BEC69B08-2081-87B5-5091-EDA1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash\src">
-      <UniqueIdentifier>{4171E9F0-7B26-6826-2EAF-EDBA}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash\libs">
-      <UniqueIdentifier>{A6100739-A709-5E0B-A81E-1E6D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash\libs\nanoflann">
-      <UniqueIdentifier>{F7AFF2DF-4115-1A6B-C989-EBB1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash\libs\nanoflann\include">
-      <UniqueIdentifier>{02BF8E98-896F-261F-E9CB-73C8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash\libs\ofxSpatialHash">
-      <UniqueIdentifier>{141F9213-E342-A7B1-4839-E1F4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash\libs\ofxSpatialHash\include">
-      <UniqueIdentifier>{4B24B9CE-B376-3B24-229D-7759}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx">
-      <UniqueIdentifier>{C5DFD7B1-CA65-5751-2D16-D0C6}</UniqueIdentifier>
     </Filter>
     <Filter Include="addons\ofxDatGui">
       <UniqueIdentifier>{B36B06DF-1AA4-00D4-5A1B-6893}</UniqueIdentifier>
@@ -264,12 +180,6 @@
     <Filter Include="addons\ofxMidi\libs\rtmidi">
       <UniqueIdentifier>{8E6C5628-3502-6F01-4B1D-AEAE}</UniqueIdentifier>
     </Filter>
-    <Filter Include="addons\ofxNetwork">
-      <UniqueIdentifier>{01A15744-29A6-108D-08E9-83A7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxNetwork\src">
-      <UniqueIdentifier>{3D1C10C7-8F35-E796-9C70-F5F3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="addons\ofxOsc">
       <UniqueIdentifier>{D91DCA33-6E5D-4481-2AEC-9FBB}</UniqueIdentifier>
     </Filter>
@@ -294,91 +204,61 @@
     <Filter Include="addons\ofxOsc\libs\oscpack\src\osc">
       <UniqueIdentifier>{EDACB89C-9768-9551-4D41-B590}</UniqueIdentifier>
     </Filter>
-    <Filter Include="addons\ofxXmlSettings">
-      <UniqueIdentifier>{877F005D-13E6-0592-1D97-F2E3}</UniqueIdentifier>
+    <Filter Include="addons\ofxSpatialHash">
+      <UniqueIdentifier>{BEC69B08-2081-87B5-5091-EDA1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="addons\ofxXmlSettings\src">
-      <UniqueIdentifier>{CCB2AC63-49D2-977C-CFE8-AEAD}</UniqueIdentifier>
+    <Filter Include="addons\ofxSpatialHash\src">
+      <UniqueIdentifier>{4171E9F0-7B26-6826-2EAF-EDBA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="addons\ofxXmlSettings\libs">
-      <UniqueIdentifier>{687714A8-1662-FA1C-261F-50F0}</UniqueIdentifier>
+    <Filter Include="addons\ofxSpatialHash\libs">
+      <UniqueIdentifier>{A6100739-A709-5E0B-A81E-1E6D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxSpatialHash\libs\nanoflann">
+      <UniqueIdentifier>{F7AFF2DF-4115-1A6B-C989-EBB1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxSpatialHash\libs\nanoflann\include">
+      <UniqueIdentifier>{02BF8E98-896F-261F-E9CB-73C8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxSpatialHash\libs\ofxSpatialHash">
+      <UniqueIdentifier>{141F9213-E342-A7B1-4839-E1F4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxSpatialHash\libs\ofxSpatialHash\include">
+      <UniqueIdentifier>{4B24B9CE-B376-3B24-229D-7759}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx">
+      <UniqueIdentifier>{C5DFD7B1-CA65-5751-2D16-D0C6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\generators">
+      <UniqueIdentifier>{82af4c6e-4329-48e7-9e7d-9d73d9818088}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gestures">
+      <UniqueIdentifier>{da136e0f-e5bc-432d-be81-0faa6a49e53b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gui">
+      <UniqueIdentifier>{4eda55ac-2d9f-4760-8a2b-29e89b4e8daa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\maps">
+      <UniqueIdentifier>{8f9c66fa-02d1-4c44-b725-365009fbf854}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ML">
+      <UniqueIdentifier>{707010b3-29d4-44ed-a85d-4444e2253db0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\nodes">
+      <UniqueIdentifier>{9751c48f-59be-4aaf-9e28-badc40db7afa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\pages">
+      <UniqueIdentifier>{1c7ba7e1-2942-4a0e-8a8e-85f5b8d1d1fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\points">
+      <UniqueIdentifier>{51864f58-3d2b-428e-961b-ec3bce918906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{4849d40a-596f-4a07-ab25-292654a5bae7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\generators\noiseGenerator.h">
-      <Filter>src\generators</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gestures\gesture.h">
-      <Filter>src\gestures</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gestures\gesturePage.h">
-      <Filter>src\gestures</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gui\scrollGui.h">
-      <Filter>src\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\maps\baseMap.h">
-      <Filter>src\maps</Filter>
-    </ClInclude>
-    <ClInclude Include="src\maps\NNI.h">
-      <Filter>src\maps</Filter>
-    </ClInclude>
-    <ClInclude Include="src\maps\RGBMap.h">
-      <Filter>src\maps</Filter>
-    </ClInclude>
-    <ClInclude Include="src\maps\triggerMap.h">
-      <Filter>src\maps</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nodes\connection.h">
-      <Filter>src\nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nodes\moduleInterface.h">
-      <Filter>src\nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nodes\moduleNode.h">
-      <Filter>src\nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\nodes\node.h">
-      <Filter>src\nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ofApp.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\basePage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\NNIpage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\rgbPage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\triggerPage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\points\point.h">
-      <Filter>src\points</Filter>
-    </ClInclude>
-    <ClInclude Include="src\points\rgbPoint.h">
-      <Filter>src\points</Filter>
-    </ClInclude>
-    <ClInclude Include="src\points\trigger.h">
-      <Filter>src\points</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\mntUtils.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxSpatialHash\src\ofxSpatialHash.h">
-      <Filter>addons\ofxSpatialHash\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\nanoflann\include\nanoflann.hpp">
-      <Filter>addons\ofxSpatialHash\libs\nanoflann\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx\KDTree.h">
-      <Filter>addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGui2dPad.h">
       <Filter>addons\ofxDatGui\src\components</Filter>
@@ -479,30 +359,6 @@
     <ClInclude Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.h">
       <Filter>addons\ofxMidi\libs\rtmidi</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetwork.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPManager.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPServer.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPSettings.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxUDPManager.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxUDPSettings.h">
-      <Filter>addons\ofxNetwork\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOsc.h">
       <Filter>addons\ofxOsc\src</Filter>
     </ClInclude>
@@ -563,23 +419,92 @@
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.h">
       <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h">
-      <Filter>addons\ofxXmlSettings\src</Filter>
+    <ClInclude Include="..\..\..\addons\ofxSpatialHash\src\ofxSpatialHash.h">
+      <Filter>addons\ofxSpatialHash\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h">
-      <Filter>addons\ofxXmlSettings\libs</Filter>
+    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\nanoflann\include\nanoflann.hpp">
+      <Filter>addons\ofxSpatialHash\libs\nanoflann\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx\KDTree.h">
+      <Filter>addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx</Filter>
+    </ClInclude>
+    <ClInclude Include="src\generators\noiseGenerator.h">
+      <Filter>src\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gestures\gesture.h">
+      <Filter>src\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gestures\gesturePage.h">
+      <Filter>src\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\scrollGui.h">
+      <Filter>src\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maps\baseMap.h">
+      <Filter>src\maps</Filter>
     </ClInclude>
     <ClInclude Include="src\maps\CBCS.h">
       <Filter>src\maps</Filter>
     </ClInclude>
-    <ClInclude Include="src\pages\CBCSPage.h">
-      <Filter>src\pages</Filter>
+    <ClInclude Include="src\maps\NNI.h">
+      <Filter>src\maps</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maps\RGBMap.h">
+      <Filter>src\maps</Filter>
+    </ClInclude>
+    <ClInclude Include="src\maps\triggerMap.h">
+      <Filter>src\maps</Filter>
     </ClInclude>
     <ClInclude Include="src\ML\pythonML.h">
       <Filter>src\ML</Filter>
     </ClInclude>
+    <ClInclude Include="src\nodes\connection.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nodes\moduleInterface.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nodes\moduleNode.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nodes\node.h">
+      <Filter>src\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\basePage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\CBCSPage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\NNIpage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\rgbPage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\triggerPage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\points\point.h">
+      <Filter>src\points</Filter>
+    </ClInclude>
+    <ClInclude Include="src\points\rgbPoint.h">
+      <Filter>src\points</Filter>
+    </ClInclude>
+    <ClInclude Include="src\points\trigger.h">
+      <Filter>src\points</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\mntUtils.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bin\data\MNT.ico" />
+    <Image Include="icon.ico" />
+    <Image Include="bin\data\MNT.png" />
   </ItemGroup>
 </Project>
