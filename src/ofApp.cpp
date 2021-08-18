@@ -1352,6 +1352,18 @@ void ofApp::windowResized(int w, int h){
 		int y = h * float(node->getBox().y) / _lastHeight;
 		node->setPosition(x, y);
 	}
+	for (auto& node : _inputNodes)
+	{
+		int x = w * float(node.getBox().x) / _lastWidth;
+		int y = h * float(node.getBox().y) / _lastHeight;
+		node.setPosition(x, y);
+	}
+	for (auto& node : _outputNodes)
+	{
+		int x = w * float(node.getBox().x) / _lastWidth;
+		int y = h * float(node.getBox().y) / _lastHeight;
+		node.setPosition(x, y);
+	}
 	if (_moduleNodes.size() > 0)
 	{
 		_pageMarginLeft = _moduleNodes[0]->getPagePosition().x;
