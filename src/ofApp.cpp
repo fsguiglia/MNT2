@@ -1097,11 +1097,11 @@ void ofApp::keyReleased(int key){
 		break;
 	case('S'):
 	case('s'):
-		save();
+		if(_control) save();
 		break;
 	case('L'):
 	case('l'):
-		load();
+		if(_control) load();
 		break;
 	case(OF_KEY_SHIFT):
 		_shift = false;

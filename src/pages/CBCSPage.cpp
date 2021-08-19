@@ -6,7 +6,7 @@ CBCSPage::CBCSPage()
 	setMidiOutput(false);
 	setOscOutput(false);
 	setStringOutput(true);
-	setAddress("cbcs/");
+	setAddress("/cbcs");
 }
 
 void CBCSPage::setup(int width, int height, int guiWidth, int maxMessages)
