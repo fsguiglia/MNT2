@@ -1344,33 +1344,36 @@ void ofApp::mouseExited(int x, int y){
 }
 
 void ofApp::windowResized(int w, int h){
-	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
-	for (auto& node : _moduleNodes)
+	if (w != 0 && h != 0)
 	{
-		node->resizePage(w, h);
-		int x = w * float(node->getBox().x) / _lastWidth;
-		int y = h * float(node->getBox().y) / _lastHeight;
-		node->setPosition(x, y);
+		_gui->setPosition(ofGetWidth() - _guiWidth, 20);
+		for (auto& node : _moduleNodes)
+		{
+			node->resizePage(w, h);
+			int x = w * float(node->getBox().x) / _lastWidth;
+			int y = h * float(node->getBox().y) / _lastHeight;
+			node->setPosition(x, y);
+		}
+		for (auto& node : _inputNodes)
+		{
+			int x = w * float(node.getBox().x) / _lastWidth;
+			int y = h * float(node.getBox().y) / _lastHeight;
+			node.setPosition(x, y);
+		}
+		for (auto& node : _outputNodes)
+		{
+			int x = w * float(node.getBox().x) / _lastWidth;
+			int y = h * float(node.getBox().y) / _lastHeight;
+			node.setPosition(x, y);
+		}
+		if (_moduleNodes.size() > 0)
+		{
+			_pageMarginLeft = _moduleNodes[0]->getPagePosition().x;
+			_pageMarginRight = _pageMarginLeft + _moduleNodes[0]->getPageWidth();
+		}
+		_lastWidth = w;
+		_lastHeight = h;
 	}
-	for (auto& node : _inputNodes)
-	{
-		int x = w * float(node.getBox().x) / _lastWidth;
-		int y = h * float(node.getBox().y) / _lastHeight;
-		node.setPosition(x, y);
-	}
-	for (auto& node : _outputNodes)
-	{
-		int x = w * float(node.getBox().x) / _lastWidth;
-		int y = h * float(node.getBox().y) / _lastHeight;
-		node.setPosition(x, y);
-	}
-	if (_moduleNodes.size() > 0)
-	{
-		_pageMarginLeft = _moduleNodes[0]->getPagePosition().x;
-		_pageMarginRight = _pageMarginLeft + _moduleNodes[0]->getPageWidth();
-	}
-	_lastWidth = w;
-	_lastHeight = h;
 }
 
 void ofApp::gotMessage(ofMessage msg){
