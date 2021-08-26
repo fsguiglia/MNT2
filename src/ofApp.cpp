@@ -551,7 +551,10 @@ tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
 			get<0>(parameters) = _inputNodes[i].getName();
 			get<1>(parameters) = _inputNodes[i].getInputs();
 			get<2>(parameters) = _inputNodes[i].getOutputs();
-			get<3>(parameters) = ofVec2f(x - _inputNodes[i].getPosition().x, y - _inputNodes[i].getPosition().y);
+			ofVec2f offset;
+			offset.x = x - _inputNodes[i].getPosition().x * ofGetWidth();
+			offset.y = y - _inputNodes[i].getPosition().y * ofGetHeight();
+			get<3>(parameters) = offset;
 			break;
 		}
 	}
@@ -562,7 +565,10 @@ tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
 			get<0>(parameters) = _outputNodes[i].getName();
 			get<1>(parameters) = _outputNodes[i].getInputs();
 			get<2>(parameters) = _outputNodes[i].getOutputs();
-			get<3>(parameters) = ofVec2f(x - _outputNodes[i].getPosition().x, y - _outputNodes[i].getPosition().y);
+			ofVec2f offset;
+			offset.x = x - _outputNodes[i].getPosition().x * ofGetWidth();
+			offset.y = y - _outputNodes[i].getPosition().y * ofGetHeight();
+			get<3>(parameters) = offset;
 			break;
 		}
 	}
