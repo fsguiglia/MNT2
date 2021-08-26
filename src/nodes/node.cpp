@@ -10,7 +10,7 @@ Node::Node()
 	_id = 0;
 }
 
-void Node::setup(int x, int y, int w, int h, int inputs, int outputs, string name, ofColor color)
+void Node::setup(float x, float y, int w, int h, int inputs, int outputs, string name, ofColor color)
 {
 	setup(x, y, w, h);
 	setInputs(inputs);
@@ -19,7 +19,7 @@ void Node::setup(int x, int y, int w, int h, int inputs, int outputs, string nam
 	setColor(color);
 }
 
-void Node::setup(int x, int y, int w, int h)
+void Node::setup(float x, float y, int w, int h)
 {
 	_rect.setPosition(x, y);
 	_rect.setWidth(w);
@@ -59,24 +59,30 @@ void Node::setColor(ofColor color)
 
 void Node::draw(ofTrueTypeFont & font)
 {
+	ofPushMatrix();
+	ofPushStyle();
 	ofSetColor(_color);
-	ofDrawRectangle(_rect);
+	ofTranslate(_rect.x * ofGetWidth(), _rect.y * ofGetHeight());
+	ofDrawRectangle(0,0,_rect.width, _rect.height);
+	
 	ofRectangle bb = font.getStringBoundingBox(_name, 0, 0);
 	if (bb.getWidth() > _rect.getWidth()) _rect.setWidth(bb.getWidth() * 1.2);
 	ofSetColor(255);
-	font.drawString(_name, _rect.x + (_rect.width - bb.width) * 0.5, _rect.y + bb.height + (_rect.height - bb.height) * 0.5);
+	font.drawString(_name, (_rect.width - bb.width) * 0.5, bb.height + (_rect.height - bb.height) * 0.5);
 	for (int i = 0; i < _inputs; i++)
 	{
 		if (i == _selectedIn) ofSetColor(150, 0, 0);
 		else ofSetColor(150);
-		ofDrawCircle(_rect.x, _rect.y + _inPositions[i].y * _rect.height, _rect.height * _inPositions[i].width);
+		ofDrawCircle(0, _inPositions[i].y * _rect.height, _rect.height * _inPositions[i].width);
 	}
 	for (int i = 0; i < _outputs; i++)
 	{
 		if (i == _selectedOut) ofSetColor(150, 0, 0);
 		else ofSetColor(150);
-		ofDrawCircle(_rect.x + _rect.getWidth(), _rect.y + _outPositions[i].y * _rect.height, _rect.height * _outPositions[i].width);
+		ofDrawCircle(0 + _rect.getWidth(), _outPositions[i].y * _rect.height, _rect.height * _outPositions[i].width);
 	}
+	ofPopMatrix();
+	ofPopStyle();
 }
 
 void Node::setSize(int w, int h)
@@ -85,7 +91,7 @@ void Node::setSize(int w, int h)
 	_rect.setHeight(h);
 }
 
-void Node::setPosition(int x, int y)
+void Node::setPosition(float x, float y)
 {
 	_rect.setPosition(x, y);
 }
@@ -162,7 +168,10 @@ int Node::getId()
 
 bool Node::inside(int x, int y)
 {
-	bool in = _rect.inside(x, y);
+	ofRectangle translated = _rect;
+	translated.x *= ofGetWidth();
+	translated.y *= ofGetHeight();
+	bool in = translated.inside(x, y);
 	return in;
 }
 

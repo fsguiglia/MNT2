@@ -219,42 +219,42 @@ void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 	if (label == "Interpolate")
 	{
 		ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Interpolate", _moduleColor);
+		node->setup(0.5, 0.5, 90, 30, 1, 1, "Interpolate", _moduleColor);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Concatenate")
 	{
 		ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Concatenate", _moduleColor);
+		node->setup(0.5, 0.5, 90, 30, 1, 1, "Concatenate", _moduleColor);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Trigger")
 	{
 		ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Trigger", _moduleColor);
+		node->setup(0.5, 0.5, 90, 30, 1, 1, "Trigger", _moduleColor);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Draw")
 	{
 		ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Draw", _moduleColor);
+		node->setup(0.5, 0.5, 90, 30, 1, 1, "Draw", _moduleColor);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Gesture")
 	{
 		ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Gesture", _generatorColor);
+		node->setup(0.5, 0.5, 90, 30, 1, 1, "Gesture", _generatorColor);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
 	if (label == "Noise")
 	{
 		ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
-		node->setup(ofGetWidth() * 0.5, ofGetHeight() * 0.5, 90, 30, 1, 1, "Noise", _generatorColor);
+		node->setup(0.5, 0.5, 90, 30, 1, 1, "Noise", _generatorColor);
 		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
 		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
 	}
@@ -295,7 +295,7 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	string name = "in:" + port;
 	if (e.checked)
 	{
-		if (_MIDIInputs.find(name) == _MIDIInputs.end()) createMIDIInput(port, 50, ofGetHeight() * 0.5);
+		if (_MIDIInputs.find(name) == _MIDIInputs.end()) createMIDIInput(port, 0.15, 0.5);
 	}
 	else
 	{
@@ -309,7 +309,7 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 	string name = "out:" + port;
 	if (e.checked)
 	{
-		if (_MIDIOutputs.find(name) == _MIDIOutputs.end()) createMIDIOutput(port, ofGetWidth() - 250, ofGetHeight() * 0.5);
+		if (_MIDIOutputs.find(name) == _MIDIOutputs.end()) createMIDIOutput(port, 0.85, 0.5);
 	}
 	else
 	{
@@ -317,7 +317,7 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 	}
 }
 
-string ofApp::createMIDIInput(string port, int x, int y)
+string ofApp::createMIDIInput(string port, float x, float y)
 { 
 	string name = "in:" + port;
 	_MIDIInputs[name] = ofxMidiIn();
@@ -364,7 +364,7 @@ void ofApp::deleteMIDIInput(string port)
 	_gui->getToggle(port, "Midi In")->setChecked(false);
 }
 
-string ofApp::createMIDIOutput(string port, int x, int y)
+string ofApp::createMIDIOutput(string port, float x, float y)
 {
 	string name = "out:" + port;
 	_MIDIOutputs[name] = ofxMidiOut();
@@ -429,20 +429,20 @@ void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 	if (e.target->getName() == "oscIn")
 	{
 		bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos);
-		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber) createOscInput(e.text, 50, ofGetHeight() * 0.5);
+		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber) createOscInput(e.text, 0.15, 0.5);
 	}
 	else if (e.target->getName() == "oscOut")
 	{
 		vector<string> split = ofSplitString(e.text, ":");
 		if (split.size() == 2) {
 			bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
-			if (isNumber) createOscOutput(split[0], split[1], ofGetWidth() - 250, ofGetHeight() * 0.5);
+			if (isNumber) createOscOutput(split[0], split[1], 0.85, 0.5);
 		}
 	}
 	e.target->setText("");
 }
 
-void ofApp::createOscInput(string port, int x, int y)
+void ofApp::createOscInput(string port, float x, float y)
 {
 	ofxOscReceiver receiver;
 	receiver.setup(ofToInt(port));
@@ -483,7 +483,7 @@ void ofApp::deleteOscInput(string port)
 	}
 }
 
-void ofApp::createOscOutput(string ip, string port, int x, int y)
+void ofApp::createOscOutput(string ip, string port, float x, float y)
 {
 	string name = ip + ":" + port;
 	ofxOscSender sender;
@@ -537,7 +537,10 @@ tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
 			get<0>(parameters) = _moduleNodes[i]->getName();
 			get<1>(parameters) = _moduleNodes[i]->getInputs();
 			get<2>(parameters) = _moduleNodes[i]->getOutputs();
-			get<3>(parameters) = ofVec2f(x - _moduleNodes[i]->getPosition().x, y - _moduleNodes[i]->getPosition().y);
+			ofVec2f offset;
+			offset.x = x - _moduleNodes[i]->getPosition().x * ofGetWidth();
+			offset.y = y - _moduleNodes[i]->getPosition().y * ofGetHeight();
+			get<3>(parameters) = offset;
 			break;
 		}
 	}
@@ -790,7 +793,6 @@ void ofApp::clear()
 		if (port.second.isOpen())
 		{
 			port.second.closePort();
-			cout << port.first << endl;
 			vector<string> split = ofSplitString(port.first, ":");
 			_gui->getToggle(split[1], "Midi Out")->setChecked(false);
 		}
@@ -1097,10 +1099,12 @@ void ofApp::keyReleased(int key){
 		break;
 	case('S'):
 	case('s'):
+	case(19):
 		if(_control) save();
 		break;
 	case('L'):
 	case('l'):
+	case(12):
 		if(_control) load();
 		break;
 	case(OF_KEY_SHIFT):
@@ -1142,17 +1146,21 @@ void ofApp::mouseDragged(int x, int y, int button){
 	}
 	else
 	{
+		ofVec2f curPos;
+		curPos.x = (x - _selectionOffset.x) / (float)ofGetWidth();
+		curPos.y = float(y - _selectionOffset.y) / (float)ofGetHeight();
+
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getName() == _selected) node->setPosition(x - _selectionOffset.x, y - _selectionOffset.y);
+			if (node->getName() == _selected) node->setPosition(curPos.x, curPos.y);
 		}
 		for (auto& node : _inputNodes)
 		{
-			if (node.getName() == _selected) node.setPosition(x - _selectionOffset.x, y - _selectionOffset.y);
+			if (node.getName() == _selected) node.setPosition(curPos.x, curPos.y);
 		}
 		for (auto& node : _outputNodes)
 		{
-			if (node.getName() == _selected) node.setPosition(x - _selectionOffset.x, y - _selectionOffset.y);
+			if (node.getName() == _selected) node.setPosition(curPos.x, curPos.y);
 		}
 	}
 }
@@ -1352,19 +1360,19 @@ void ofApp::windowResized(int w, int h){
 			node->resizePage(w, h);
 			int x = w * float(node->getBox().x) / _lastWidth;
 			int y = h * float(node->getBox().y) / _lastHeight;
-			node->setPosition(x, y);
+			//node->setPosition(x, y);
 		}
 		for (auto& node : _inputNodes)
 		{
 			int x = w * float(node.getBox().x) / _lastWidth;
 			int y = h * float(node.getBox().y) / _lastHeight;
-			node.setPosition(x, y);
+			//node.setPosition(x, y);
 		}
 		for (auto& node : _outputNodes)
 		{
 			int x = w * float(node.getBox().x) / _lastWidth;
 			int y = h * float(node.getBox().y) / _lastHeight;
-			node.setPosition(x, y);
+			//node.setPosition(x, y);
 		}
 		if (_moduleNodes.size() > 0)
 		{

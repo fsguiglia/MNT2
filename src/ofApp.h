@@ -19,16 +19,23 @@
 /*
 cosas para hacer:
 
-*cbcs note out (0.wav - 127.wav) -> esto es medio un quilombo por como funciona page la salida es MIDI o OSC, no las dos
+*concatenate note out para usar con samplers (0.wav - 127.wav) 
+	|
+	-> esto hay que verlo en detalle: en page la salida es MIDI u OSC y después se traduce, no las dos
 
-*escribi gesture y noise a las corridas, en realidad debería repensar la estructura asi:
+*gesture y noise son muy desprolijos, en realidad debería repensar asi:
 
 	basePage->mapPage->modules
 	|   \
 	V	 L>gesture
 	noise
 
-* podria haber una clase que maneje la gui general, para descargar un poco ofApp y que quede todo mas claro
+* descargar ofApp con una clase para la gui
+
+* el tamaño de los nodos debería decidirse en setup, no cada vez que los dibujo
+	|
+	-> en general estoy haciendo ruido cuando decido las fuentes, esta pensado como si pudieran cambiar
+	   y las paso cada vez que dibujo texto, pero es siempre la misma
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -50,17 +57,17 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		string removePortNumber(string name);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
 		void MIDIOutToggle(ofxDatGuiToggleEvent e);
-		string createMIDIInput(string port, int x, int y);
+		string createMIDIInput(string port, float x, float y);
 		void deleteMIDIInput(string port);
-		string createMIDIOutput(string port, int x, int y);
+		string createMIDIOutput(string port, float x, float y);
 		void deleteMIDIOutput(string port);
 		void newMidiMessage(ofxMidiMessage& msg);
 		//--------------------------------------------------------------
 		void setupOSC();
 		void OSCTextInput(ofxDatGuiTextInputEvent e);
-		void createOscInput(string port, int x, int y);
+		void createOscInput(string port, float x, float y);
 		void deleteOscInput(string port);
-		void createOscOutput(string ip, string port, int x, int y);
+		void createOscOutput(string ip, string port, float x, float y);
 		void deleteOscOutput(string ip, string port);
 		//--------------------------------------------------------------
 		tuple<string, int, int, ofVec2f> selectNode(int x, int y);

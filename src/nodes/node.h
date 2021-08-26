@@ -5,15 +5,15 @@ class Node
 {
 public:
 	Node();
-	void Node::setup(int x, int y, int w, int h, int inputs, int outputs, string name, ofColor color);
-	void setup(int x, int y, int w, int h);
+	void setup(float x, float y, int w, int h, int inputs, int outputs, string name, ofColor color);
+	void setup(float x, float y, int w, int h);
 	void setInputs(int inputs);
 	void setOutputs(int outputs);
 	void setColor(ofColor color);
 	void draw(ofTrueTypeFont& font);
 
 	void setSize(int w, int h);
-	void setPosition(int x, int y);
+	void setPosition(float x, float y);
 	ofVec2f getPosition();
 	int getWidth();
 	int getHeight();
@@ -35,7 +35,7 @@ public:
 private:
 	bool _isInput, _isOutput;
 	int _inputs, _outputs, _selectedIn, _selectedOut;
-	ofRectangle _rect;
+	ofRectangle _rect, _name_bb;
 	vector<ofRectangle> _inPositions, _outPositions;
 	ofColor _color;
 
