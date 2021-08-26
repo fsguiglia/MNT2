@@ -125,9 +125,9 @@ ofRectangle Node::getInputConnector(int index)
 {
 	ofRectangle connector = _inPositions[index];
 	connector.x *= _rect.width;
-	connector.x += _rect.x;
+	connector.x += _rect.x * ofGetWidth();
 	connector.y *= _rect.height;
-	connector.y += _rect.y;
+	connector.y += _rect.y * ofGetHeight();
 	connector.width *= _rect.width;
 	connector.height *= _rect.height;
 	return connector;
@@ -137,9 +137,9 @@ ofRectangle Node::getOutputConnector(int index)
 {
 	ofRectangle connector = _outPositions[index];
 	connector.x *= _rect.width;
-	connector.x += _rect.x;
+	connector.x += _rect.x * ofGetWidth();
 	connector.y *= _rect.height;
-	connector.y += _rect.y;
+	connector.y += _rect.y * ofGetHeight();
 	connector.width *= _rect.width;
 	connector.height *= _rect.height;
 	return connector;

@@ -76,58 +76,31 @@ void ofApp::draw(){
 
 void ofApp::drawConnection(Connection& connection)
 {
-	ofVec2f in, out;
+	ofRectangle in_rect, out_rect;
 	for (auto& node : _moduleNodes)
 	{
-		if (connection.fromId == node->getName())
-		{
-			ofRectangle rect = node->getOutputConnector(connection.fromOutput);
-			in = rect.getPosition();
-			in.x += rect.getWidth() * 0.5;
-			in.y += rect.getHeight() * 0.5;
-		}
-		if (connection.toId == node->getName())
-		{
-			ofRectangle rect = node->getInputConnector(connection.toInput);
-			out = rect.getPosition();
-			out.x += rect.getWidth() * 0.5;
-			out.y += rect.getHeight() * 0.5;
-		}
+		if (connection.fromId == node->getName()) in_rect = node->getOutputConnector(connection.fromOutput);
+		if (connection.toId == node->getName()) out_rect = node->getInputConnector(connection.toInput);
 	}
 	for (auto& node : _inputNodes)
 	{
-		if (connection.fromId == node.getName())
-		{
-			ofRectangle rect = node.getOutputConnector(connection.fromOutput);
-			in = rect.getPosition();
-			in.x += rect.getWidth() * 0.5;
-			in.y += rect.getHeight() * 0.5;
-		}
-		if (connection.toId == node.getName())
-		{
-			ofRectangle rect = node.getInputConnector(connection.toInput);
-			out = rect.getPosition();
-			out.x += rect.getWidth() * 0.5;
-			out.y += rect.getHeight() * 0.5;
-		}
+		if (connection.fromId == node.getName()) in_rect = node.getOutputConnector(connection.fromOutput);
+		if (connection.toId == node.getName()) out_rect = node.getInputConnector(connection.toInput);
 	}
 	for (auto& node : _outputNodes)
 	{
-		if (connection.fromId == node.getName())
-		{
-			ofRectangle rect = node.getOutputConnector(connection.fromOutput);
-			in = rect.getPosition();
-			in.x += rect.getWidth() * 0.5;
-			in.y += rect.getHeight() * 0.5;
-		}
-		if (connection.toId == node.getName())
-		{
-			ofRectangle rect = node.getInputConnector(connection.toInput);
-			out = rect.getPosition();
-			out.x += rect.getWidth() * 0.5;
-			out.y += rect.getHeight() * 0.5;
-		}
+		if (connection.fromId == node.getName()) in_rect = node.getOutputConnector(connection.fromOutput);
+		if (connection.toId == node.getName()) out_rect = node.getInputConnector(connection.toInput);
 	}
+
+	ofVec2f in;
+	in = in_rect.getPosition();
+	in.x += in_rect.getWidth() * 0.5;
+	in.y += in_rect.getHeight() * 0.5;
+	ofVec2f out;
+	out = out_rect.getPosition();
+	out.x += out_rect.getWidth() * 0.5;
+	out.y += out_rect.getHeight() * 0.5;
 	if (connection.isDump) ofSetColor(255, 0, 0);
 	else ofSetColor(0);
 	ofDrawLine(in, out);
