@@ -39,10 +39,10 @@ void RGBPage::setupGui()
 	_gui->addSlider("Radius", 0., 1., _radius);
 	_gui->addBreak();
 	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("learn")->setName("controlLearn");
+	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
 	_controlFolder->addToggle("Mouse Control");
-	_controlFolder->addSlider("x", 0., 1.)->setName("ctrlX");
-	_controlFolder->addSlider("y", 0., 1.)->setName("ctrlY");
+	_controlFolder->addSlider("x", 0., 1.)->setName("x");
+	_controlFolder->addSlider("y", 0., 1.)->setName("y");
 	_controlFolder->collapse();
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
@@ -56,7 +56,7 @@ void RGBPage::setupGui()
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
-	_gui->addToggle("learn")->setName("parameterLearn");
+	_gui->addToggle("Learn parameters")->setName("parameterLearn");
 	_gui->onToggleEvent(this, &RGBPage::toggleEvent);
 	_gui->onSliderEvent(this, &RGBPage::sliderEvent);
 	_gui->onTextInputEvent(this, &RGBPage::textInputEvent);
@@ -74,15 +74,15 @@ void RGBPage::setupGui()
 void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
-	if (name == "ctrlX" || name == "ctrlY")
+	if (name == "x" || name == "y")
 	{
 		_lastSelectedControl = name;
 		if (!_controlLearn)
 		{
-			ofVec2f nniCursor = _map.getCursors()[0];
-			if (name == "ctrlX") nniCursor.x = e.value;
-			if (name == "ctrlY") nniCursor.y = e.value;
-			_map.setCursor(nniCursor, 0);
+			ofVec2f cursor = _map.getCursors()[0];
+			if (name == "x") cursor.x = e.value;
+			if (name == "y") cursor.y = 1 - e.value;
+			_map.setCursor(cursor, 0);
 
 		}
 	}
@@ -153,7 +153,14 @@ void RGBPage::toggleEvent(ofxDatGuiToggleEvent e)
 			_controlLearn = false;
 		}
 	}
-	if (e.target->getName() == "active") _map.setActive(e.checked);
+	if (e.target->getName() == "active")
+	{
+		_map.setActive(e.checked);
+		_gui->getToggle("controlLearn")->setChecked(false);
+		_controlLearn = false;
+		_gui->getToggle("parameterLearn")->setChecked(false);
+		_parameterLearn = false;
+	}
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 	if (e.target->getName() == "Trigger")

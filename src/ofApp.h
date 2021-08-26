@@ -21,7 +21,8 @@ cosas para hacer:
 
 *concatenate note out para usar con samplers (0.wav - 127.wav) 
 	|
-	-> esto hay que verlo en detalle: en page la salida es MIDI u OSC y después se traduce, no las dos
+	-> esto hay que verlo en detalle: en page la salida es MIDI u OSC y después se traduce,
+	   no está pensado para enviar dos datos diferentes
 
 *gesture y noise son muy desprolijos, en realidad debería repensar asi:
 
@@ -35,7 +36,15 @@ cosas para hacer:
 * el tamaño de los nodos debería decidirse en setup, no cada vez que los dibujo
 	|
 	-> en general estoy haciendo ruido cuando decido las fuentes, esta pensado como si pudieran cambiar
-	   y las paso cada vez que dibujo texto, pero es siempre la misma
+	   y las paso cada vez que dibujo texto, pero es siempre la misma, se podria pasar en setup
+
+* estoy metiendo ruido con el tamaño absoluto y la posicion relativa de los nodos, limpiar
+
+* midi map está mucho mejor resuelto en gesture y noise que en basePage, tomar como modelo y replicar
+
+* los controles mapeables deberian pintarse de un color cuando midi map esta activo, deberia haber algun
+  feedback de la gui o algo para recordar que estas mapeando, en esa misma linea no estoy seguro de que este
+  bien que active = true resulte en map = false
 */
 
 class ofApp : public ofBaseApp, public ofxMidiListener {

@@ -45,7 +45,7 @@ void NNIPage::setupGui()
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->collapse();
 	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("learn")->setName("controlLearn");
+	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
 	_controlFolder->addToggle("Mouse Control");
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
@@ -54,7 +54,7 @@ void NNIPage::setupGui()
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
-	_gui->addToggle("learn")->setName("parameterLearn");
+	_gui->addToggle("Learn Parameters")->setName("parameterLearn");
 	_gui->onButtonEvent(this, &NNIPage::buttonEvent);
 	_gui->onToggleEvent(this, &NNIPage::toggleEvent);
 	_gui->onSliderEvent(this, &NNIPage::sliderEvent);
@@ -134,7 +134,7 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 		{
 			ofVec2f nniCursor = _map.getCursor();
 			if (name == "x") nniCursor.x = e.value;
-			if (name == "y") nniCursor.y = e.value;
+			if (name == "y") nniCursor.y = 1 - e.value;
 			_map.setCursor(nniCursor);
 		}
 	}
@@ -173,7 +173,14 @@ void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
 			_controlLearn = false;
 		}
 	}
-	if (e.target->getName() == "active") _map.setActive(e.checked);
+	if (e.target->getName() == "active")
+	{
+		_map.setActive(e.checked);
+		_gui->getToggle("controlLearn")->setChecked(false);
+		_controlLearn = false;
+		_gui->getToggle("parameterLearn")->setChecked(false);
+		_parameterLearn = false;
+	}
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 }

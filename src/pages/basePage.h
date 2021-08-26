@@ -232,33 +232,33 @@ inline bool BasePage<T>::getUseGlobalParameters()
 template<typename T>
 inline void BasePage<T>::MIDIIn(string port, int channel, int control, float value)
 {
-	if (!_map.getActive())
+	string sControl = ofToString(control);
+	string sChannel = ofToString(channel);
+	string parameterName = sChannel + "/" + sControl;
+	string controlName = port + "/" + parameterName;
+	string sliderLabel = "ch" + sChannel + "/cc" + sControl;
+	map<string, float> curParameters;
+
+	bool valid = true;
+	valid = valid && channel >= 0 && channel < 128;
+	valid = valid && control >= 0 && control < 128;
+	valid = valid && value >= 0 && value < 1;
+
+	if (valid)
 	{
-		string sControl = ofToString(control);
-		string sChannel = ofToString(channel);
-		string parameterName = sChannel + "/" + sControl;
-		string controlName = port + "/" + parameterName;
-		string sliderLabel = "ch" + sChannel + "/cc" + sControl;
-		map<string, float> curParameters;
-
-		bool valid = true;
-		valid = valid && channel >= 0 && channel < 128;
-		valid = valid && control >= 0 && control < 128;
-		valid = valid && value >= 0 && value < 1;
-
-		if (valid)
+		if (!_map.getActive())
 		{
 			if (_controlLearn)
 			{
 				if (_lastSelectedControl == "x")
 				{
 					_CCXY[0] = controlName;
-					_gui->getSlider("x")->setLabel(sliderLabel);
+					_gui->getSlider("x")->setLabel("x:" + sliderLabel);
 				}
 				if (_lastSelectedControl == "y")
 				{
 					_CCXY[1] = controlName;
-					_gui->getSlider("y")->setLabel(sliderLabel);
+					_gui->getSlider("y")->setLabel("y:" + sliderLabel);
 				}
 			}
 			else if (_parameterLearn)
@@ -294,11 +294,11 @@ inline void BasePage<T>::MIDIIn(string port, int channel, int control, float val
 					}
 				}
 			}
-			else
-			{
-				if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
-				if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
-			}
+		}
+		if (!_controlLearn)
+		{
+			if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
+			if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
 		}
 	}
 }

@@ -46,7 +46,7 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addButton("Normalize");
 	_arrangeFolder->collapse();
 	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("learn")->setName("controlLearn");
+	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
 	_controlFolder->addToggle("Mouse Control");
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
@@ -129,10 +129,10 @@ void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 		_lastSelectedControl = name;
 		if (!_controlLearn)
 		{
-			ofVec2f nniCursor = _map.getCursor();
-			if (name == "x") nniCursor.x = e.value;
-			if (name == "y") nniCursor.y = e.value;
-			_map.setCursor(nniCursor);
+			ofVec2f cursor = _map.getCursor();
+			if (name == "x") cursor.x = e.value;
+			if (name == "y") cursor.y = 1 - e.value;
+			_map.setCursor(cursor);
 		}
 	}
 	else if (name == "radius")
@@ -144,7 +144,12 @@ void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 {
 	if (e.target->getName() == "controlLearn") _controlLearn = e.checked;
-	if (e.target->getName() == "active") _map.setActive(e.checked);
+	if (e.target->getName() == "active")
+	{
+		_map.setActive(e.checked);
+		_gui->getToggle("controlLearn")->setChecked(false);
+		_controlLearn = false;
+	}
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 	if (e.target->getName() == "Analize complete files") {
 		if (e.checked) _dr.setParameter("--mode", 1);

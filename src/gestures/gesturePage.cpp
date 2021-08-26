@@ -382,7 +382,7 @@ void GesturePage::sliderEvent(ofxDatGuiSliderEvent e)
 		else
 		{
 			if (name == "x") _cursor.x = e.value;
-			if (name == "y") _cursor.y = e.value;
+			if (name == "y") _cursor.y = 1 - e.value;
 			if (name == "Scrub") getCursorAtPercent(e.value);
 		}
 	}
@@ -530,7 +530,7 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 					{
 						_gui->getSlider(name[1])->setValue(value, false);
 						if (name[1] == "x") _cursor.x = value;
-						else if(name[1] == "y") _cursor.y = value;
+						else if(name[1] == "y") _cursor.y = 1 - value;
 						else if (name[1] == "Scrub") getCursorAtPercent(value);
 					}
 				}

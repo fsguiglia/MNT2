@@ -285,7 +285,8 @@ void NoiseGenerator::MIDIIn(string port, int control, int channel, float value)
 					}
 					else if (name[0] == "slider")
 					{
-						_gui->getSlider(name[1])->setValue(value);
+						if(name[1] == "center y") _gui->getSlider(name[1])->setValue(1 - value);
+						else _gui->getSlider(name[1])->setValue(value);
 					}
 				}
 			}

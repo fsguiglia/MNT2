@@ -38,7 +38,7 @@ void TriggerPage::setupGui()
 	_gui->addToggle("randomize");
 	_gui->addBreak();
 	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("learn")->setName("controlLearn");
+	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
 	_controlFolder->addToggle("Mouse Control");
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
@@ -53,7 +53,7 @@ void TriggerPage::setupGui()
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
-	_gui->addToggle("learn")->setName("parameterLearn");
+	_gui->addToggle("Learn parameters")->setName("parameterLearn");
 	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
 	_gui->onSliderEvent(this, &TriggerPage::sliderEvent);
 	_gui->onTextInputEvent(this, &TriggerPage::textInputEvent);
@@ -78,7 +78,7 @@ void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 		{
 			ofVec2f cursor = _map.getCursors()[0];
 			if (name == "x") cursor.x = e.value;
-			if (name == "y") cursor.y = e.value;
+			if (name == "y") cursor.y = 1 - e.value;
 			_map.setCursor(cursor, 0);
 
 		}
@@ -133,7 +133,14 @@ void TriggerPage::toggleEvent(ofxDatGuiToggleEvent e)
 			_controlLearn = false;
 		}
 	}
-	if (e.target->getName() == "active") _map.setActive(e.checked);
+	if (e.target->getName() == "active")
+	{
+		_map.setActive(e.checked);
+		_gui->getToggle("parameterLearn")->setChecked(false);
+		_parameterLearn = false;
+		_gui->getToggle("controlLearn")->setChecked(false);
+		_controlLearn = false;
+	}
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 	if (e.target->getName() == "Switch")
