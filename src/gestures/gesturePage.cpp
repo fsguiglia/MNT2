@@ -340,7 +340,7 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 	}
 	if (e.target->getName() == "Random")
 	{
-		if (_learn) _lastControl = "button/Play random";
+		if (_learn) _lastControl = "button/Random";
 		else random();
 	}
 	if (e.target->getName() == "Clear mappings")
