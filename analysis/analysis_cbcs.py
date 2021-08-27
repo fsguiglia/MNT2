@@ -182,17 +182,23 @@ def getFeatures(samples, window_size, hop_length):
 	shape = int((1 + window_size * 0.5))
 	shape *= int(samples[0].shape[0] / hop_length) + 1
 	D = np.array([]).reshape(0, shape)
-	for sample in samples:
+	print('extracting features')
+	bar = progressbar.ProgressBar(maxval=samples.shape[0], \
+    widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+	bar.start()
+	for index,sample in enumerate(samples):
 		sample = sample.T
 		S = librosa.stft(sample, n_fft = window_size, hop_length = hop_length)
 		S = np.abs(S)
 		S = S.reshape(S.shape[0] * S.shape[1])
 		S = S.reshape(1, shape)
 		D = np.concatenate((D, S))
+		bar.update(index + 1)
+	bar.finish()
 	return D
 
 def getPCA(data, components):
-	print('Principal component analysis')
+	print('Principal component analysis (this can take a while)')
 	pca = PCA(n_components=components)
 	pca.fit(data)
 	Y = pca.transform(data)
@@ -200,7 +206,7 @@ def getPCA(data, components):
 	return Y
 
 def getTSNE(data, components, perplexity, learning_rate, iterations):
-	print('t-distributed stochastic neighbor embedding')
+	print('t-distributed stochastic neighbor embedding (this can take a while)')
 	tsne = TSNE(n_components = components,
 			 perplexity = perplexity,
 			 learning_rate = learning_rate,
