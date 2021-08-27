@@ -27,6 +27,7 @@ void ofApp::setup(){
 void ofApp::update() {
 	for (auto& node : _moduleNodes) node->update();
 	updateConnections();
+	
 	_gui->setVisible(!_mode);
 	_gui->setEnabled(!_mode);
 	_gui->update();
@@ -634,10 +635,31 @@ void ofApp::updateConnections()
 			{
 				if (node->getName() == connection.fromId)
 				{
-					if (connection.isDump) MIDIMessages = node->getMidiDump();
+					//midi dump
+					if (connection.isDump)
+					{
+						if (node->getMidiOutput())
+						{
+							for (auto message : node->getMidiDump())
+							{
+								//add node name as port name
+								string newName = node->getName() + "/" + message.first;
+								MIDIMessages[newName] = message.second;
+							}
+						}
+					}
 					else
 					{
-						if(node->getMidiOutput()) MIDIMessages = node->getMidiOut();
+						//midi
+						if (node->getMidiOutput())
+						{
+							for (auto message : node->getMidiOut())
+							{
+								//add node name as port name
+								string newName = node->getName() + "/" + message.first;
+								MIDIMessages[newName] = message.second;
+							}
+						}
 						if(node->getOscOutput()) OSCMessages = node->getOSCOut();
 						if (node->getStringOutput())
 						{
@@ -714,8 +736,8 @@ void ofApp::updateConnections()
 			{
 				for (auto& element : MIDIMessages)
 				{
-					int channel = ofToInt(ofSplitString(element.first, "/")[0]);
-					int control = ofToInt(ofSplitString(element.first, "/")[1]);
+					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
+					int control = ofToInt(ofSplitString(element.first, "/")[2]);
 					int value = element.second * 127;
 					if (_MIDIOutputs[output].isOpen())
 					{

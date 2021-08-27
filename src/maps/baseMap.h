@@ -179,11 +179,7 @@ array<float, 2> BaseMap<T>::getClosest(ofVec2f pos, bool select)
 			minDist = curDist;
 		}
 	}
-	if (select)
-	{
-		_lastSelected = closest;
-		_lastSelectedMs = ofGetElapsedTimeMillis();
-	}
+	if (select) setLastSelected(closest, ofGetElapsedTimeMillis());
 	return array<float, 2>({ (float)closest, minDist });
 }
 
