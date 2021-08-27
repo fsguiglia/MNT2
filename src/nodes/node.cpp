@@ -2,28 +2,26 @@
 
 Node::Node()
 {
+	_name = "node";
+	_rect.width = 50;
+	_rect.height = 30;
 	_color = ofColor(80, 80, 80);
 	_isInput = false;
 	_isOutput = false;
 	_selectedIn = -1;
 	_selectedOut = -1;
 	_id = 0;
+	setName(_name, false);
 }
 
-void Node::setup(float x, float y, int w, int h, int inputs, int outputs, string name, ofColor color)
+void Node::setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeFont font, ofColor color)
 {
-	setup(x, y, w, h);
+	_rect.height = h;
+	setPosition(x,y);
 	setInputs(inputs);
 	setOutputs(outputs);
-	setName(name, true);
 	setColor(color);
-}
-
-void Node::setup(float x, float y, int w, int h)
-{
-	_rect.setPosition(x, y);
-	_rect.setWidth(w);
-	_rect.setHeight(h);
+	_font = font;
 }
 
 void Node::setInputs(int inputs)
@@ -57,31 +55,29 @@ void Node::setColor(ofColor color)
 	_color = color;
 }
 
-void Node::draw(ofTrueTypeFont & font)
+void Node::draw()
 {
-	ofPushMatrix();
 	ofPushStyle();
 	ofSetColor(_color);
-	ofTranslate(_rect.x * ofGetWidth(), _rect.y * ofGetHeight());
-	ofDrawRectangle(0,0,_rect.width, _rect.height);
-	
-	ofRectangle bb = font.getStringBoundingBox(_name, 0, 0);
-	if (bb.getWidth() > _rect.getWidth()) _rect.setWidth(bb.getWidth() * 1.2);
+	ofRectangle r = _rect;
+	r.x *= ofGetWidth();
+	r.y *= ofGetHeight();
+	ofDrawRectangle(r);
 	ofSetColor(255);
-	font.drawString(_name, (_rect.width - bb.width) * 0.5, bb.height + (_rect.height - bb.height) * 0.5);
+	// a ojo...
+	_font.drawString(_name, r.x + r.width * 0.08, r.y + (r.height + _font.getLineHeight() * 0.75) * 0.5);
 	for (int i = 0; i < _inputs; i++)
 	{
 		if (i == _selectedIn) ofSetColor(150, 0, 0);
 		else ofSetColor(150);
-		ofDrawCircle(0, _inPositions[i].y * _rect.height, _rect.height * _inPositions[i].width);
+		ofDrawCircle(r.x, r.y + _inPositions[i].y * r.height, r.height * _inPositions[i].width);
 	}
 	for (int i = 0; i < _outputs; i++)
 	{
 		if (i == _selectedOut) ofSetColor(150, 0, 0);
 		else ofSetColor(150);
-		ofDrawCircle(0 + _rect.getWidth(), _outPositions[i].y * _rect.height, _rect.height * _outPositions[i].width);
+		ofDrawCircle(r.x + r.getWidth(), r.y + _outPositions[i].y * r.height, r.height * _outPositions[i].width);
 	}
-	ofPopMatrix();
 	ofPopStyle();
 }
 
@@ -149,6 +145,8 @@ void Node::setName(string name, bool addId)
 {
 	_name = name;
 	if (addId) _name += "(" + ofToString(_id) + ")";
+	ofRectangle bb = _font.getStringBoundingBox(_name, 0, 0);
+	_rect.setWidth(bb.width * 1.2);
 }
 
 string Node::getName()

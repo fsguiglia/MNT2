@@ -5,12 +5,11 @@ class Node
 {
 public:
 	Node();
-	void setup(float x, float y, int w, int h, int inputs, int outputs, string name, ofColor color);
-	void setup(float x, float y, int w, int h);
+	void setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeFont font, ofColor color);
 	void setInputs(int inputs);
 	void setOutputs(int outputs);
 	void setColor(ofColor color);
-	void draw(ofTrueTypeFont& font);
+	void draw();
 
 	void setSize(int w, int h);
 	void setPosition(float x, float y);
@@ -37,6 +36,7 @@ private:
 	int _inputs, _outputs, _selectedIn, _selectedOut;
 	ofRectangle _rect, _name_bb;
 	vector<ofRectangle> _inPositions, _outPositions;
+	ofTrueTypeFont _font;
 	ofColor _color;
 
 	string _name;

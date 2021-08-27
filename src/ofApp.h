@@ -33,13 +33,6 @@ cosas para hacer:
 
 * descargar ofApp con una clase para la gui
 
-* el tamaño de los nodos debería decidirse en setup, no cada vez que los dibujo
-	|
-	-> en general estoy haciendo ruido cuando decido las fuentes, esta pensado como si pudieran cambiar
-	   y las paso cada vez que dibujo texto, pero es siempre la misma, se podria pasar en setup
-
-* estoy metiendo ruido con el tamaño absoluto y la posicion relativa de los nodos, limpiar
-
 * midi map está mucho mejor resuelto en gesture y noise que en basePage, tomar como modelo y replicar
 
 * los controles mapeables deberian pintarse de un color cuando midi map esta activo, deberia haber algun
@@ -58,6 +51,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		//--------------------------------------------------------------
 		void setupColor();
 		void setupGui();
+		void moduleButtonEvent(ofxDatGuiButtonEvent e);
 		void buttonEvent(ofxDatGuiButtonEvent e);
 		//--------------------------------------------------------------
 		void changePage(int page);
@@ -122,6 +116,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		vector<ofColor> _colorPallete;
 		ofTrueTypeFont _verdana;
 		ofxDatGui* _gui;
+		ofxDatGuiFolder* _moduleFolder;
 		ofxDatGuiFolder* _midiInFolder;
 		ofxDatGuiFolder* _midiOutFolder;
 		ofxDatGuiFolder* _oscFolder;

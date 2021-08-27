@@ -226,10 +226,11 @@ void TriggerPage::mousePressed(int x, int y, int button, bool doubleClick)
 		if (button < 2)
 		{
 			int lastSelected = _map.getLastSelected();
-			array<float, 2> selection = _map.getClosest(pos, true);
+			array<float, 2> selection = _map.getClosest(pos, false);
 			if (selection[1] < _minClickDistance)
 			{
 				_lastSelectedPoint = int(selection[0]);
+				_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
 				if (int(selection[0]) != lastSelected)
 				{
 					Trigger point = _map.getPoint(int(selection[0]));

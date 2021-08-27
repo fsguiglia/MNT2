@@ -68,9 +68,9 @@ void ofApp::draw(){
 	{
 		//draw nodes and connections
 		for (auto connection : _connections) drawConnection(connection);
-		for (auto& node : _moduleNodes) node->draw(_verdana);
-		for (auto& node : _inputNodes) node.draw(_verdana);
-		for (auto& node : _outputNodes) node.draw(_verdana);
+		for (auto& node : _moduleNodes) node->draw();
+		for (auto& node : _inputNodes) node.draw();
+		for (auto& node : _outputNodes) node.draw();
 		_gui->draw();
 	}
 }
@@ -144,13 +144,16 @@ void ofApp::setupGui()
 	_ioColor = ofColor(30, 125, 30);
 	_gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
 	_gui->addHeader("MNT");
-	_gui->addButton("Interpolate");
-	_gui->addButton("Concatenate");
-	_gui->addButton("Trigger");
-	_gui->addButton("Draw");
-	_gui->addButton("Gesture");
-	_gui->addButton("Noise");
-	_gui->addBreak();
+	_moduleFolder = _gui->addFolder("Modules");
+	_moduleFolder->addButton("Interpolate");
+	_moduleFolder->addButton("Concatenate");
+	_moduleFolder->addButton("Trigger");
+	_moduleFolder->addButton("Draw");
+	_moduleFolder->addButton("Gesture");
+	_moduleFolder->addButton("Noise");
+	_moduleFolder->onButtonEvent(this, &ofApp::moduleButtonEvent);
+	_moduleFolder->collapse();
+	_gui->onButtonEvent(this, &ofApp::buttonEvent);
 	_midiInFolder = _gui->addFolder("Midi In");
 	for (auto port : _MIDIInPorts) _midiInFolder->addToggle(port.first);
 	_midiInFolder->onToggleEvent(this, &ofApp::MIDIInToggle);
@@ -175,6 +178,7 @@ void ofApp::setupGui()
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
+	_moduleFolder->setLabelColor(_moduleColor);
 	_gui->getButton("Interpolate")->setLabelColor(_moduleColor);
 	_gui->getButton("Concatenate")->setLabelColor(_moduleColor);
 	_gui->getButton("Trigger")->setLabelColor(_moduleColor);
@@ -187,51 +191,28 @@ void ofApp::setupGui()
 	_gui->setOpacity(0.8);
 }
 
+void ofApp::moduleButtonEvent(ofxDatGuiButtonEvent e)
+{
+	string label = e.target->getLabel();
+	if (label == "Interpolate") _moduleNodes.push_back(make_unique<ModuleNode<NNIPage>>());
+	if (label == "Concatenate") _moduleNodes.push_back(make_unique<ModuleNode<CBCSPage>>());
+	if (label == "Trigger") _moduleNodes.push_back(make_unique<ModuleNode<TriggerPage>>());
+	if (label == "Draw") _moduleNodes.push_back(make_unique<ModuleNode<RGBPage>>());
+	if (label == "Gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
+	if (label == "Noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
+
+	_moduleNodes[_moduleNodes.size() - 1]->setup(0.5, 0.5, 30, 1, 1, _verdana, _moduleColor);
+	_moduleNodes[_moduleNodes.size() - 1]->setName(label, true);
+	_moduleNodes[_moduleNodes.size() - 1]->setPosition(
+		(ofGetWidth() - _moduleNodes[_moduleNodes.size() - 1]->getWidth()) * 0.5 / (float)ofGetWidth(),
+		(ofGetHeight() - _moduleNodes[_moduleNodes.size() - 1]->getHeight()) * 0.5 / (float)ofGetHeight()
+	);
+	_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
+}
+
 void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
 {
 	string label = e.target->getLabel();
-	if (label == "Interpolate")
-	{
-		ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-		node->setup(0.5, 0.5, 90, 30, 1, 1, "Interpolate", _moduleColor);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-	}
-	if (label == "Concatenate")
-	{
-		ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-		node->setup(0.5, 0.5, 90, 30, 1, 1, "Concatenate", _moduleColor);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-	}
-	if (label == "Trigger")
-	{
-		ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
-		node->setup(0.5, 0.5, 90, 30, 1, 1, "Trigger", _moduleColor);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-	}
-	if (label == "Draw")
-	{
-		ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
-		node->setup(0.5, 0.5, 90, 30, 1, 1, "Draw", _moduleColor);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-	}
-	if (label == "Gesture")
-	{
-		ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
-		node->setup(0.5, 0.5, 90, 30, 1, 1, "Gesture", _generatorColor);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-	}
-	if (label == "Noise")
-	{
-		ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
-		node->setup(0.5, 0.5, 90, 30, 1, 1, "Noise", _generatorColor);
-		node->setupPage(1024, 1024, _guiWidth, _colorPallete);
-		_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-	}
 	if (label == "New") clear();
 	if (label == "Load") load();
 	if (label == "Save") save();
@@ -269,7 +250,14 @@ void ofApp::MIDIInToggle(ofxDatGuiToggleEvent e)
 	string name = "in:" + port;
 	if (e.checked)
 	{
-		if (_MIDIInputs.find(name) == _MIDIInputs.end()) createMIDIInput(port, 0.15, 0.5);
+		if (_MIDIInputs.find(name) == _MIDIInputs.end())
+		{
+			createMIDIInput(port, 0.15, 0.5);
+			_inputNodes[_inputNodes.size() - 1].setPosition(
+				_inputNodes[_inputNodes.size() - 1].getPosition().x,
+				(ofGetHeight() - _inputNodes[_inputNodes.size() - 1].getHeight()) * 0.5 / (float)ofGetHeight()
+			);
+		}
 	}
 	else
 	{
@@ -283,7 +271,14 @@ void ofApp::MIDIOutToggle(ofxDatGuiToggleEvent e)
 	string name = "out:" + port;
 	if (e.checked)
 	{
-		if (_MIDIOutputs.find(name) == _MIDIOutputs.end()) createMIDIOutput(port, 0.85, 0.5);
+		if (_MIDIOutputs.find(name) == _MIDIOutputs.end())
+		{
+			createMIDIOutput(port, 0.85, 0.5);
+			_outputNodes[_outputNodes.size() - 1].setPosition(
+				0.85 - (_outputNodes[_outputNodes.size() - 1].getWidth() / (float)ofGetWidth()),
+				(ofGetHeight() - _outputNodes[_outputNodes.size() - 1].getHeight()) * 0.5 / (float)ofGetHeight()
+			);
+		}
 	}
 	else
 	{
@@ -299,10 +294,9 @@ string ofApp::createMIDIInput(string port, float x, float y)
 	_MIDIInputs[name].addListener(this);
 
 	Node node;
-	node.setup(x, y, 80, 30);
+	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
 	node.setName(name);
 	node.setAsInput(true);
-	node.setColor(_ioColor);
 	_inputNodes.push_back(node);
 	return name;
 }
@@ -345,10 +339,9 @@ string ofApp::createMIDIOutput(string port, float x, float y)
 	_MIDIOutputs[name].openPort(_MIDIOutPorts[port]);
 
 	Node node;
-	node.setup(x, y, 80, 30);
+	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
 	node.setName(name);
 	node.setAsOutput(true);
-	node.setColor(_ioColor);
 	_outputNodes.push_back(node);
 	return name;
 }
@@ -403,14 +396,28 @@ void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 	if (e.target->getName() == "oscIn")
 	{
 		bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos);
-		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber) createOscInput(e.text, 0.15, 0.5);
+		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber)
+		{
+			createOscInput(e.text, 0.15, 0.5);
+			_inputNodes[_inputNodes.size() - 1].setPosition(
+				_inputNodes[_inputNodes.size() - 1].getPosition().x,
+				(ofGetHeight() - _inputNodes[_inputNodes.size() - 1].getHeight()) * 0.5 / (float)ofGetHeight()
+			);
+		}
 	}
 	else if (e.target->getName() == "oscOut")
 	{
 		vector<string> split = ofSplitString(e.text, ":");
 		if (split.size() == 2) {
 			bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
-			if (isNumber) createOscOutput(split[0], split[1], 0.85, 0.5);
+			if (isNumber)
+			{
+				createOscOutput(split[0], split[1], 0.85, 0.5);
+				_outputNodes[_outputNodes.size() - 1].setPosition(
+					0.85 - (_outputNodes[_outputNodes.size() - 1].getWidth() / (float)ofGetWidth()),
+					(ofGetHeight() - _outputNodes[_outputNodes.size() - 1].getHeight()) * 0.5 / (float)ofGetHeight()
+				);
+			}
 		}
 	}
 	e.target->setText("");
@@ -423,10 +430,9 @@ void ofApp::createOscInput(string port, float x, float y)
 	_oscReceivers[port] = receiver;
 
 	Node node;
-	node.setup(x, y, 80, 30);
-	node.setName("osc:" + port);
+	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
+	node.setName("osc: " + port);
 	node.setAsInput(true);
-	node.setColor(_ioColor);
 	_inputNodes.push_back(node);
 }
 
@@ -459,16 +465,15 @@ void ofApp::deleteOscInput(string port)
 
 void ofApp::createOscOutput(string ip, string port, float x, float y)
 {
-	string name = ip + ":" + port;
 	ofxOscSender sender;
+	string name = ip + ":" + port;
 	sender.setup(ip, ofToInt(port));
 	_oscSenders[name] = sender;
 
 	Node node;
-	node.setup(x, y, 80, 30);
-	node.setName("osc:" + name);
+	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
+	node.setName("osc: " + name);
 	node.setAsOutput(true);
-	node.setColor(_ioColor);
 	_outputNodes.push_back(node);
 }
 
@@ -677,7 +682,6 @@ void ofApp::updateConnections()
 				}
 			}
 		}
-		
 		//output
 		//output node
 		if (connection.toOutputNode)
@@ -739,6 +743,7 @@ void ofApp::updateConnections()
 					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
 					int control = ofToInt(ofSplitString(element.first, "/")[2]);
 					int value = element.second * 127;
+					cout << channel << "," << control << "," << value << endl;
 					if (_MIDIOutputs[output].isOpen())
 					{
 						_MIDIOutputs[output].sendControlChange(channel, control, value);
@@ -904,53 +909,27 @@ void ofApp::load()
 			ofJson jModules = jLoad["Modules"];
 			for (auto& element : jModules)
 			{
-				if (element["type"].get<string>() == "Interpolate")
-				{
-
-					ModuleNode<NNIPage>* node = new ModuleNode<NNIPage>();
-					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				}
-				if (element["type"].get<string>() == "Concatenate")
-				{
-
-					ModuleNode<CBCSPage>* node = new ModuleNode<CBCSPage>();
-					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				}
-				else if (element["type"].get<string>() == "Trigger")
-				{
-					ModuleNode<TriggerPage>* node = new ModuleNode<TriggerPage>();
-					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				}
-				else if (element["type"].get<string>() == "Draw")
-				{
-					ModuleNode<RGBPage>* node = new ModuleNode<RGBPage>();
-					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				}
-				else if (element["type"].get<string>() == "Gesture")
-				{
-					ModuleNode<GesturePage>* node = new ModuleNode<GesturePage>();
-					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				}
-				else if (element["type"].get<string>() == "Noise")
-				{
-					ModuleNode<NoiseGenerator>* node = new ModuleNode<NoiseGenerator>();
-					_moduleNodes.push_back(unique_ptr<ModuleInterface>(node));
-				}
-
+				if (element["type"].get<string>() == "Interpolate") _moduleNodes.push_back(make_unique<ModuleNode<NNIPage>>());
+				if (element["type"].get<string>() == "Concatenate") _moduleNodes.push_back(make_unique<ModuleNode<CBCSPage>>());
+				if (element["type"].get<string>() == "Trigger") _moduleNodes.push_back(make_unique<ModuleNode<TriggerPage>>());
+				if (element["type"].get<string>() == "Draw") _moduleNodes.push_back(make_unique<ModuleNode<RGBPage>>());
+				if (element["type"].get<string>() == "Gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
+				if (element["type"].get<string>() == "Noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
+				
 				_moduleNodes[_moduleNodes.size() - 1]->setup(
 					element["x"],
 					element["y"],
-					90,
 					30,
 					element["inputs"],
 					element["outputs"],
-					element["type"].get<string>(),
+					_verdana,
 					_moduleColor);
+
+				_moduleNodes[_moduleNodes.size() - 1]->setName(element["type"].get<string>(), true);
 
 				_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				ofJson data = element["data"];
 				_moduleNodes[_moduleNodes.size() - 1]->load(data);
-
 				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
 				string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
 				names[oldName] = newName;
