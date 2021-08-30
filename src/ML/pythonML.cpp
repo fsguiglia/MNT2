@@ -4,15 +4,22 @@ PythonML::PythonML()
 {
 	_running = false;
 	_completed = false;
+	_prefix = "";
 }
 
-void PythonML::setup(string scriptPath, string name)
+void PythonML::setup(string scriptPath, string name, string prefix)
 {
 	_scriptPath = ofFilePath::getAbsolutePath(scriptPath);
 	string folder = _scriptPath.substr(0, _scriptPath.find_last_of("\\/")) + "/tmp/";
 	_inputFilePath = folder + name + ".tmp";
 	_outputFilePath = folder + name + "_o.tmp";
+	_prefix = prefix;
 
+}
+
+void PythonML::setPrefix(string prefix)
+{
+	_prefix = prefix;
 }
 
 void PythonML::setParameters(map<string, float> parameters)
@@ -43,7 +50,7 @@ void PythonML::start(ofJson data)
 
 void PythonML::start()
 {
-	string command = "python " + _scriptPath;
+	string command = _prefix + " " + _scriptPath;
 	command += " -f " + _inputFilePath;
 	for (auto parameter : _parameters) command = command + " " + parameter.first + " " + ofToString(parameter.second);
 	system(command.c_str());

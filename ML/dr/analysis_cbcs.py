@@ -14,6 +14,7 @@ import argparse
 import sys
 import json
 
+'''
 def main():
 	args = process_arguments(sys.argv)
 	output_folder = args['output_folder']
@@ -25,21 +26,24 @@ def main():
 	iterations = int(args['iterations'])
 	mode = int(args['mode'])
 	technique = int(args['technique'])
+	analyze(output_folder, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, mode, technique)
+'''
+	
+def analyze(output_folder, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, mode, technique):
 	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
 	file_position = list()
 	Y = np.array([])
 	
 	#save empty json and exit if no file is provided
-	if args['input'] is None:
-		init_path = os.environ['USERPROFILE'] + '//Desktop//'
-		args['input'] = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
-		if args['input'] is None:
-			error = 'no file to analize'
-			print(error)
-			save_empty_file(error, new_path)
-			exit()
+	init_path = os.environ['USERPROFILE'] + '//Desktop//'
+	audio_files = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
+	if audio_files is None:
+		error = 'no file to analize'
+		print(error)
+		save_empty_file(error, new_path)
+		sys.exit()
 
-	files = getListOfFiles(args['input'], ['.wav'])
+	files = getListOfFiles(audio_files, ['.wav'])
 	
 	X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
 	
@@ -61,7 +65,7 @@ def main():
 		error = 'not enough data to create map, exiting'
 		print(error)
 		save_empty_file(error, new_path)
-		exit()
+		sys.exit()
 
 	D = getFeatures(X, window_size, hop_length)
 	Y = np.zeros((len(file_position),2))
@@ -76,8 +80,8 @@ def main():
 	Y = min_max_normalize(Y)
 	
 	save(Y, file_position, new_path)
-	exit()
-		
+
+'''
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='CBCS t-SNE')
 	
@@ -135,6 +139,7 @@ def process_arguments(args):
 					 help='Dimensionality reduction technique (0: tsne, 1: pca)')
 
 	return vars(parser.parse_args())
+'''
 
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
@@ -245,4 +250,5 @@ def save_empty_file(error, output_file):
 	out["error"] = error
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
-main()
+		
+#main()

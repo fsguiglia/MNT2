@@ -14,11 +14,10 @@ import easygui
 import argparse
 import sys
 import json
-
+'''
 def main():
 	args = process_arguments(sys.argv)
 	json_path =	args['input_file']
-	audio_path = args['audio_files']
 	sample_rate = int(args['sample_rate'])
 	window_size = int(args['window_size'])
 	hop_length = int(args['hop_length'])
@@ -27,12 +26,14 @@ def main():
 	iterations = int(args['iterations'])
 	mode = int(args['mode'])
 	technique = int(args['technique'])
-	
+	analyze(json_path, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, mode, technique)
+'''
+def analyze(json_path, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, mode, technique):
 	#exit if no file is provided
-	if args['input_file'] is None: 
+	if json_path is None: 
 		print("no input file, exiting")
 		sleep(1)
-		exit()
+		sys.exit()
 		
 	new_path = json_path[:json_path.rfind('.')] + '_o.tmp'
 	data = dict()
@@ -52,15 +53,14 @@ def main():
 		parameters.append(cur_parameters)
 		
 	#save json and exit if no audio files are provided
-	if args['audio_files'] is None:
-		init_path = os.environ['USERPROFILE'] + '//Desktop//'
-		args['audio_files'] = (easygui.diropenbox(default = init_path))
-		if args['audio_files'] is None:
-			save(data, new_path)
-			sleep(1)
-			exit()
+	init_path = os.environ['USERPROFILE'] + '//Desktop//'
+	audio_files = (easygui.diropenbox(default = init_path))
+	if audio_files is None:
+		save(data, new_path)
+		sleep(1)
+		sys.exit()
 
-	files = getListOfFiles(args['audio_files'], ['.wav'])
+	files = getListOfFiles(audio_files, ['.wav'])
 	validFiles = list()
 	#save json and exit if files dont match zones
 	for point in data["points"]:
@@ -68,7 +68,7 @@ def main():
 		id_audio_file_exists = False
 		for file in files:
 			fileName = os.path.basename(file)
-			if fileName[:-4] == str(zone_id):
+			if fileName[:-4] == str(zone_id) or ('0' + fileName[-4]) == str(zone_id):
 				id_audio_file_exists = True
 				validFiles.append(file)
 				break
@@ -76,7 +76,7 @@ def main():
 			print("file missing: " + str(zone_id) + ".wav, exiting") 
 			save(data, new_path)
 			sleep(1)
-			exit()
+			sys.exit()
 	
 	X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
 	
@@ -106,19 +106,15 @@ def main():
 		point['pos']['y'] = float(pos[1])
 	
 	save(data, new_path)
-	exit()
-		
+
+'''
 def process_arguments(args):
-	parser = argparse.ArgumentParser(description='CBCS t-SNE')
+	parser = argparse.ArgumentParser(description='NNI audio analysis')
 
 	parser.add_argument('-f', '--input_file',
 						action='store',
 						help='path to the output directory')
-	
-	parser.add_argument('-a', '--audio_files',
-						action='store',
-						help='path to the input directory')
-	
+
 	parser.add_argument('-d', '--dimentions',
 						action='store',
 						default=2,
@@ -165,7 +161,7 @@ def process_arguments(args):
 					 help='Dimensionality reduction technique (0: tsne, 1: pca)')
 
 	return vars(parser.parse_args())
-
+'''
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
 	allFiles = list()
@@ -241,8 +237,4 @@ def min_max_normalize(a):
 def save(data, path):
 	with open(path, 'w+') as f:
 		json.dump(data, f, indent = 4)
-		
-		
-	
-
-main()	
+#main()	

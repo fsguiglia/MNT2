@@ -78,10 +78,14 @@ void GesturePage::setupGui()
 
 void GesturePage::setupLSTM()
 {
-	_lstmTrain.setup("../../analysis/lstm_train.py", "gest");
+	_lstmTrain.setup("../../ML/lstm/mnt_lstm.py", "gest", "python");
+	map<string, float> trainParameters;
+	trainParameters["--script"] = 0;
+	_lstmTrain.setParameters(trainParameters);
 	
-	_lstmGen.setup("../../analysis/lstm_generate.py", "gest");
+	_lstmGen.setup("../../ML/lstm/mnt_lstm.py", "gest", "python");
 	map<string, float> genParameters;
+	genParameters["--script"] = 1;
 	genParameters["--temperature"] = 0.1;
 	_lstmGen.setParameters(genParameters);
 }

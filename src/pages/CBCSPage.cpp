@@ -71,12 +71,13 @@ void CBCSPage::setupGui()
 
 void CBCSPage::setupTsne()
 {
-	_dr.setup("../../analysis/analysis_cbcs.py", "cbcs"); //ver valores por defecto
+	_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //ver valores por defecto
 	map<string, float> drParameters;
+	drParameters["--script"] = 0;
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;
 	drParameters["--iterations"] = 1000;
-	drParameters["--mode"] = 0;
+	drParameters["--cbcs_mode"] = 0;
 	_dr.setParameters(drParameters);
 }
 
@@ -152,8 +153,8 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 	}
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 	if (e.target->getName() == "Analize complete files") {
-		if (e.checked) _dr.setParameter("--mode", 1);
-		else _dr.setParameter("--mode", 0);
+		if (e.checked) _dr.setParameter("--cbcs_mode", 1);
+		else _dr.setParameter("--cbcs_mode", 0);
 	}
 }
 

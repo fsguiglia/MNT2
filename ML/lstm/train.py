@@ -4,19 +4,14 @@ import json
 import numpy as np
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-import tensorflow as tf
+#import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import mdn
 import easygui
 
+'''
 def main():
-	print('-----------------------------------------------------')
-	print('-----------------------------------------------------')
-	print('----------------go do something else-----------------')
-	print('----------this is going to take a LONG time----------')
-	print('-----------------------------------------------------')
-	print('-----------------------------------------------------')
 	args = process_arguments(sys.argv)
 	#exit if no file is provided
 	if args['input_file'] is None: 
@@ -32,8 +27,17 @@ def main():
 	mode = int(args['mode'])
 	mdn_components = -1
 	learning_rate = 0.001
-	
-	with open('../analysis/lstm_hyperparameters.ini') as f:
+'''
+		
+def train(path, length, h1_n, h2_n, epochs, batch_size, mode, mdn_components, learning_rate):
+	print('-----------------------------------------------------')
+	print('-----------------------------------------------------')
+	print('----------------go do something else-----------------')
+	print('----------this is going to take a LONG time----------')
+	print('-----------------------------------------------------')
+	print('-----------------------------------------------------')
+		
+	with open('../ML/lstm/hyperparameters.ini') as f:
 		hp = json.load(f)
 		if length == -1: length = hp['sequence_length']
 		if h1_n == -1: h1_n = hp['h1']
@@ -41,8 +45,8 @@ def main():
 		if epochs == -1: epochs = hp['epochs']
 		if batch_size == -1: batch_size = hp['batch_size']
 		if mdn_components == -1: mdn_components = hp['mdn_components']
-		if mode == -1: mode = hp['mode']
-		learning_rate = hp['learning_rate']
+		if mode == -1: mode = int(hp['mode'])
+		if learning_rate == -1: learning_rate = hp['learning_rate']
 	
 	data = dict()
 	
@@ -65,10 +69,10 @@ def main():
 		for j, gesture in enumerate(gesture_list):
 			print(cur_epoch + ', gesture ' + str(j+1) + "/" + str(len(gesture_list)) + ": ", end = " ")
 			X,y = get_examples(gesture, length)
-			#X -= mean
-			#X /= std
-			#y -= mean
-			#y /= std
+			X -= mean
+			X /= std
+			y -= mean
+			y /= std
 			history = model.fit(X, y, epochs=1, batch_size=1, verbose=2, shuffle=False)
 			model.reset_states()
 
@@ -82,6 +86,7 @@ def main():
 		model.save(model_file)
 		print('saved as: ' + model_file)
 
+'''
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='gesture LSTM')
 	
@@ -115,7 +120,7 @@ def process_arguments(args):
 						help='mode: 0 for lstm, 1 for lstm + mdn')
 
 	return vars(parser.parse_args())
-
+'''
 def get_gestures(data):
 	time_sum = 0
 	num_points = 0
@@ -180,4 +185,4 @@ def lstm_mdn(h1n, h2n, batch_size, length, lr, mdn_components):
 	model.compile(loss=mdn.get_mixture_loss_func(2,mdn_components), optimizer=optimizer)
 	return model
 	
-main()
+#main()

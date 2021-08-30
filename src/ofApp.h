@@ -108,7 +108,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		
 		//GUI
 		const size_t _maxPages = 1;
-		const size_t _guiWidth = 300;
+		int _guiWidth = 300;
 		int _lastWidth, _lastHeight;
 		int _pageMarginLeft, _pageMarginRight;
 		int _page;
@@ -121,6 +121,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofxDatGuiFolder* _midiOutFolder;
 		ofxDatGuiFolder* _oscFolder;
 		ofColor _moduleColor, _generatorColor, _ioColor;
+		float _scale;
 
 		//IO
 		string _folder, _file;

@@ -72,8 +72,9 @@ void NNIPage::setupGui()
 
 void NNIPage::setupTsne()
 {
-	_audioDr.setup("../../analysis/analysis_nni.py", "nni_audio"); //ver valores por defecto
+	_audioDr.setup("../../ML/dr/mnt_analysis.py", "nni_audio", "python"); //ver valores por defecto
 	map<string, float> audioDrParameters;
+	audioDrParameters["--script"] = 1;
 	audioDrParameters["--perplexity"] = 5;
 	audioDrParameters["--learning_rate"] = 15;
 	audioDrParameters["--iterations"] = 1000;
@@ -82,7 +83,10 @@ void NNIPage::setupTsne()
 
 void NNIPage::setupPca()
 {
-	_pca.setup("../../analysis/pca_nni.py", "pca_nni"); //ver valores por defecto
+	_pca.setup("../../ML/dr/mnt_analysis.py", "pca_nni", "python"); //ver valores por defecto
+	map<string, float> audioDrParameters;
+	audioDrParameters["--script"] = 2;
+	_pca.setParameters(audioDrParameters);
 }
 
 void NNIPage::update()

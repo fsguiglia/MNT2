@@ -4,30 +4,31 @@ import json
 import os
 import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-import tensorflow as tf
+#import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import mdn
 import random
 import easygui
 import progressbar
-
+'''
 def main():
 	#args
 	args = process_arguments(sys.argv)
-	#exit if no file is provided
+	#exit if no file is provided	
 	if args['input_file'] is None: 
 		print('no file, exiting')
 		exit()
 		
 	json_path = args['input_file']
-	new_path = json_path[:json_path.rfind('.')] + '_o.tmp'
-	args = process_arguments(sys.argv)
 	temperature = float(args['temperature'])  
 	mode = -1
 	mdn_components = -1
+	generate(input_file, temperature, mode, mdn_components)
+'''
+def generate(json_path, temperature, mode, mdn_components):	
 	data = dict()
-	
+	new_path = json_path[:json_path.rfind('.')] + '_o.tmp'
 	print('select model file')
 	#get model path
 	default_path = os.environ['USERPROFILE'] + '//Desktop//' + '*.h5'
@@ -68,7 +69,7 @@ def main():
 	
 	#generate
 	print('generating gestures: ')
-	new_sequences = generate(model, n_gestures, gesture_list, temperature)
+	new_sequences = generate_sequences(model, n_gestures, gesture_list, temperature)
 	#prepare save file
 	data['gestures'] = list()
 	for i,sequence in enumerate(new_sequences):
@@ -89,7 +90,7 @@ def main():
 	
 	with open(new_path, 'w+') as f:
 		json.dump(data, f, indent = 4)
-
+'''
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='gesture LSTM')
 	
@@ -103,6 +104,7 @@ def process_arguments(args):
 						help='temperature')
 
 	return vars(parser.parse_args())
+'''
 
 def get_gestures(data):
 	time_sum = 0
@@ -153,7 +155,7 @@ def get_examples(sequence, length):
 	y = np.array(y)
 	return X,y
 
-def generate(model, n, gesture_list, temperature):
+def generate_sequences(model, n, gesture_list, temperature):
 	#get data from model
 	batch_size = model.get_config()['layers'][1]['config']['batch_input_shape'][0]
 	length = model.get_config()['layers'][1]['config']['batch_input_shape'][1]
@@ -190,8 +192,8 @@ def generate(model, n, gesture_list, temperature):
 		sequences, y = get_examples(gesture_list[index], length)
 		cur_length = len(gesture_list[index])
 		sequence = sequences[0]
-		#sequence -= mean
-		#sequence /= std
+		sequence -= mean
+		sequence /= std
 		predicted = np.zeros((cur_length, 2))
 		predicted[:length] = sequence
 
@@ -206,11 +208,11 @@ def generate(model, n, gesture_list, temperature):
 			bar_pos += 1
 			bar.update(bar_pos)
 		
-		#predicted *= std
-		#predicted += mean
+		predicted *= std
+		predicted += mean
 		gen_sequences.append(predicted.tolist())
 		
 	bar.finish()
 	return gen_sequences
 
-main()
+#main()

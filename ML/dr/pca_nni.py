@@ -6,16 +6,20 @@ import json
 import numpy as np
 from sklearn.decomposition import PCA
 
+'''
 def main():
 	args = process_arguments(sys.argv)
 	#exit if no file is provided
 	if args['input_file'] is None: 
 		exit()
-	
-	data = dict()
-	parameters = []
 	path = args['input_file']
 	dimentions = int(args['dimentions'])
+	analyze(path, dimentions)
+'''
+
+def analyze(path, dimentions):
+	data = dict()
+	parameters = []
 	
 	with open(path) as f:	
 		data = json.load(f)
@@ -40,7 +44,7 @@ def main():
 	#save data
 	new_path = path[:path.rfind('.')] + '_o.tmp'
 	save(data, new_path)
-	
+'''	
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='CBCS t-SNE')
 	
@@ -54,7 +58,7 @@ def process_arguments(args):
 						help='Dimension of the embedded space (default: 2)')
 
 	return vars(parser.parse_args())
-
+'''
 def min_max_normalize(a):
 	a = np.transpose(a)
 	max_values = np.amax(a,1)
@@ -67,4 +71,4 @@ def save(data, path):
 	with open(path, 'w+') as f:
 		json.dump(data, f, indent = 4)
 	
-main()
+#main()

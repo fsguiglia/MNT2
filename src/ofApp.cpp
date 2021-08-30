@@ -4,7 +4,19 @@ void ofApp::setup(){
 	setWindowTitle("untitled");
 	ofSetEscapeQuitsApp(false);
 	ofSetFrameRate(60);
-
+	/*
+	of 0.11 does not support HiDPI Screens on Windows
+	Add this to ofAppGLFWindow:
+	glm::vec2 ofAppGLFWWindow::getWindowScale() {
+		float xscale = 1;
+		float yscale = 1;
+		glfwGetWindowContentScale(windowP, &xscale, &yscale);
+		return glm::vec2(xscale, yscale);
+	}
+	or replace the next line with _scale = 1
+	*/
+	_scale = ((ofAppGLFWWindow *)(ofGetWindowPtr()))->getWindowScale().x;
+	_guiWidth *= _scale;
 	_file = "";
 	setupColor();
 	//MIDI
@@ -13,7 +25,7 @@ void ofApp::setup(){
 	//GUI
 	_page = -1;
 	setupGui();
-	_verdana.load("Verdana2.ttf", 8);
+	_verdana.load("Verdana2.ttf", 8 * _scale);
 	_lastWidth = ofGetWidth();
 	_lastHeight = ofGetHeight();
 
@@ -139,6 +151,10 @@ void ofApp::setupColor()
 //--------------------------------------------------------------
 void ofApp::setupGui()
 {
+	/*
+	use ofAppGLFWWindow::getWindowScale() -see ofApp::setup()- in ofxDatGuiTheme::ofxDatGuiIsHighResolution()
+	if you want gui to resize following windows' scale and layout
+	*/
 	_moduleColor = ofColor(30, 30, 70);
 	_generatorColor = ofColor(125, 30, 30);
 	_ioColor = ofColor(30, 125, 30);
@@ -175,16 +191,19 @@ void ofApp::setupGui()
 	_gui->collapse();
 	_gui->onButtonEvent(this, &ofApp::buttonEvent);
 	_gui->setAutoDraw(false);
+	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setPosition(ofGetWidth() - _guiWidth, 20);
-	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
 	_moduleFolder->setLabelColor(_moduleColor);
+	/*
 	_gui->getButton("Interpolate")->setLabelColor(_moduleColor);
 	_gui->getButton("Concatenate")->setLabelColor(_moduleColor);
 	_gui->getButton("Trigger")->setLabelColor(_moduleColor);
 	_gui->getButton("Draw")->setLabelColor(_moduleColor);
 	_gui->getButton("Gesture")->setLabelColor(_generatorColor);
 	_gui->getButton("Noise")->setLabelColor(_generatorColor);
+	*/
+	_moduleFolder->setLabelColor(_moduleColor);
 	_midiInFolder->setLabelColor(_ioColor);
 	_midiOutFolder->setLabelColor(_ioColor);
 	_oscFolder->setLabelColor(_ioColor);
@@ -1334,6 +1353,7 @@ void ofApp::mouseExited(int x, int y){
 void ofApp::windowResized(int w, int h){
 	if (w != 0 && h != 0)
 	{
+		cout << ofGetWidth() << endl;
 		_gui->setPosition(ofGetWidth() - _guiWidth, 20);
 		for (auto& node : _moduleNodes)
 		{
