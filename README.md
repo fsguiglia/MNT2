@@ -17,4 +17,3 @@ Para acceder a los gestos generativos y las operaciones de reducción dimensiona
 
 
 MNT2 incluye un sintetizador para Max For Live, disponible en [github.com/fsguiglia/concatenate](https://github.com/fsguiglia/concatenate)
-### ¡Gracias!
