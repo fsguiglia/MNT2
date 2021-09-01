@@ -300,8 +300,11 @@ void TriggerPage::load(ofJson& json)
 		bool isSwitch = curPoint["switch"];
 		int index = _map.addPoint(position, radius, threshold);
 		_map.setSwitch(index, isSwitch);
-		auto obj = curPoint["parameters"].get<ofJson::object_t>();
-		for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
+		if (curPoint.find("parameters") != curPoint.end())
+		{
+			auto obj = curPoint["parameters"].get<ofJson::object_t>();
+			for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
+		}
 	}
 	//gui
 	vector<string> split;

@@ -342,8 +342,11 @@ void RGBPage::load(ofJson & json)
 		int index = _map.addPoint(position, img);
 		_map.setTrigger(index, isTrigger);
 		_map.resizePoint(index, curPoint["width"], curPoint["height"]);
-		auto obj = curPoint["parameters"].get<ofJson::object_t>();
-		for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
+		if (curPoint.find("parameters") != curPoint.end())
+		{
+			auto obj = curPoint["parameters"].get<ofJson::object_t>();
+			for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
+		}
 	}
 	_radius = json["radius"];
 	_map.setRadius(_radius);

@@ -762,7 +762,6 @@ void ofApp::updateConnections()
 					int channel = ofToInt(ofSplitString(element.first, "/")[1]);
 					int control = ofToInt(ofSplitString(element.first, "/")[2]);
 					int value = element.second * 127;
-					cout << channel << "," << control << "," << value << endl;
 					if (_MIDIOutputs[output].isOpen())
 					{
 						_MIDIOutputs[output].sendControlChange(channel, control, value);
@@ -1353,7 +1352,6 @@ void ofApp::mouseExited(int x, int y){
 void ofApp::windowResized(int w, int h){
 	if (w != 0 && h != 0)
 	{
-		cout << ofGetWidth() << endl;
 		_gui->setPosition(ofGetWidth() - _guiWidth, 20);
 		for (auto& node : _moduleNodes)
 		{
