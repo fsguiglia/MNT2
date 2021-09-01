@@ -491,7 +491,7 @@ void ofApp::createOscOutput(string ip, string port, float x, float y)
 
 	Node node;
 	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
-	node.setName("osc: " + name);
+	node.setName("osc:" + name);
 	node.setAsOutput(true);
 	_outputNodes.push_back(node);
 }
