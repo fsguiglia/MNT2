@@ -322,6 +322,7 @@ void TriggerPage::load(ofJson& json)
 
 	if (_map.getPoints().size() != 0)
 	{
+		_map.setLastSelected(0, ofGetElapsedTimeMillis());
 		Trigger point = _map.getPoint(0);
 		updateSelected(0, point);
 	}

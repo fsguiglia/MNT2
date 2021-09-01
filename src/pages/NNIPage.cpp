@@ -356,6 +356,7 @@ void NNIPage::load(ofJson& json)
 
 	if (_map.getPoints().size() != 0)
 	{
+		_map.setLastSelected(0, ofGetElapsedTimeMillis());
 		updateSelected(0, _map.getPoint(_map.getPoints().size() - 1));
 	}
 }
