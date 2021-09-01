@@ -36,7 +36,7 @@ void RGBPage::setupGui()
 	_gui->addHeader("Draw", false);
 	_gui->addToggle("active");
 	_gui->addToggle("randomize");
-	_gui->addSlider("Radius", 0., 1., _radius);
+	_gui->addSlider("Radius", 0., 1., _radius)->setName("Radius");
 	_gui->addBreak();
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
@@ -88,13 +88,13 @@ void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else if (name == "Radius" || name == "posX" || name == "posY" || name == "Width" || name == "Height")
 	{
-		if (_map.getLastSelected() >= 0)
-		{
 			if (name == "Radius")
 			{
 				_radius = e.value;
 				_map.setRadius(_radius);
 			}
+		if (_map.getLastSelected() >= 0)
+		{
 			if (name == "posX")
 			{
 				float x = e.value;
@@ -339,7 +339,7 @@ void RGBPage::load(ofJson & json)
 			img.allocate(100, 100, ofImageType::OF_IMAGE_GRAYSCALE);
 			img.setColor(200);
 		}
-		int index = _map.addPoint(position, img);
+		int index = _map.addPoint(position, img, curPoint["image_path"].get<string>());
 		_map.setTrigger(index, isTrigger);
 		_map.resizePoint(index, curPoint["width"], curPoint["height"]);
 		if (curPoint.find("parameters") != curPoint.end())
