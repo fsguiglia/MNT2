@@ -54,7 +54,7 @@ def train(path, length, h1_n, h2_n, epochs, batch_size, mode, mdn_components, le
 		data = json.load(f)
 	
 	gesture_list,t = get_gestures(data)
-	mean, std = get_mean_std(gesture_list)
+	#mean, std = get_mean_std(gesture_list)
 	
 	#define model
 	if mode == 0:
@@ -69,10 +69,10 @@ def train(path, length, h1_n, h2_n, epochs, batch_size, mode, mdn_components, le
 		for j, gesture in enumerate(gesture_list):
 			print(cur_epoch + ', gesture ' + str(j+1) + "/" + str(len(gesture_list)) + ": ", end = " ")
 			X,y = get_examples(gesture, length)
-			X -= mean
-			X /= std
-			y -= mean
-			y /= std
+			#X -= mean
+			#X /= std
+			#y -= mean
+			#y /= std
 			history = model.fit(X, y, epochs=1, batch_size=1, verbose=2, shuffle=False)
 			model.reset_states()
 

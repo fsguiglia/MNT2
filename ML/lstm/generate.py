@@ -166,7 +166,7 @@ def generate_sequences(model, n, gesture_list, temperature):
 		mdn_components = model.get_config()['layers'][-1]['config']['num_mixtures']
 	
 	#prepare first sequences
-	mean, std = get_mean_std(gesture_list)
+	#mean, std = get_mean_std(gesture_list)
 	indexes = list()
 	indexes_length = int(n / len(gesture_list))
 	if indexes_length < 1 : indexes_length = 1
@@ -192,8 +192,8 @@ def generate_sequences(model, n, gesture_list, temperature):
 		sequences, y = get_examples(gesture_list[index], length)
 		cur_length = len(gesture_list[index])
 		sequence = sequences[0]
-		sequence -= mean
-		sequence /= std
+		#sequence -= mean
+		#sequence /= std
 		predicted = np.zeros((cur_length, 2))
 		predicted[:length] = sequence
 
@@ -208,8 +208,8 @@ def generate_sequences(model, n, gesture_list, temperature):
 			bar_pos += 1
 			bar.update(bar_pos)
 		
-		predicted *= std
-		predicted += mean
+		#predicted *= std
+		#predicted += mean
 		gen_sequences.append(predicted.tolist())
 		
 	bar.finish()

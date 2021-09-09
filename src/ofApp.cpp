@@ -450,7 +450,7 @@ void ofApp::createOscInput(string port, float x, float y)
 
 	Node node;
 	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
-	node.setName("osc: " + port);
+	node.setName("osc:" + port);
 	node.setAsInput(true);
 	_inputNodes.push_back(node);
 }
