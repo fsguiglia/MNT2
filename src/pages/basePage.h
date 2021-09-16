@@ -271,7 +271,6 @@ inline void BasePage<T>::MIDIIn(string port, int channel, int control, float val
 
 					if (curParameters.find(parameterName) == curParameters.end())
 					{
-						cout << "agrega" << endl;
 						if (_useGlobalParameters) _map.addGlobalParameter(parameterName, value);
 						else _map.addPointParameter(lastSelected, parameterName, value);
 

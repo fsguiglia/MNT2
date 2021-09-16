@@ -121,18 +121,7 @@ void ofApp::drawConnection(Connection& connection)
 
 void ofApp::exit()
 {
-	for (auto port : _MIDIInputs)
-	{
-		if (port.second.isOpen())
-		{
-			port.second.closePort();
-			port.second.removeListener(this);
-		}
-	}
-	for (auto port : _MIDIOutputs)
-	{
-		if (port.second.isOpen()) port.second.closePort();
-	}
+	clear();
 }
 
 void ofApp::setupColor()
@@ -444,15 +433,19 @@ void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 
 void ofApp::createOscInput(string port, float x, float y)
 {
-	ofxOscReceiver receiver;
-	receiver.setup(ofToInt(port));
-	_oscReceivers[port] = receiver;
+	try {
+		_oscReceivers[port] = ofxOscReceiver();
+		_oscReceivers[port].setup(ofToInt(port));
 
-	Node node;
-	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
-	node.setName("osc:" + port);
-	node.setAsInput(true);
-	_inputNodes.push_back(node);
+		Node node;
+		node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
+		node.setName("osc:" + port);
+		node.setAsInput(true);
+		_inputNodes.push_back(node);
+	}
+	catch (const std::exception& e) { 
+		cout << "could not create port" << endl;
+	}
 }
 
 void ofApp::deleteOscInput(string port)
@@ -484,16 +477,22 @@ void ofApp::deleteOscInput(string port)
 
 void ofApp::createOscOutput(string ip, string port, float x, float y)
 {
-	ofxOscSender sender;
-	string name = ip + ":" + port;
-	sender.setup(ip, ofToInt(port));
-	_oscSenders[name] = sender;
+	try {
+		ofxOscSender sender;
+		string name = ip + ":" + port;
+		sender.setup(ip, ofToInt(port));
+		_oscSenders[name] = sender;
 
-	Node node;
-	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
-	node.setName("osc:" + name);
-	node.setAsOutput(true);
-	_outputNodes.push_back(node);
+		Node node;
+		node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
+		node.setName("osc:" + name);
+		node.setAsOutput(true);
+		_outputNodes.push_back(node);
+	}
+
+	catch (const std::exception& e) { 
+		cout << "could not create port" << endl;
+	}
 }
 
 void ofApp::deleteOscOutput(string ip, string port)
@@ -821,6 +820,10 @@ void ofApp::clear()
 			_gui->getToggle(split[1], "Midi Out")->setChecked(false);
 		}
 	}
+
+	//for (auto port : _oscReceivers) port.second.stop();
+	//for (auto port : _oscSenders) port.second.clear();
+	
 	_file = "";
 	setWindowTitle("untitled");
 }
@@ -863,9 +866,9 @@ void ofApp::load()
 				if (osc)
 				{
 					bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
-					if (_oscReceivers.find(curPort) == _oscReceivers.end() && isNumber)
+					if (isNumber)
 					{
-						createOscInput(curPort, element["x"], element["y"]);
+						createOscInput(split[1], element["x"], element["y"]);
 						names[curPort] = curPort;
 					}
 				}
@@ -886,43 +889,6 @@ void ofApp::load()
 					}
 				}
 			}
-			ofJson jOut = jLoad["out"];
-			for (auto& element : jOut)
-			{
-				string curPort = element["port"].get<string>();
-				bool osc = false;
-				vector<string> split = ofSplitString(curPort, ":");
-				if (split.size() == 3)
-				{
-					if (split[0] == "osc") osc = true;
-				}
-				if (osc)
-				{
-					bool isNumber = (split[2].find_first_not_of("0123456789") == std::string::npos);
-					if (isNumber)
-					{
-						createOscOutput(split[1], split[2], element["x"], element["y"]);
-						names[curPort] = curPort;
-					}
-				}
-				else
-				{
-					bool portAvailable = false;
-					for (auto port : _MIDIOutPorts) {
-						if (port.first == split[1])
-						{
-							portAvailable = true;
-							break;
-						}
-					}
-					if (portAvailable)
-					{
-						string name = createMIDIOutput(split[1], element["x"], element["y"]);
-						names[name] = name;
-					}
-				}
-			}
-
 			//Modules
 			ofJson jModules = jLoad["Modules"];
 			for (auto& element : jModules)
@@ -952,7 +918,7 @@ void ofApp::load()
 				string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
 				names[oldName] = newName;
 			}
-
+			
 			//CONNECTIONS
 			ofJson jConnections = jLoad["Connections"];
 			for (auto& element : jConnections)
@@ -971,7 +937,7 @@ void ofApp::load()
 				{
 					bool inputExists = false;
 					for (auto port : _MIDIInPorts) if ("in:" + port.first == connection.fromId) inputExists = true;
-					for (auto port : _oscReceivers) if (port.first == connection.fromId) inputExists = true;
+					for (auto port : _oscReceivers) if ("osc:" + port.first == connection.fromId) inputExists = true;
 					validConnection = validConnection && inputExists;
 				}
 
@@ -984,6 +950,7 @@ void ofApp::load()
 				}
 
 				if (validConnection) _connections.push_back(connection);
+				
 			}
 			//LOAD
 			_file = loadFile.getName();
