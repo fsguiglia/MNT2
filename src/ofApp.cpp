@@ -433,19 +433,14 @@ void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 
 void ofApp::createOscInput(string port, float x, float y)
 {
-	try {
-		_oscReceivers[port] = ofxOscReceiver();
-		_oscReceivers[port].setup(ofToInt(port));
+	_oscReceivers[port] = ofxOscReceiver();
+	_oscReceivers[port].setup(ofToInt(port));
 
-		Node node;
-		node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
-		node.setName("osc:" + port);
-		node.setAsInput(true);
-		_inputNodes.push_back(node);
-	}
-	catch (const std::exception& e) { 
-		cout << "could not create port" << endl;
-	}
+	Node node;
+	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
+	node.setName("osc:" + port);
+	node.setAsInput(true);
+	_inputNodes.push_back(node);
 }
 
 void ofApp::deleteOscInput(string port)
@@ -477,22 +472,16 @@ void ofApp::deleteOscInput(string port)
 
 void ofApp::createOscOutput(string ip, string port, float x, float y)
 {
-	try {
-		ofxOscSender sender;
-		string name = ip + ":" + port;
-		sender.setup(ip, ofToInt(port));
-		_oscSenders[name] = sender;
+	ofxOscSender sender;
+	string name = ip + ":" + port;
+	sender.setup(ip, ofToInt(port));
+	_oscSenders[name] = sender;
 
-		Node node;
-		node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
-		node.setName("osc:" + name);
-		node.setAsOutput(true);
-		_outputNodes.push_back(node);
-	}
-
-	catch (const std::exception& e) { 
-		cout << "could not create port" << endl;
-	}
+	Node node;
+	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
+	node.setName("osc:" + name);
+	node.setAsOutput(true);
+	_outputNodes.push_back(node);
 }
 
 void ofApp::deleteOscOutput(string ip, string port)
@@ -918,7 +907,6 @@ void ofApp::load()
 				string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
 				names[oldName] = newName;
 			}
-			
 			//CONNECTIONS
 			ofJson jConnections = jLoad["Connections"];
 			for (auto& element : jConnections)
@@ -937,7 +925,9 @@ void ofApp::load()
 				{
 					bool inputExists = false;
 					for (auto port : _MIDIInPorts) if ("in:" + port.first == connection.fromId) inputExists = true;
-					for (auto port : _oscReceivers) if ("osc:" + port.first == connection.fromId) inputExists = true;
+					if (ofSplitString(connection.fromId, ":")[0] == "osc") inputExists = true;
+					//this line was causing crashes randomly, maybe the receiver wasnt created yet?
+					//for (auto port : _oscReceivers) if ("osc:" + port.first == connection.fromId) inputExists = true;
 					validConnection = validConnection && inputExists;
 				}
 
@@ -945,13 +935,13 @@ void ofApp::load()
 				{
 					bool outputExists = false;
 					for (auto port : _MIDIOutPorts) if ("out:" + port.first == connection.toId) outputExists = true;
-					for (auto port : _oscSenders) if ("osc:" + port.first == connection.toId) outputExists = true;
+					if (ofSplitString(connection.toId, ":")[0] == "osc") outputExists = true;
+					//for (auto port : _oscSenders) if ("osc:" + port.first == connection.toId) outputExists = true;
 					validConnection = validConnection && outputExists;
 				}
-
 				if (validConnection) _connections.push_back(connection);
-				
 			}
+			
 			//LOAD
 			_file = loadFile.getName();
 			_folder = ofSplitString(path, _file)[0];
