@@ -36,8 +36,8 @@ void CBCSPage::setupGui()
 	_gui = new ScrollGui();
 	_gui->addHeader("Concatenate", false);
 	_gui->addToggle("active");
-	_arrangeFolder = _gui->addFolder("Analize");
-	_arrangeFolder->addToggle("Analize complete files", false);
+	_arrangeFolder = _gui->addFolder("Analyze");
+	_arrangeFolder->addToggle("Analyze complete files", false);
 	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
