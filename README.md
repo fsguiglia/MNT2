@@ -16,5 +16,6 @@ Si no, pueden compilar la solución usando:
   
 Para acceder a los gestos generativos y las operaciones de reducción dimensional es necesario Python (probado con 3.9) con las siguientes librerías: tensorflow > 2.5, easygui, keras-mdn-layer, progressbar, sklearn y librosa
 
-Aún me encuentro trabajando en un manual, pero puede descargarse una guía de inicio rápido desde [www.sguiglia.com.ar/soft/MNT2_guia.pdf](http://www.sguiglia.com.ar/soft/MNT2_guia.pdf)
+Aún me encuentro trabajando en un manual, pero puede descargarse una guía de inicio rápido desde [www.sguiglia.com.ar/soft/MNT2_guia.pdf](http://www.sguiglia.com.ar/soft/MNT2_guia.pdf).
+
 MNT2 incluye un sintetizador para Max For Live, disponible en [github.com/fsguiglia/concatenate](https://github.com/fsguiglia/concatenate)
