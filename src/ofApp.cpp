@@ -144,9 +144,9 @@ void ofApp::setupGui()
 	use ofAppGLFWWindow::getWindowScale() -see ofApp::setup()- in ofxDatGuiTheme::ofxDatGuiIsHighResolution()
 	if you want gui to resize following windows' scale and layout
 	*/
-	_moduleColor = ofColor(30, 30, 70);
-	_generatorColor = ofColor(125, 30, 30);
-	_ioColor = ofColor(30, 125, 30);
+	_moduleColor = ofColor(30, 30, 70, 190);
+	_generatorColor = ofColor(125, 30, 190);
+	_ioColor = ofColor(30, 125, 30, 190);
 	_gui = new ofxDatGui(ofxDatGuiAnchor::TOP_RIGHT);
 	_gui->addHeader("MNT");
 	_moduleFolder = _gui->addFolder("Modules");

@@ -264,3 +264,4 @@ __pycache__/
 # De este proyecto
 analysis/tmp
 analysis/lstm_hyperparameters.ini
+todo.txt

@@ -16,32 +16,7 @@
 #include "generators/noiseGenerator.h"
 #include "utils/mntUtils.h"
 
-/*
-cosas para hacer:
-
-*concatenate note out para usar con samplers (0.wav - 127.wav) 
-	|
-	-> esto hay que verlo en detalle: en page la salida es MIDI u OSC y después se traduce,
-	   no está pensado para enviar dos datos diferentes
-
-*gesture y noise son muy desprolijos, en realidad debería repensar asi:
-
-	basePage->mapPage->modules
-	|   \
-	V	 L>gesture
-	noise
-
-* descargar ofApp con una clase para la gui
-
-* midi map está mucho mejor resuelto en gesture y noise que en basePage, tomar como modelo y replicar
-
-* los controles mapeables deberian pintarse de un color cuando midi map esta activo, deberia haber algun
-  feedback de la gui o algo para recordar que estas mapeando, en esa misma linea no estoy seguro de que este
-  bien que active = true resulte en map = false
-*/
-
 class ofApp : public ofBaseApp, public ofxMidiListener {
-
 	public:
 		void setup();
 		void update();
