@@ -6,7 +6,7 @@ Pueden descargar un ejecutable para Windows (probado con Windows 10) desde [www.
 * openFrameworks no soporta displays HiDPI en Windows, aunque trabajé sobre este problema puede ser que algunos íconos se vean pequeños en algunos monitores.
 * Pyinstaller no se lleva bien con Tensorflow > 2.0, para acceder a los gestos generativos por ahora es necesario necesario instalar Python (probado con 3.9) con las siguientes librerías: tensorflow > 2.5, easygui, keras-mdn-layer, progressbar
 
-Si no, pueden compilar la solución usando:
+Si no, pueden compilar la solución y correr los scripts de python usando:
 * Visual Studio 2017
 * openFrameworks 0.11 con los siguientes addons:
   * ofxDatGui
