@@ -9,40 +9,24 @@ TriggerPage::TriggerPage()
 	setAddress("cbcs/");
 }
 
-void TriggerPage::setup(int width, int height, int guiWidth, int maxMessages)
+void TriggerPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 {
-	_map.setup(width, height);
-	_guiWidth = guiWidth;
-	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
+	_radius = 0.05;
+	_threshold = 0.75;
+	_map.setup(w, h);
 	_map.setActive(false);
 	_map.setRandomize(0.);
 	_map.setDrawSelected(true);
-	_mouseControl = false;
-	_controlLearn = false;
-	_parameterLearn = false;
-	_inside = false;
-	_visible = false;
-	setupGui();
-	_maxMessages = maxMessages;
 	vector<ofVec2f> initialCursors = { ofVec2f(0,0) };
 	_map.setCursors(initialCursors);
-	_radius = 0.05;
-	_threshold = 0.75;
+
+	BasePage::setup(name, w, h, guiWidth, maxMessages);
+	setupGui();
 }
 
 void TriggerPage::setupGui()
 {
-	_gui = new ScrollGui();
-	_gui->addHeader("Trigger", false);
-	_gui->addToggle("active");
 	_gui->addToggle("randomize");
-	_gui->addBreak();
-	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
-	_controlFolder->addToggle("Mouse Control");
-	_controlFolder->addSlider("x", 0., 1.)->setName("x");
-	_controlFolder->addSlider("y", 0., 1.)->setName("y");
-	_controlFolder->collapse();
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);

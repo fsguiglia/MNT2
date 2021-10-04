@@ -8,7 +8,7 @@ class CBCSPage : public BasePage<CBCS>
 {
 public:
 	CBCSPage();
-	void setup(int width, int height, int guiWidth, int maxMessages = 50);
+	void setup(string name, int w, int h, int guiWidth, int maxMessages = 50);
 	void setupGui();
 	void setupTsne();
 

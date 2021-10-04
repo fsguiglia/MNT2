@@ -7,7 +7,7 @@ public:
 	ModuleNode();
 	~ModuleNode();
 
-	void setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette);
+	void setupPage(string name, int w, int h, int guiWidth, vector<ofColor> colorPalette);
 	void setPageHeader(string label);
 	void update();
 	void drawPage(ofTrueTypeFont& font);
@@ -66,9 +66,9 @@ inline ModuleNode<T>::~ModuleNode()
 }
 
 template<typename T>
-inline void ModuleNode<T>::setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette)
+inline void ModuleNode<T>::setupPage(string name, int w, int h, int guiWidth, vector<ofColor> colorPalette)
 {
-	_page->setup(w, h, guiWidth);
+	_page->setup(name, w, h, guiWidth);
 	_page->setColorPallete(colorPalette);
 	_page->setVisible(false);
 }

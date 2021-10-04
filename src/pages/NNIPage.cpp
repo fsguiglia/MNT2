@@ -9,31 +9,22 @@ NNIPage::NNIPage()
 	setAddress("");
 }
 
-void NNIPage::setup(int width, int height, int guiWidth, int maxMessages)
+void NNIPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 {
-	_map.setup(width, height);
-	_guiWidth = guiWidth;
-	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
+	_map.setup(w, h);
 	_map.setActive(false);
 	_map.setRandomize(0.);
 	_map.setDrawInterpolation(true);
 	_map.setDrawSelected(true);
-	_mouseControl = false;
-	_controlLearn = false;
-	_parameterLearn = false;
-	_inside = false;
-	_visible = false;
+	
+	BasePage::setup(name, w, h, guiWidth, maxMessages);
 	setupPca();
 	setupTsne();
 	setupGui();
-	_maxMessages = maxMessages;	
 }
 
 void NNIPage::setupGui()
 {
-	_gui = new ScrollGui();
-	_gui->addHeader("Interpolate", false);
-	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("arrange");
 	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("PCA (Audio)")->setName("pca_audio");
@@ -44,12 +35,6 @@ void NNIPage::setupGui()
 	_arrangeFolder->addBreak();
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->collapse();
-	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
-	_controlFolder->addToggle("Mouse Control");
-	_controlFolder->addSlider("x", 0., 1.)->setName("x");
-	_controlFolder->addSlider("y", 0., 1.)->setName("y");
-	_controlFolder->collapse();
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);

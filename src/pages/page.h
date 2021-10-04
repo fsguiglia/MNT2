@@ -8,7 +8,7 @@ class Page {
 public:
 	Page();
 
-	void setup(int w, int h, int guiWidth, int maxMessages = 20);
+	virtual void setup(string name, int w, int h, int guiWidth, int maxMessages = 20) = 0;
 	virtual void update() = 0;
 	virtual void draw(ofTrueTypeFont font) = 0;
 	void setHeader(string label);
@@ -43,12 +43,10 @@ public:
 
 	//io
 	void MIDIIn(string port, int control, int channel, float value);
-	virtual void handleMIDIIn() = 0;
 	map<string, float> getMidiOut(bool clear = false);
 	map<string, float> getMidiDump(bool clear = false);
 
 	void OSCIn(string address, float value);
-	virtual void handleOSCIn() = 0;
 	map<string, float> getOscOut(bool clear = false);
 	void setAddress(string address);
 	string getAddress();
@@ -61,9 +59,13 @@ public:
 	virtual ofJson save() = 0;
 
 protected:
+	virtual void moduleMIDIIn(string port, int control, int channel, float value) = 0;
+	virtual void moduleOSCIn(string address, float value) = 0;
+	
 	void addMessages(map<string, float> messages, map<string, float>& queue);
 	void setStringMessages(vector<string> messages);
 	void clearMessages(map<string, float>& queue);
+
 	ofRectangle centerSquarePosition(int w, int h);
 
 	//gui

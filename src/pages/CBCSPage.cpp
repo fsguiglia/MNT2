@@ -9,33 +9,22 @@ CBCSPage::CBCSPage()
 	setAddress("/cbcs");
 }
 
-void CBCSPage::setup(int width, int height, int guiWidth, int maxMessages)
+void CBCSPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 {
-	_map.setup(width, height);
-	_guiWidth = guiWidth;
-
-	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
+	_map.setup(w, h);
 	_map.setRadius(0.05);
 	_map.setActive(false);
 	_map.setRandomize(0.);
 	_map.setDrawSelected(true);
 	_map.setCursor(ofVec2f(-1, -1));
 
-	_mouseControl = false;
-	_controlLearn = false;
-	_parameterLearn = false;
-	_inside = false;
-	_visible = false;
+	BasePage::setup(name, w, h, guiWidth, maxMessages);
 	setupTsne();
 	setupGui();
-	_maxMessages = maxMessages;
 }
 
 void CBCSPage::setupGui()
 {
-	_gui = new ScrollGui();
-	_gui->addHeader("Concatenate", false)->setName("Header");
-	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("Analyze");
 	_arrangeFolder->addToggle("Analyze complete files", false)->setName("complete");
 	_arrangeFolder->addButton("PCA")->setName("pca");
@@ -45,12 +34,6 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addButton("Normalize");
 	_arrangeFolder->collapse();
-	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
-	_controlFolder->addToggle("Mouse Control");
-	_controlFolder->addSlider("x", 0., 1.)->setName("x");
-	_controlFolder->addSlider("y", 0., 1.)->setName("y");
-	_controlFolder->collapse();
 	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
 	_gui->addTextInput("address", getAddress());
 	_gui->addButton("Export file list")->setName("Export");

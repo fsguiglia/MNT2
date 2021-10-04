@@ -216,8 +216,13 @@ void ofApp::moduleButtonEvent(ofxDatGuiButtonEvent e)
 		(ofGetWidth() - _moduleNodes[_moduleNodes.size() - 1]->getWidth()) * 0.5 / (float)ofGetWidth(),
 		(ofGetHeight() - _moduleNodes[_moduleNodes.size() - 1]->getHeight()) * 0.5 / (float)ofGetHeight()
 	);
-	_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
-	_moduleNodes[_moduleNodes.size() - 1]->setPageHeader(_moduleNodes[_moduleNodes.size() - 1]->getName());
+	_moduleNodes[_moduleNodes.size() - 1]->setupPage(
+		_moduleNodes[_moduleNodes.size() - 1]->getName(),
+		1024,
+		1024,
+		_guiWidth,
+		_colorPallete
+	);
 }
 
 void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
@@ -940,7 +945,13 @@ void ofApp::load()
 
 				_moduleNodes[_moduleNodes.size() - 1]->setName(element["type"].get<string>(), true);
 
-				_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
+				_moduleNodes[_moduleNodes.size() - 1]->setupPage(
+					_moduleNodes[_moduleNodes.size() - 1]->getName(),
+					1024,
+					1024,
+					_guiWidth,
+					_colorPallete
+				);
 				ofJson data = element["data"];
 				_moduleNodes[_moduleNodes.size() - 1]->load(data);
 				string oldName = element["type"].get<string>() + "/" + ofToString(element["id"]);

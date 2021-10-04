@@ -19,11 +19,12 @@ NoiseGenerator::NoiseGenerator()
 	_yFrame = _seed + 1000;
 }
 
-void NoiseGenerator::setup(int w, int h, int guiWidth)
+void NoiseGenerator::setup(string name, int w, int h, int guiWidth)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	setupGui();
+	setHeader(name);
 }
 
 void NoiseGenerator::setupGui()

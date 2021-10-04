@@ -7,7 +7,7 @@
 class NNIPage : public BasePage<NNI> {
 public:
 	NNIPage();
-	void setup(int width, int height, int guiWidth, int maxMessages = 20);
+	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
 	void setupGui();
 	void setupTsne();
 	void setupPca();

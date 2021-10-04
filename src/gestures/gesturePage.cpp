@@ -18,12 +18,13 @@ GesturePage::GesturePage()
 	_scrubPolySpacing = 0.02;
 }
 
-void GesturePage::setup(int w, int h, int guiWidth)
+void GesturePage::setup(string name, int w, int h, int guiWidth)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	setupLSTM();
 	setupGui();
+	setHeader(name);
 }
 
 void GesturePage::setupGui()

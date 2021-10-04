@@ -1,19 +1,14 @@
 #include "page.h"
 
-void Page::setup(int w, int h, int guiWidth, int maxMessages)
+Page::Page()
 {
-	_guiWidth = guiWidth;
-	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
-	_maxMessages = maxMessages;
+	_controlLearn = false;
+	_parameterLearn = false;
 }
 
 void Page::setHeader(string label)
 {
 	_gui->getHeader()->setLabel(label);
-}
-
-Page::Page()
-{
 }
 
 ofVec2f Page::getPosition()
@@ -83,9 +78,38 @@ bool Page::getStringOutput()
 
 void Page::MIDIIn(string port, int control, int channel, float value)
 {
-	/*
-		aca separar entre mapeo de sliders y etc con acciones al interior del mapa-> esto ultimo en un metodo privado
-	*/
+	string sControl = ofToString(control);
+	string sChannel = ofToString(channel);
+	string parameterName = sChannel + "/" + sControl;
+	string controlName = port + "/" + parameterName;
+	string sliderLabel = "ch" + sChannel + "/cc" + sControl;
+	map<string, float> curParameters;
+
+	bool valid = true;
+	valid = valid && channel >= 0 && channel < 128;
+	valid = valid && control >= 0 && control < 128;
+	valid = valid && value >= 0 && value < 1;
+	if (valid)
+	{
+		if (_controlLearn) {
+			if (_lastSelectedControl == "x")
+			{
+				_CCXY[0] = controlName;
+				_gui->getSlider("x")->setLabel("x:" + sliderLabel);
+			}
+			if (_lastSelectedControl == "y")
+			{
+				_CCXY[1] = controlName;
+				_gui->getSlider("y")->setLabel("y:" + sliderLabel);
+			}
+		}
+		else
+		{
+			if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
+			if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
+		}
+		moduleMIDIIn(port, control, channel, value);
+	}
 }
 
 map<string, float> Page::getMidiOut(bool clear)
@@ -104,9 +128,7 @@ map<string, float> Page::getMidiDump(bool clear)
 
 void Page::OSCIn(string address, float value)
 {
-	/*
-		aca separar active y control de especifico de cada pagina y hacer una nueva funcion como en midi
-	*/
+	moduleOSCIn(address, value);
 }
 
 map<string, float> Page::getOscOut(bool clear)

@@ -6,6 +6,9 @@ template<typename T> class BasePage : public Page {
 public:
 	BasePage();
 
+	void setup(string name, int w, int h, int guiWidth, int maxMessages);
+	void setupGui(string name);
+
 	void update();
 	void draw(ofTrueTypeFont font);
 
@@ -15,10 +18,8 @@ public:
 	void setUseGlobalParameters(bool globalParameters);
 	bool getUseGlobalParameters();
 
-	void MIDIIn(string port, int channel, int control, float value);
-	void handleMIDIIn();
-	void OSCIn(string address, float value);
-	void handleOSCIn();
+	void moduleMIDIIn(string port, int control, int channel, float value);
+	void moduleOSCIn(string address, float value);
 
 protected:
 	T _map;
@@ -34,6 +35,35 @@ inline BasePage<T>::BasePage()
 {
 	_lastSelectedPoint = -1;
 	_minClickDistance = 0.1;
+	_mouseControl = false;
+	_controlLearn = false;
+	_parameterLearn = false;
+	_inside = false;
+	_visible = false;
+}
+
+template<typename T>
+inline void BasePage<T>::setup(string name, int w, int h, int guiWidth, int maxMessages)
+{
+	_guiWidth = guiWidth;
+	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
+	_maxMessages = maxMessages;
+	setupGui(name);
+}
+
+template<typename T>
+inline void BasePage<T>::setupGui(string name)
+{
+	_gui = new ScrollGui();
+	_gui->addHeader(name, false)->setName("Header");
+	_gui->addToggle("active");
+	_controlFolder = _gui->addFolder("Control");
+	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
+	_controlFolder->addToggle("Mouse Control");
+	_controlFolder->addSlider("x", 0., 1.)->setName("x");
+	_controlFolder->addSlider("y", 0., 1.)->setName("y");
+	_controlFolder->collapse();
+	_gui->addBreak();
 }
 
 template<typename T>
@@ -97,7 +127,7 @@ inline bool BasePage<T>::getUseGlobalParameters()
 }
 
 template<typename T>
-inline void BasePage<T>::MIDIIn(string port, int channel, int control, float value)
+inline void BasePage<T>::moduleMIDIIn(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -106,77 +136,43 @@ inline void BasePage<T>::MIDIIn(string port, int channel, int control, float val
 	string sliderLabel = "ch" + sChannel + "/cc" + sControl;
 	map<string, float> curParameters;
 
-	bool valid = true;
-	valid = valid && channel >= 0 && channel < 128;
-	valid = valid && control >= 0 && control < 128;
-	valid = valid && value >= 0 && value < 1;
-
-	if (valid)
-	{
-		if (!_map.getActive())
+	if (_parameterLearn)
+	{		
+		int lastSelected = _map.getLastSelected();
+		if (lastSelected != -1)
 		{
-			if (_controlLearn)
+			if (_useGlobalParameters) curParameters = _map.getParameters();
+			else curParameters = _map.getPoint(lastSelected).getValues();
+			
+			if (curParameters.find(parameterName) == curParameters.end())
 			{
-				if (_lastSelectedControl == "x")
-				{
-					_CCXY[0] = controlName;
-					_gui->getSlider("x")->setLabel("x:" + sliderLabel);
-				}
-				if (_lastSelectedControl == "y")
-				{
-					_CCXY[1] = controlName;
-					_gui->getSlider("y")->setLabel("y:" + sliderLabel);
-				}
+				if (_useGlobalParameters) _map.addGlobalParameter(parameterName, value);
+				else _map.addPointParameter(lastSelected, parameterName, value);
+				
+				_gui->addSlider(sliderLabel, 0., 1.);
+				_gui->getSlider(sliderLabel)->setName(parameterName);
+				_gui->setRemovableSlider(parameterName);
+				_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
+				_gui->setWidth(300, 0.3);
+				_gui->setOpacity(0.5);
+				_gui->update();
 			}
-			else if (_parameterLearn)
+			else if (curParameters[parameterName] != value)
 			{
-				int lastSelected = _map.getLastSelected();
-				if (lastSelected != -1)
-				{
-					if (_useGlobalParameters) curParameters = _map.getParameters();
-					else curParameters = _map.getPoint(lastSelected).getValues();
-
-					if (curParameters.find(parameterName) == curParameters.end())
-					{
-						if (_useGlobalParameters) _map.addGlobalParameter(parameterName, value);
-						else _map.addPointParameter(lastSelected, parameterName, value);
-
-						_gui->addSlider(sliderLabel, 0., 1.);
-						_gui->getSlider(sliderLabel)->setName(parameterName);
-						_gui->setRemovableSlider(parameterName);
-						_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
-						_gui->setWidth(300, 0.3);
-						_gui->setOpacity(0.5);
-						_gui->update();
-					}
-					else if (curParameters[parameterName] != value)
-					{
-						if (_useGlobalParameters) _map.setGlobalParameter(parameterName, value);
-						_map.setPointParameter(_map.getLastSelected(), parameterName, value);
-						_gui->getSlider(parameterName)->setValue(value, false);
-
-						map<string, float> curMessage;
-						curMessage[parameterName] = value;
-						addMessages(curMessage, _MIDIOutMessages);
-					}
-				}
+				if (_useGlobalParameters) _map.setGlobalParameter(parameterName, value);
+				_map.setPointParameter(_map.getLastSelected(), parameterName, value);
+				_gui->getSlider(parameterName)->setValue(value, false);
+				
+				map<string, float> curMessage;
+				curMessage[parameterName] = value;
+				addMessages(curMessage, _MIDIOutMessages);
 			}
-		}
-		if (!_controlLearn)
-		{
-			if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
-			if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
 		}
 	}
 }
 
 template<typename T>
-inline void BasePage<T>::handleMIDIIn()
-{
-}
-
-template<typename T>
-inline void BasePage<T>::OSCIn(string address, float value)
+inline void BasePage<T>::moduleOSCIn(string address, float value)
 {
 	vector<string> split = ofSplitString(address, "/");
 	if (split.size() > 0)
@@ -213,9 +209,4 @@ inline void BasePage<T>::OSCIn(string address, float value)
 			}
 		}
 	}
-}
-
-template<typename T>
-inline void BasePage<T>::handleOSCIn()
-{
 }

@@ -6,7 +6,7 @@
 class TriggerPage : public BasePage<TriggerMap> {
 public:
 	TriggerPage();
-	void setup(int width, int height, int guiWidth, int maxMessages = 20);
+	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
 	void setupGui();
 
 	void sliderEvent(ofxDatGuiSliderEvent e);
