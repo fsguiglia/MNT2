@@ -922,12 +922,12 @@ void ofApp::load()
 			ofJson jModules = jLoad["Modules"];
 			for (auto& element : jModules)
 			{
-				if (element["type"].get<string>() == "Interpolate") _moduleNodes.push_back(make_unique<ModuleNode<NNIPage>>());
-				if (element["type"].get<string>() == "Concatenate") _moduleNodes.push_back(make_unique<ModuleNode<CBCSPage>>());
-				if (element["type"].get<string>() == "Trigger") _moduleNodes.push_back(make_unique<ModuleNode<TriggerPage>>());
-				if (element["type"].get<string>() == "Draw") _moduleNodes.push_back(make_unique<ModuleNode<RGBPage>>());
-				if (element["type"].get<string>() == "Gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
-				if (element["type"].get<string>() == "Noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
+				if (element["type"].get<string>() == "interpolate") _moduleNodes.push_back(make_unique<ModuleNode<NNIPage>>());
+				if (element["type"].get<string>() == "concatenate") _moduleNodes.push_back(make_unique<ModuleNode<CBCSPage>>());
+				if (element["type"].get<string>() == "trigger") _moduleNodes.push_back(make_unique<ModuleNode<TriggerPage>>());
+				if (element["type"].get<string>() == "draw") _moduleNodes.push_back(make_unique<ModuleNode<RGBPage>>());
+				if (element["type"].get<string>() == "gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
+				if (element["type"].get<string>() == "noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
 				
 				_moduleNodes[_moduleNodes.size() - 1]->setup(
 					element["x"],
@@ -943,7 +943,7 @@ void ofApp::load()
 				_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
 				ofJson data = element["data"];
 				_moduleNodes[_moduleNodes.size() - 1]->load(data);
-				string oldName = element["type"].get<string>() + "(" + ofToString(element["id"]) + ")";
+				string oldName = element["type"].get<string>() + "/" + ofToString(element["id"]);
 				string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
 				names[oldName] = newName;
 			}
@@ -1029,7 +1029,7 @@ void ofApp::save()
 		for (auto& node : _moduleNodes)
 		{
 			ofJson jModule;
-			jModule["type"] = ofSplitString(node->getName(), "(")[0];
+			jModule["type"] = ofSplitString(node->getName(), "/")[0];
 			jModule["id"] = node->getId();
 			jModule["x"] = node->getBox().x;
 			jModule["y"] = node->getBox().y;
