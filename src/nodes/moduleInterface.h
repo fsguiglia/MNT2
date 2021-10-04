@@ -5,6 +5,7 @@
 class ModuleInterface : public Node {
 public:
 	virtual void setupPage(int w, int h, int guiWidth, vector<ofColor> colorPalette) = 0;
+	virtual void setPageHeader(string label) = 0;
 	virtual void update() = 0;
 	virtual void drawPage(ofTrueTypeFont& font) = 0;
 	virtual void resizePage(int w, int h) = 0;

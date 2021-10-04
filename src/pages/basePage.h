@@ -21,6 +21,8 @@ public:
 
 	void setMinClickDistance(float distance);
 
+	void setHeader(string lable);
+
 	void setAddress(string address);
 	string getAddress();
 
@@ -61,7 +63,7 @@ protected:
 	bool _midiOutput, _oscOutput, _stringOutput;
 	int _guiWidth, _maxMessages, _lastSelectedPoint;
 	float _minClickDistance;
-	string _lastSelectedControl, _address;
+	string _lastSelectedControl, _address, _name;
 	string _CCXY[2];
 	ofRectangle _position;
 	map<string, float> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
@@ -167,6 +169,12 @@ template<typename T>
 inline void BasePage<T>::setMinClickDistance(float distance)
 {
 	_minClickDistance = distance;
+}
+
+template<typename T>
+inline void BasePage<T>::setHeader(string label)
+{
+	_gui->getHeader()->setLabel(label);
 }
 
 template<typename T>

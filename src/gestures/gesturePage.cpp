@@ -76,6 +76,11 @@ void GesturePage::setupGui()
 	_scrollView->update();
 }
 
+void GesturePage::setHeader(string label)
+{
+	_gui->getHeader()->setLabel(label);
+}
+
 void GesturePage::setupLSTM()
 {
 	_lstmTrain.setup("../../ML/lstm/mnt_lstm.py", "gest", "python");

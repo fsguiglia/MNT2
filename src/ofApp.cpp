@@ -217,6 +217,7 @@ void ofApp::moduleButtonEvent(ofxDatGuiButtonEvent e)
 		(ofGetHeight() - _moduleNodes[_moduleNodes.size() - 1]->getHeight()) * 0.5 / (float)ofGetHeight()
 	);
 	_moduleNodes[_moduleNodes.size() - 1]->setupPage(1024, 1024, _guiWidth, _colorPallete);
+	_moduleNodes[_moduleNodes.size() - 1]->setPageHeader(_moduleNodes[_moduleNodes.size() - 1]->getName());
 }
 
 void ofApp::buttonEvent(ofxDatGuiButtonEvent e)

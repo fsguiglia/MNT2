@@ -53,6 +53,11 @@ void NoiseGenerator::setupGui()
 	_gui->update();
 }
 
+void NoiseGenerator::setHeader(string label)
+{
+	_gui->getHeader()->setLabel(label);
+}
+
 void NoiseGenerator::update()
 {
 	if (_active)

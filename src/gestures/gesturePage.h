@@ -10,6 +10,7 @@ public:
 	GesturePage();
 	void setup(int w, int h, int guiWidth);
 	void setupGui();
+	void setHeader(string label);
 	void setupLSTM();
 
 	void update();
