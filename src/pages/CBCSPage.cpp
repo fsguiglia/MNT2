@@ -37,7 +37,7 @@ void CBCSPage::setupGui()
 	_gui->addHeader("Concatenate", false);
 	_gui->addToggle("active");
 	_arrangeFolder = _gui->addFolder("Analyze");
-	_arrangeFolder->addToggle("Analyze complete files", false);
+	_arrangeFolder->addToggle("Analyze complete files", false)->setName("complete");
 	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
@@ -152,7 +152,7 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 		_controlLearn = false;
 	}
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
-	if (e.target->getName() == "Analize complete files") {
+	if (e.target->getName() == "complete") {
 		if (e.checked) _dr.setParameter("--cbcs_mode", 1);
 		else _dr.setParameter("--cbcs_mode", 0);
 	}

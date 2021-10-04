@@ -209,6 +209,7 @@ void ofApp::moduleButtonEvent(ofxDatGuiButtonEvent e)
 	if (label == "Gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
 	if (label == "Noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
 
+	label = ofToLower(label);
 	_moduleNodes[_moduleNodes.size() - 1]->setup(0.5, 0.5, 30, 1, 1, _verdana, _moduleColor);
 	_moduleNodes[_moduleNodes.size() - 1]->setName(label, true);
 	_moduleNodes[_moduleNodes.size() - 1]->setPosition(
@@ -587,17 +588,34 @@ void ofApp::createDeleteConnection(tuple<string, int, int, ofVec2f> out, tuple<s
 
 void ofApp::updateConnections()
 {
+	//vector of all current midi messages
 	midiMutex.lock();
-	vector<ofxMidiMessage> curMessages;
-	curMessages = _MIDIMessages;
+	vector<ofxMidiMessage> curMIDIMessages;
+	curMIDIMessages = _MIDIMessages;
 	_MIDIMessages.clear();
 	midiMutex.unlock();
+
+	/*
+	create a copy of all osc messages so they can be used in multiple connection 
+	they get deleted from receiver on getNextMessage()
+	*/
+	map<string, vector<ofxOscMessage>> curOSCMessages;
+	for (auto& receiver : _oscReceivers)
+	{
+		vector<ofxOscMessage> messages;
+		while (receiver.second.hasWaitingMessages()) {
+			ofxOscMessage m;
+			receiver.second.getNextMessage(m);
+			messages.push_back(m);
+		}
+		curOSCMessages[receiver.first] = messages;
+	}
 
 	for (auto& connection : _connections)
 	{
 		map<string, float> MIDIMessages, OSCMessages;
 		vector <pair<string, vector<string>>> stringMessages;
-		
+
 		//input
 		//from input
 		if (connection.fromInputNode)
@@ -610,14 +628,13 @@ void ofApp::updateConnections()
 				//osc input
 				if (split[0] == "osc")
 				{
-					for (auto& receiver : _oscReceivers)
+					for (auto& receiver : curOSCMessages)
 					{
 						if (receiver.first == split[1])
 						{
-							while (receiver.second.hasWaitingMessages()) {
-								ofxOscMessage m;
-								receiver.second.getNextMessage(m);
-								OSCMessages[m.getAddress()] = m.getArgAsFloat(0);
+							for(auto &message : receiver.second)
+							{
+								OSCMessages[message.getAddress()] = message.getArgAsFloat(0);
 							}
 						}
 					}
@@ -625,7 +642,7 @@ void ofApp::updateConnections()
 				//midi input
 				else
 				{
-					for (auto msg : curMessages)
+					for (auto msg : curMIDIMessages)
 					{
 						if (msg.portName == _MIDIInPorts[split[1]])
 						{
@@ -774,7 +791,29 @@ void ofApp::updateConnections()
 					}
 					for (auto element : OSCMessages)
 					{
-						node->OSCIn(element.first, element.second);
+						vector<string> vAddress = ofSplitString(element.first, "/");
+						bool addressMatch = false;
+						string curAddress = element.first;
+						if (vAddress.size() > 0)
+						{
+							if (vAddress[0] == "global") {
+								addressMatch = true;
+								curAddress = curAddress.substr(7, string::npos);
+							}
+						}
+						if (vAddress.size() > 1)
+						{
+							string nodeAddress = vAddress[0] + "/" + vAddress[1];
+							if (node->getName() == nodeAddress)
+							{
+								addressMatch = true;
+								curAddress = curAddress.substr(nodeAddress.length() + 1, string::npos);
+							}
+						}
+						if (addressMatch)
+						{
+							node->OSCIn(curAddress, element.second);
+						}
 					}
 				}
 			}

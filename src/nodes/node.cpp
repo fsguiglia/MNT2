@@ -144,7 +144,7 @@ ofRectangle Node::getOutputConnector(int index)
 void Node::setName(string name, bool addId)
 {
 	_name = name;
-	if (addId) _name += "(" + ofToString(_id) + ")";
+	if (addId) _name += "/" + ofToString(_id);
 	ofRectangle bb = _font.getStringBoundingBox(_name, 0, 0);
 	_rect.setWidth(bb.width * 1.2);
 }
