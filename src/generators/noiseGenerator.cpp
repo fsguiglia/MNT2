@@ -30,7 +30,7 @@ void NoiseGenerator::setupGui()
 {
 	_gui = new ofxDatGui();
 	_gui->addHeader("Perlin Noise", false);
-	_gui->addToggle("Active");
+	_gui->addToggle("active");
 	_gui->addSlider("x speed", 0, 10, 1)->setName("x speed");
 	_gui->addSlider("y speed", 0, 10, 1)->setName("y speed");
 	_gui->addSlider("center x", 0, 1, _center.x)->setName("center x");
@@ -311,6 +311,16 @@ map<string, float> NoiseGenerator::getMidiDump()
 
 void NoiseGenerator::OSCIn(string address, float value)
 {
+	vector<string> split = ofSplitString(address, "/");
+	if (split.size() > 0)
+	{
+		if (split[0] == "active")
+		{
+			bool curActiveState = (value == 1);
+			_gui->getToggle("active")->setChecked(curActiveState);
+			_active = curActiveState;
+		}
+	}
 }
 
 map<string, float> NoiseGenerator::getOscOut()

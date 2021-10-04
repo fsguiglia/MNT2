@@ -315,6 +315,16 @@ template<typename T>
 inline void BasePage<T>::OSCIn(string address, float value)
 {
 	vector<string> split = ofSplitString(address, "/");
+	if (split.size() > 0)
+	{
+		if (split[0] == "active")
+		{
+			cout << "active" << endl;
+			bool curActiveState = (value == 1);
+			_gui->getToggle("active")->setChecked(curActiveState);
+			_map.setActive(curActiveState);
+		}
+	}
 	if (split.size() > 1)
 	{
 		if (split[0] == "control")
