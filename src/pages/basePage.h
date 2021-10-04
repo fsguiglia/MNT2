@@ -1,73 +1,32 @@
 #pragma once
 #include "ofMain.h"
-#include "../gui/scrollGui.h"
-#include "../utils/mntUtils.h"
-#include "ofxDatGui.h"
+#include "page.h"
 
-template<typename T> class BasePage {
+template<typename T> class BasePage : public Page {
 public:
 	BasePage();
 
-	virtual void setup(int width, int height, int guiWidth, int maxMessages = 20) = 0;
-	void setColorPallete(vector<ofColor> colorPallete);
 	void update();
 	void draw(ofTrueTypeFont font);
 
-	ofVec2f getPosition();
-	int getHeight();
-	int getWidth();
-	void resize(int w, int h);
-	ofRectangle centerSquarePosition(int w, int h);
-
+	void setColorPallete(vector<ofColor> colorPallete);
 	void setMinClickDistance(float distance);
-
-	void setHeader(string lable);
-
-	void setAddress(string address);
-	string getAddress();
-
-	void setMidiOutput(bool midiOutput);
-	void setOscOutput(bool oscOutput);
-	void setStringOutput(bool stringOutput);
-	bool getMidiOutput();
-	bool getOscOutput();
-	bool getStringOutput();
 
 	void setUseGlobalParameters(bool globalParameters);
 	bool getUseGlobalParameters();
 
 	void MIDIIn(string port, int channel, int control, float value);
+	void handleMIDIIn();
 	void OSCIn(string address, float value);
-
-	map<string, float> getOscOut(bool clear = false);
-	vector<string> getStringOut(bool clear = false);
-	map<string, float> getMidiDump(bool clear = false);
-	map<string, float> getMidiOut(bool clear = false);
-	
-	void setVisible(bool visible);
-	void clearMessages();
-
-	virtual void load(ofJson& json) = 0;
-	virtual ofJson save() = 0;
+	void handleOSCIn();
 
 protected:
-	void addMessages(map<string, float> messages, map<string, float>& queue);
-	void setStringMessages(vector<string> messages);
-	void clearMessages(map<string, float>& queue);
-
 	T _map;
-	ScrollGui* _gui;
 	ofxDatGuiFolder* _controlFolder;
 	ofxDatGuiFolder* _arrangeFolder;
-	bool _mouseControl, _inside, _controlLearn, _parameterLearn, _visible, _useGlobalParameters;
-	bool _midiOutput, _oscOutput, _stringOutput;
-	int _guiWidth, _maxMessages, _lastSelectedPoint;
+	bool _mouseControl, _useGlobalParameters;
+	int _lastSelectedPoint;
 	float _minClickDistance;
-	string _lastSelectedControl, _address, _name;
-	string _CCXY[2];
-	ofRectangle _position;
-	map<string, float> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
-	vector<string> _stringMessages;
 };
 
 template<typename T>
@@ -118,111 +77,11 @@ inline void BasePage<T>::draw(ofTrueTypeFont font)
 	ofPopStyle();
 }
 
-template<typename T>
-inline ofVec2f BasePage<T>::getPosition()
-{
-	return ofVec2f(_position.getPosition());
-}
-
-template<typename T>
-inline int BasePage<T>::getHeight()
-{
-	return _position.getHeight();
-}
-
-template<typename T>
-inline int BasePage<T>::getWidth()
-{
-	return (_position.getWidth() + _guiWidth);
-}
-
-template<typename T>
-inline void BasePage<T>::resize(int w, int h)
-{
-	_position = centerSquarePosition(w - _guiWidth, h);
-	_gui->setPosition(_position.x + _position.getWidth(), 0);
-	_gui->setMaxHeight(h);
-	_gui->update();
-}
-
-template<typename T>
-inline ofRectangle BasePage<T>::centerSquarePosition(int w, int h)
-{
-	ofRectangle rect;
-	int max = w;
-	int min = h;
-
-	if (h > w)
-	{
-		min = w;
-		max = h;
-	}
-	rect.setWidth(min);
-	rect.setHeight(min);
-	rect.setX(float(w - min) * 0.5);
-	rect.setY(float(h - min) * 0.5);
-
-	return rect;
-}
 
 template<typename T>
 inline void BasePage<T>::setMinClickDistance(float distance)
 {
 	_minClickDistance = distance;
-}
-
-template<typename T>
-inline void BasePage<T>::setHeader(string label)
-{
-	_gui->getHeader()->setLabel(label);
-}
-
-template<typename T>
-inline void BasePage<T>::setAddress(string address)
-{
-	_address = address;
-}
-
-template<typename T>
-inline string BasePage<T>::getAddress()
-{
-	return _address;
-}
-
-template<typename T>
-inline void BasePage<T>::setMidiOutput(bool midiOutput)
-{
-	_midiOutput = midiOutput;
-}
-
-template<typename T>
-inline void BasePage<T>::setOscOutput(bool oscOutput)
-{
-	_oscOutput = oscOutput;
-}
-
-template<typename T>
-inline void BasePage<T>::setStringOutput(bool stringOutput)
-{
-	_stringOutput = stringOutput;
-}
-
-template<typename T>
-inline bool BasePage<T>::getMidiOutput()
-{
-	return _midiOutput;
-}
-
-template<typename T>
-inline bool BasePage<T>::getOscOutput()
-{
-	return _oscOutput;
-}
-
-template<typename T>
-inline bool BasePage<T>::getStringOutput()
-{
-	return _stringOutput;
 }
 
 template<typename T>
@@ -312,6 +171,11 @@ inline void BasePage<T>::MIDIIn(string port, int channel, int control, float val
 }
 
 template<typename T>
+inline void BasePage<T>::handleMIDIIn()
+{
+}
+
+template<typename T>
 inline void BasePage<T>::OSCIn(string address, float value)
 {
 	vector<string> split = ofSplitString(address, "/");
@@ -319,7 +183,6 @@ inline void BasePage<T>::OSCIn(string address, float value)
 	{
 		if (split[0] == "active")
 		{
-			cout << "active" << endl;
 			bool curActiveState = (value == 1);
 			_gui->getToggle("active")->setChecked(curActiveState);
 			_map.setActive(curActiveState);
@@ -353,75 +216,6 @@ inline void BasePage<T>::OSCIn(string address, float value)
 }
 
 template<typename T>
-inline map<string, float> BasePage<T>::getOscOut(bool clear)
+inline void BasePage<T>::handleOSCIn()
 {
-	map<string, float> out = _OSCOutMessages;
-	if (clear) clearMessages(_OSCOutMessages);
-	return out;
-}
-
-template<typename T>
-inline vector<string> BasePage<T>::getStringOut(bool clear)
-{
-	vector<string> out = _stringMessages;
-	if (clear) _stringMessages.clear();
-	return out;
-}
-
-template<typename T>
-inline map<string, float> BasePage<T>::getMidiDump(bool clear)
-{
-	map<string, float> out = _MIDIDumpMessages;
-	if (clear) clearMessages(_MIDIDumpMessages);
-	return out;
-}
-
-template<typename T>
-inline map<string, float> BasePage<T>::getMidiOut(bool clear)
-{
-	map<string, float> out = _MIDIOutMessages;
-	if (clear) clearMessages(_MIDIOutMessages);
-	return out;
-}
-
-template<typename T>
-inline void BasePage<T>::setVisible(bool visible)
-{
-	if (_visible && !visible)
-	{
-		if(_controlLearn) _gui->getToggle("controlLearn")->setChecked(false);
-		if(_parameterLearn) _gui->getToggle("parameterLearn")->setChecked(false);
-		_controlLearn = false;
-		_parameterLearn = false;
-	}
-	_visible = visible;
-	_inside = visible;
-}
-
-template<typename T>
-inline void BasePage<T>::clearMessages()
-{
-	_MIDIOutMessages.clear();
-	_MIDIDumpMessages.clear();
-	_OSCOutMessages.clear();
-	_stringMessages.clear();
-}
-
-template<typename T>
-inline void BasePage<T>::addMessages(map<string, float> messages, map<string, float>& queue)
-{
-	queue.insert(messages.begin(), messages.end());
-	while (queue.size() > _maxMessages) queue.erase(queue.begin());;
-}
-
-template<typename T>
-inline void BasePage<T>::setStringMessages(vector<string> messages)
-{
-	_stringMessages = messages;
-}
-
-template<typename T>
-inline void BasePage<T>::clearMessages(map<string, float>& queue)
-{
-	queue.clear();
 }

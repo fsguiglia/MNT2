@@ -136,6 +136,9 @@
     <ClCompile Include="src\utils\mntUtils.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\pages\page.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -498,6 +501,9 @@
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\pages\page.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

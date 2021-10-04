@@ -223,6 +223,7 @@
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp" />
     <ClCompile Include="src\pages\CBCSPage.cpp" />
     <ClCompile Include="src\pages\NNIPage.cpp" />
+    <ClCompile Include="src\pages\page.cpp" />
     <ClCompile Include="src\pages\rgbPage.cpp" />
     <ClCompile Include="src\pages\triggerPage.cpp" />
     <ClCompile Include="src\points\point.cpp" />
@@ -306,6 +307,7 @@
     <ClInclude Include="src\pages\basePage.h" />
     <ClInclude Include="src\pages\CBCSPage.h" />
     <ClInclude Include="src\pages\NNIpage.h" />
+    <ClInclude Include="src\pages\page.h" />
     <ClInclude Include="src\pages\rgbPage.h" />
     <ClInclude Include="src\pages\triggerPage.h" />
     <ClInclude Include="src\points\point.h" />
