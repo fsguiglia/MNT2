@@ -12,25 +12,24 @@ NoiseGenerator::NoiseGenerator()
 	_radius.set(0.5, 0.5);
 	_active = false;
 	_visible = false;
-	_learn = false;
 	_cursor.set(-1, -1);
 	_seed = (int)ofRandom(10000);
 	_xFrame = _seed;
 	_yFrame = _seed + 1000;
 }
 
-void NoiseGenerator::setup(string name, int w, int h, int guiWidth)
+void NoiseGenerator::setup(string name, int w, int h, int guiWidth, int maxMessages)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
-	setupGui();
-	setHeader(name);
+	setupGui(name);
+	//maxMessage does nothing...
 }
 
-void NoiseGenerator::setupGui()
+void NoiseGenerator::setupGui(string name)
 {
-	_gui = new ofxDatGui();
-	_gui->addHeader("Perlin Noise", false);
+	_gui = new ScrollGui();
+	_gui->addHeader(name, false)->setName("Header");
 	_gui->addToggle("active");
 	_gui->addSlider("x speed", 0, 10, 1)->setName("x speed");
 	_gui->addSlider("y speed", 0, 10, 1)->setName("y speed");
@@ -54,11 +53,6 @@ void NoiseGenerator::setupGui()
 	_gui->update();
 }
 
-void NoiseGenerator::setHeader(string label)
-{
-	_gui->getHeader()->setLabel(label);
-}
-
 void NoiseGenerator::update()
 {
 	if (_active)
@@ -66,8 +60,8 @@ void NoiseGenerator::update()
 		generate();
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_output["control/x"] = _cursor.x;
-			_output["control/y"] = _cursor.y;
+			_OSCOutMessages["global/control/x"] = _cursor.x;
+			_OSCOutMessages["global/control/y"] = _cursor.y;
 		}
 		_xFrame += _xSpeed * 0.02;
 		_yFrame += _ySpeed * 0.02;
@@ -116,51 +110,24 @@ void NoiseGenerator::draw(ofTrueTypeFont font)
 	ofPopStyle();
 }
 
-ofVec2f NoiseGenerator::getPosition()
-{
-	return ofVec2f(_position.x, _position.y);
-}
-
-int NoiseGenerator::getHeight()
-{
-	return _position.height;
-}
-
-int NoiseGenerator::getWidth()
-{
-	return (_position.width + _guiWidth);
-}
-
-void NoiseGenerator::resize(int w, int h)
-{
-	_position = centerSquarePosition(w - _guiWidth, h);
-	_gui->setPosition(_position.x + _position.getWidth(), 0);
-	_gui->update();
-}
-
 void NoiseGenerator::setColorPallete(vector<ofColor> colorPalette)
 {
 	_colorPallete = colorPalette;
 }
 
-void NoiseGenerator::setVisible(bool visible)
-{
-	_visible = visible;
-}
-
 void NoiseGenerator::buttonEvent(ofxDatGuiButtonEvent e)
 {
-	if (e.target->getName() == "Clear mappings") clearMappings();
+	if (e.target->getName() == "Clear mappings") clearMidiMap();
 }
 
 void NoiseGenerator::toggleEvent(ofxDatGuiToggleEvent e)
 {
-	if (e.target->getName() == "Learn")	_learn = e.target->getChecked();
-	if (e.target->getName() == "Active")
+	if (e.target->getName() == "Learn")	_controlLearn = e.target->getChecked();
+	if (e.target->getName() == "active")
 	{
-		if (_learn) 
+		if (_controlLearn) 
 		{
-			_lastControl = "toggle/Active";
+			_lastControl = "toggle/active";
 			e.target->setChecked(false);
 		}
 		else _active = e.target->getChecked();
@@ -170,7 +137,7 @@ void NoiseGenerator::toggleEvent(ofxDatGuiToggleEvent e)
 void NoiseGenerator::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
-	if (_learn)
+	if (_controlLearn)
 	{
 		_lastControl = "slider/" + name;
 	}
@@ -205,42 +172,11 @@ void NoiseGenerator::mouseScrolled(int scroll)
 {
 }
 
-void NoiseGenerator::setMidiOutput(bool midiOutput)
+void NoiseGenerator::moduleMIDIIn(string port, int control, int channel, float value)
 {
-	_midiOutput = midiOutput;
 }
 
-void NoiseGenerator::setOscOutput(bool oscOutput)
-{
-	_oscOutput = oscOutput;
-}
-
-void NoiseGenerator::setStringOutput(bool stringOutput)
-{
-	_stringOutput = stringOutput;
-}
-
-bool NoiseGenerator::getMidiOutput()
-{
-	return _midiOutput;
-}
-
-bool NoiseGenerator::getOscOutput()
-{
-	return _oscOutput;
-}
-
-bool NoiseGenerator::getStringOutput()
-{
-	return _stringOutput;
-}
-
-string NoiseGenerator::getAddress()
-{
-	return string();
-}
-
-void NoiseGenerator::MIDIIn(string port, int control, int channel, float value)
+void NoiseGenerator::moduleMIDIMap(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -253,64 +189,30 @@ void NoiseGenerator::MIDIIn(string port, int control, int channel, float value)
 	valid = valid && value >= 0 && value <= 1;
 	if (valid)
 	{
-		if (_learn)
+		for (auto element : _midiMap)
 		{
-			vector<string> vLastControl = ofSplitString(_lastControl, "/");
-			bool mapExists = false;
-			for (auto element : _midiMap)
+			if (element.second == controlName)
 			{
-				if (element.second == controlName) mapExists = true;
-			}
-			if (!mapExists)
-			{
-				_midiMap[_lastControl] = controlName;
-				if (vLastControl[0] == "toggle")
+				vector<string> name = ofSplitString(element.first, "/");
+				if (name[0] == "toggle")
 				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getToggle(vLastControl[1])->setLabel(newName);
+					bool checked = value >= 0.75;
+					_gui->getToggle(name[1])->setChecked(checked);
+					if (name[1] == "active") _active = checked;
 				}
-				else if (vLastControl[0] == "slider")
+				else if (name[0] == "slider")
 				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getSlider(vLastControl[1])->setLabel(newName);
-				}
-			}
-		}
-		else
-		{
-			for (auto element : _midiMap)
-			{
-				if (element.second == controlName)
-				{
-					vector<string> name = ofSplitString(element.first, "/");
-					if (name[0] == "toggle")
-					{
-						bool checked = value >= 0.75;
-						_gui->getToggle(name[1])->setChecked(checked);
-						if (name[1] == "Active") _active = checked;
-					}
-					else if (name[0] == "slider")
-					{
-						if(name[1] == "center y") _gui->getSlider(name[1])->setValue(1 - value);
-						else _gui->getSlider(name[1])->setValue(value);
-					}
+					if (name[1] == "center y") _gui->getSlider(name[1])->setValue(1 - value);
+					else if (name[1] == "x speed") _gui->getSlider(name[1])->setValue(10.0 * value);
+					else if (name[1] == "y speed") _gui->getSlider(name[1])->setValue(10.0 * value);
+					else _gui->getSlider(name[1])->setValue(value);
 				}
 			}
 		}
 	}
 }
 
-map<string, float> NoiseGenerator::getMidiOut()
-{
-	return map<string, float>();
-}
-
-map<string, float> NoiseGenerator::getMidiDump()
-{
-	return map<string, float>();
-}
-
-void NoiseGenerator::OSCIn(string address, float value)
+void NoiseGenerator::moduleOSCIn(string address, float value)
 {
 	vector<string> split = ofSplitString(address, "/");
 	if (split.size() > 0)
@@ -324,73 +226,11 @@ void NoiseGenerator::OSCIn(string address, float value)
 	}
 }
 
-map<string, float> NoiseGenerator::getOscOut()
-{
-	return _output;
-}
-
-vector<string> NoiseGenerator::getStringOut()
-{
-	return vector<string>();
-}
-
-void NoiseGenerator::clearMessages()
-{
-	_output.clear();
-}
-
-void NoiseGenerator::clearMappings()
-{
-	for (auto element : _midiMap)
-	{
-		vector<string> split = ofSplitString(element.first, "/");
-		if (split[0] == "button")
-		{
-			_gui->getButton(split[1])->setLabel(_gui->getButton(split[1])->getName());
-		}
-		if (split[0] == "toggle")
-		{
-			_gui->getToggle(split[1])->setLabel(_gui->getToggle(split[1])->getName());
-		}
-		if (split[0] == "slider")
-		{
-			_gui->getSlider(split[1])->setLabel(_gui->getSlider(split[1])->getName());
-		}
-	}
-	_midiMap.clear();
-}
-
 void NoiseGenerator::load(ofJson & json)
 {
 	_midiMap.clear();
 
-	for (auto element : json["midi"])
-	{
-		string name = element["name"].get<string>();
-		string value = element["value"].get<string>();
-		string sChannel = ofSplitString(value, "/")[0];
-		string sControl = ofSplitString(value, "/")[1];
-		string controlName = sChannel + "/" + sControl;
-		string controlLabel = "ch" + sChannel + "/cc" + sControl;
-
-		vector<string> vLastControl = ofSplitString(name, "/");
-		_midiMap[name] = controlName;
-		if (vLastControl[0] == "toggle")
-		{
-			string newName = vLastControl[1] + "(" + controlLabel + ")";
-			_gui->getToggle(vLastControl[1])->setLabel(newName);
-		}
-		else if (vLastControl[0] == "button")
-		{
-			string newName = vLastControl[1] + "(" + controlLabel + ")";
-			_gui->getButton(vLastControl[1])->setLabel(newName);
-		}
-		else if (vLastControl[0] == "slider")
-		{
-			string newName = vLastControl[1] + "(" + controlLabel + ")";
-			_gui->getSlider(vLastControl[1])->setLabel(newName);
-		}
-	}
+	loadMidiMap(json);
 
 	_center.x = json["center x"];
 	_center.y = json["center y"];
@@ -409,43 +249,17 @@ void NoiseGenerator::load(ofJson & json)
 
 ofJson NoiseGenerator::save()
 {
-	ofJson save;
+	ofJson jSave;
 
-	for (auto element : _midiMap)
-	{
-		ofJson mapping;
-		mapping["name"] = element.first;
-		mapping["value"] = element.second;
-		save["midi"].push_back(mapping);
-	}
+	jSave["center x"] = _center.x;
+	jSave["center y"] = _center.y;
+	jSave["radius x"] = _radius.x;
+	jSave["radius y"] = _radius.y;
+	jSave["xSpeed"] = _xSpeed;
+	jSave["ySpeed"] = _ySpeed;
 
-	save["center x"] = _center.x;
-	save["center y"] = _center.y;
-	save["radius x"] = _radius.x;
-	save["radius y"] = _radius.y;
-	save["xSpeed"] = _xSpeed;
-	save["ySpeed"] = _ySpeed;
-
-	return save;
-}
-
-ofRectangle NoiseGenerator::centerSquarePosition(int w, int h)
-{
-	ofRectangle rect;
-	int max = w;
-	int min = h;
-
-	if (h > w)
-	{
-		min = w;
-		max = h;
-	}
-	rect.setWidth(min);
-	rect.setHeight(min);
-	rect.setX(float(w - min) * 0.5);
-	rect.setY(float(h - min) * 0.5);
-
-	return rect;
+	saveMidiMap(jSave);
+	return jSave;
 }
 
 void NoiseGenerator::generate()

@@ -1,22 +1,16 @@
 #pragma once
 #include "ofMain.h"
-#include "ofxDatGui.h"
+#include "../pages/page.h"
 
-class NoiseGenerator {
+class NoiseGenerator : public Page {
 public:
 	NoiseGenerator();
-	void setup(string name, int w, int h, int guiWidth);
-	void setupGui();
-	void setHeader(string label);
+	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
+	void setupGui(string name);
 	void update();
 	void draw(ofTrueTypeFont font);
 
-	ofVec2f getPosition();
-	int getHeight();
-	int getWidth();
-	void resize(int w, int h);
 	void setColorPallete(vector<ofColor> colorPalette);
-	void setVisible(bool visible);
 
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
@@ -28,28 +22,14 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
-	void setMidiOutput(bool midiOutput);
-	void setOscOutput(bool oscOutput);
-	void setStringOutput(bool stringOutput);
-	bool getMidiOutput();
-	bool getOscOutput();
-	bool getStringOutput();
-
-	string getAddress();
-	void MIDIIn(string port, int control, int channel, float value);
-	map<string, float> getMidiOut();
-	map<string, float> getMidiDump();
-	void OSCIn(string address, float value);
-	map<string, float> getOscOut();
-	vector<string> getStringOut();
-	void clearMessages();
-	void clearMappings();
+	void moduleMIDIIn(string port, int control, int channel, float value);
+	void moduleMIDIMap(string port, int control, int channel, float value);
+	void moduleOSCIn(string address, float value);
 
 	void load(ofJson& json);
 	ofJson save();
 
 private:
-	ofRectangle centerSquarePosition(int w, int h);
 	void generate();
 
 	ofVec2f _cursor, _prevCursor;
@@ -58,17 +38,7 @@ private:
 	float _yFrame;
 
 	vector<ofColor> _colorPallete;
-	ofxDatGui* _gui;
-	ofRectangle _position;
 	float _xSpeed, _ySpeed;
 	ofVec2f _center, _radius;
-	int _guiWidth;
-	bool _visible, _active;
-
-	map<string, string> _midiMap;
-	string _lastControl;
-	bool _learn;
-
-	bool _midiOutput, _oscOutput, _stringOutput;
-	map<string, float> _output;
+	bool _active;
 };
