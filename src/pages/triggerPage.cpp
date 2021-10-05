@@ -34,8 +34,6 @@ void TriggerPage::setupGui()
 	_gui->addSlider("Radius", 0., 1., _radius);
 	_gui->addSlider("Threshold", 0., 1., _threshold);
 	_gui->addBreak();
-	_gui->addLabel("Parameters")->setName("Parameters");
-	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
 	_gui->addToggle("Learn parameters")->setName("parameterLearn");
 	_gui->onButtonEvent(this, &TriggerPage::buttonEvent);

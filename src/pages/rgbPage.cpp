@@ -37,8 +37,6 @@ void RGBPage::setupGui()
 	_gui->addSlider("Width", 0., 1.);
 	_gui->addSlider("Height", 0., 1.);
 	_gui->addBreak();
-	_gui->addLabel("Parameters")->setName("Parameters");
-	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
 	_gui->addToggle("Learn parameters")->setName("parameterLearn");
 	_gui->onButtonEvent(this, &RGBPage::buttonEvent);
