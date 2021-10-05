@@ -80,34 +80,43 @@ void Page::MIDIIn(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
-	string parameterName = sChannel + "/" + sControl;
-	string controlName = port + "/" + parameterName;
-	string sliderLabel = "ch" + sChannel + "/cc" + sControl;
-	map<string, float> curParameters;
+	string controlName = sChannel + "/" + sControl;
+	string controlLabel = "ch" + sChannel + "/cc" + sControl;
 
 	bool valid = true;
 	valid = valid && channel >= 0 && channel < 128;
 	valid = valid && control >= 0 && control < 128;
-	valid = valid && value >= 0 && value < 1;
+	valid = valid && value >= 0 && value <= 1;
 	if (valid)
 	{
-		if (_controlLearn) {
-			if (_lastSelectedControl == "x")
+		if (_controlLearn)
+		{
+			vector<string> vLastControl = ofSplitString(_lastControl, "/");
+			bool mapExists = false;
+			for (auto element : _midiMap)
 			{
-				_CCXY[0] = controlName;
-				_gui->getSlider("x")->setLabel("x:" + sliderLabel);
+				if (element.second == controlName) mapExists = true;
 			}
-			if (_lastSelectedControl == "y")
+			if (!mapExists)
 			{
-				_CCXY[1] = controlName;
-				_gui->getSlider("y")->setLabel("y:" + sliderLabel);
+				_midiMap[_lastControl] = controlName;
+				if (vLastControl[0] == "toggle")
+				{
+					string newName = vLastControl[1] + "(" + controlLabel + ")";
+					_gui->getToggle(vLastControl[1])->setLabel(newName);
+				}
+				else if (vLastControl[0] == "slider")
+				{
+					string newName = vLastControl[1] + "(" + controlLabel + ")";
+					_gui->getSlider(vLastControl[1])->setLabel(newName);
+				}
 			}
 		}
 		else
 		{
-			if (controlName == _CCXY[0]) _gui->getSlider("x")->setValue(value);
-			if (controlName == _CCXY[1]) _gui->getSlider("y")->setValue(value);
+			moduleMIDIMap(port, control, channel, value);
 		}
+		
 		moduleMIDIIn(port, control, channel, value);
 	}
 }
@@ -163,11 +172,67 @@ void Page::clearMessages()
 	_stringMessages.clear();
 }
 
-void Page::clearMappings()
+void Page::clearMidiMap()
 {
-	/*
-		ver
-	*/
+	for (auto element : _midiMap)
+	{
+		vector<string> split = ofSplitString(element.first, "/");
+		if (split[0] == "button")
+		{
+			_gui->getButton(split[1])->setLabel(_gui->getButton(split[1])->getName());
+		}
+		if (split[0] == "toggle")
+		{
+			_gui->getToggle(split[1])->setLabel(_gui->getToggle(split[1])->getName());
+		}
+		if (split[0] == "slider")
+		{
+			_gui->getSlider(split[1])->setLabel(_gui->getSlider(split[1])->getName());
+		}
+	}
+	_midiMap.clear();
+}
+
+void Page::saveMidiMap(ofJson & json)
+{
+	for (auto element : _midiMap)
+	{
+		ofJson mapping;
+		mapping["name"] = element.first;
+		mapping["value"] = element.second;
+		json["midi"].push_back(mapping);
+	}
+}
+
+void Page::loadMidiMap(ofJson & json)
+{
+	for (auto element : json["midi"])
+	{
+		string name = element["name"].get<string>();
+		string value = element["value"].get<string>();
+		string sChannel = ofSplitString(value, "/")[0];
+		string sControl = ofSplitString(value, "/")[1];
+		string controlName = sChannel + "/" + sControl;
+		string controlLabel = "ch" + sChannel + "/cc" + sControl;
+
+		vector<string> vLastControl = ofSplitString(name, "/");
+		_midiMap[name] = controlName;
+		if (vLastControl[0] == "toggle")
+		{
+			string newName = vLastControl[1] + "(" + controlLabel + ")";
+			_gui->getToggle(vLastControl[1])->setLabel(newName);
+		}
+		else if (vLastControl[0] == "button")
+		{
+			string newName = vLastControl[1] + "(" + controlLabel + ")";
+			_gui->getButton(vLastControl[1])->setLabel(newName);
+		}
+		else if (vLastControl[0] == "slider")
+		{
+			string newName = vLastControl[1] + "(" + controlLabel + ")";
+			_gui->getSlider(vLastControl[1])->setLabel(newName);
+		}
+	}
 }
 
 void Page::addMessages(map<string, float> messages, map<string, float>& queue)

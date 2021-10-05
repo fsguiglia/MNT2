@@ -19,6 +19,7 @@ public:
 	bool getUseGlobalParameters();
 
 	void moduleMIDIIn(string port, int control, int channel, float value);
+	void moduleMIDIMap (string port, int control, int channel, float value);
 	void moduleOSCIn(string address, float value);
 
 protected:
@@ -57,8 +58,9 @@ inline void BasePage<T>::setupGui(string name)
 	_gui = new ScrollGui();
 	_gui->addHeader(name, false)->setName("Header");
 	_gui->addToggle("active");
-	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
+	_controlFolder->addButton("clear MIDI")->setName("clearMIDI");
+	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("Mouse Control");
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
@@ -166,6 +168,40 @@ inline void BasePage<T>::moduleMIDIIn(string port, int control, int channel, flo
 				map<string, float> curMessage;
 				curMessage[parameterName] = value;
 				addMessages(curMessage, _MIDIOutMessages);
+			}
+		}
+	}
+}
+
+template<typename T>
+inline void BasePage<T>::moduleMIDIMap(string port, int control, int channel, float value)
+{
+	string sControl = ofToString(control);
+	string sChannel = ofToString(channel);
+	string controlName = sChannel + "/" + sControl;
+	string controlLabel = "ch" + sChannel + "/cc" + sControl;
+
+	bool valid = true;
+	valid = valid && channel >= 0 && channel < 128;
+	valid = valid && control >= 0 && control < 128;
+	valid = valid && value >= 0 && value <= 1;
+	if (valid)
+	{
+		for (auto element : _midiMap)
+		{
+			if (element.second == controlName)
+			{
+				vector<string> name = ofSplitString(element.first, "/");
+				if (name[0] == "toggle")
+				{
+					bool checked = value >= 0.75;
+					_gui->getToggle(name[1])->setChecked(checked);
+					if (name[1] == "active") _map.setActive(checked);
+				}
+				else if (name[0] == "slider")
+				{
+					_gui->getSlider(name[1])->setValue(value);
+				}
 			}
 		}
 	}

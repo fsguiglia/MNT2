@@ -218,8 +218,8 @@ void ofApp::moduleButtonEvent(ofxDatGuiButtonEvent e)
 	);
 	_moduleNodes[_moduleNodes.size() - 1]->setupPage(
 		_moduleNodes[_moduleNodes.size() - 1]->getName(),
-		1024,
-		1024,
+		_moduleSize,
+		_moduleSize,
 		_guiWidth,
 		_colorPallete
 	);
@@ -947,8 +947,8 @@ void ofApp::load()
 
 				_moduleNodes[_moduleNodes.size() - 1]->setupPage(
 					_moduleNodes[_moduleNodes.size() - 1]->getName(),
-					1024,
-					1024,
+					_moduleSize,
+					_moduleSize,
 					_guiWidth,
 					_colorPallete
 				);

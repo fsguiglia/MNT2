@@ -41,6 +41,9 @@ public:
 	bool getOscOutput();
 	bool getStringOutput();
 
+	//mapping
+	void clearMappings();
+
 	//io
 	void MIDIIn(string port, int control, int channel, float value);
 	map<string, float> getMidiOut(bool clear = false);
@@ -52,7 +55,7 @@ public:
 	string getAddress();
 	vector<string> getStringOut(bool clear = false);
 	void clearMessages();
-	void clearMappings();
+	void clearMidiMap();
 
 	//load/save
 	virtual void load(ofJson& json) = 0;
@@ -60,7 +63,11 @@ public:
 
 protected:
 	virtual void moduleMIDIIn(string port, int control, int channel, float value) = 0;
+	virtual void moduleMIDIMap(string port, int control, int channel, float value) = 0;
 	virtual void moduleOSCIn(string address, float value) = 0;
+
+	void saveMidiMap(ofJson& json);
+	void loadMidiMap(ofJson& json);
 	
 	void addMessages(map<string, float> messages, map<string, float>& queue);
 	void setStringMessages(vector<string> messages);
@@ -73,13 +80,16 @@ protected:
 	ofRectangle _position;
 	int _guiWidth;
 	bool _visible, _inside;
+	bool _controlLearn, _parameterLearn; //parameterlearn no tiene sentido para los generadores
+
+	//mapping
+	string _lastControl;
+	map<string, string> _midiMap;
 
 	//io
 	int _maxMessages;
 	bool _midiOutput, _oscOutput, _stringOutput;
-	bool _controlLearn, _parameterLearn; //parameterlearn no tiene sentido para los generadores
-	string _address, _lastSelectedControl;
-	string _CCXY[2];
+	string _address;
 	map<string, float> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
 	vector<string> _stringMessages;
 };

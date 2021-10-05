@@ -112,18 +112,19 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
+
 	if (name == "perplexity" || name == "learning rate" || name == "iterations")
 	{
 		_audioDr.setParameter(name, e.value);
 	}
 	else if (name == "x" || name == "y")
 	{
-		_lastSelectedControl = name;
+		_lastControl = "slider/" + name;
 		if (!_controlLearn)
 		{
 			ofVec2f nniCursor = _map.getCursor();
 			if (name == "x") nniCursor.x = e.value;
-			if (name == "y") nniCursor.y = 1 - e.value;
+			if (name == "y") nniCursor.y = e.value;
 			_map.setCursor(nniCursor);
 		}
 	}
@@ -164,11 +165,18 @@ void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
 	}
 	if (e.target->getName() == "active")
 	{
-		_map.setActive(e.checked);
-		_gui->getToggle("controlLearn")->setChecked(false);
-		_controlLearn = false;
-		_gui->getToggle("parameterLearn")->setChecked(false);
-		_parameterLearn = false;
+		if (_controlLearn)
+		{
+			_lastControl = "toggle/active";
+			e.target->setChecked(false);
+			_map.setActive(e.checked);
+		}
+		else
+		{
+			_map.setActive(e.checked);
+			_gui->getToggle("parameterLearn")->setChecked(false);
+			_parameterLearn = false;
+		}
 	}
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
@@ -302,7 +310,7 @@ void NNIPage::load(ofJson& json)
 	_map.clearPoints();
 	_map.clearGlobalParameters();
 	_gui->clearRemovableSliders();
-	
+
 	//load parameters to NNI and GUI
 	for (auto parameter : json["parameters"])
 	{
@@ -316,6 +324,7 @@ void NNIPage::load(ofJson& json)
 		_gui->setWidth(300, 0.3);
 		_gui->setOpacity(0.5);
 	}
+
 	for (ofJson site : json["points"])
 	{
 		for (auto parameter : _map.getParameters())
@@ -325,25 +334,13 @@ void NNIPage::load(ofJson& json)
 		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
 	}
 	
-	//gui
-	vector<string> split;
-	string sliderLabel;
-	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
-	split = ofSplitString(_CCXY[0], "/");
-	sliderLabel = "cc" + split[split.size() - 1];
-	_gui->getSlider("x")->setLabel(sliderLabel);
-
-	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
-	split = ofSplitString(_CCXY[1], "/");
-	sliderLabel = "cc" + split[split.size() - 1];
-	_gui->getSlider("y")->setLabel(sliderLabel);
-	_gui->update();
-
 	if (_map.getPoints().size() != 0)
 	{
 		_map.setLastSelected(0, ofGetElapsedTimeMillis());
 		updateSelected(0, _map.getPoint(_map.getPoints().size() - 1));
 	}
+
+	loadMidiMap(json);
 }
 
 ofJson NNIPage::save()
@@ -364,7 +361,7 @@ ofJson NNIPage::save()
 		}
 		jSave["points"].push_back(curPoint);
 	}
-	jSave["MIDIMap"]["x"] = _CCXY[0];
-	jSave["MIDIMap"]["y"] = _CCXY[1];
+
+	saveMidiMap(jSave);
 	return jSave;
 }

@@ -83,6 +83,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		
 		//GUI
 		const size_t _maxPages = 1;
+		const int _moduleSize = 1024;
 		int _guiWidth = 300;
 		int _lastWidth, _lastHeight;
 		int _pageMarginLeft, _pageMarginRight;

@@ -60,7 +60,7 @@ void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 	string name = e.target->getName();
 	if (name == "x" || name == "y")
 	{
-		_lastSelectedControl = name;
+		_lastControl = "slider/" + name;
 		if (!_controlLearn)
 		{
 			ofVec2f cursor = _map.getCursors()[0];
@@ -139,11 +139,18 @@ void RGBPage::toggleEvent(ofxDatGuiToggleEvent e)
 	}
 	if (e.target->getName() == "active")
 	{
-		_map.setActive(e.checked);
-		_gui->getToggle("controlLearn")->setChecked(false);
-		_controlLearn = false;
-		_gui->getToggle("parameterLearn")->setChecked(false);
-		_parameterLearn = false;
+		if (_controlLearn)
+		{
+			_lastControl = "toggle/active";
+			e.target->setChecked(false);
+			_map.setActive(e.checked);
+		}
+		else
+		{
+			_map.setActive(e.checked);
+			_gui->getToggle("parameterLearn")->setChecked(false);
+			_parameterLearn = false;
+		}
 	}
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
@@ -334,19 +341,6 @@ void RGBPage::load(ofJson & json)
 	}
 	_radius = json["radius"];
 	_map.setRadius(_radius);
-	//gui
-	vector<string> split;
-	string sliderLabel;
-	_CCXY[0] = json["MIDIMap"]["x"].get<string>();
-	split = ofSplitString(_CCXY[0], "/");
-	sliderLabel = "cc" + split[split.size() - 1];
-	_gui->getSlider("x")->setLabel(sliderLabel);
-
-	_CCXY[1] = json["MIDIMap"]["y"].get<string>();
-	split = ofSplitString(_CCXY[1], "/");
-	sliderLabel = "cc" + split[split.size() - 1];
-	_gui->getSlider("y")->setLabel(sliderLabel);
-	_gui->update();
 
 	if (_map.getPoints().size() != 0)
 	{
@@ -354,6 +348,8 @@ void RGBPage::load(ofJson & json)
 		RGBPoint point = _map.getPoint(0);
 		updateSelected(0, point);
 	}
+
+	loadMidiMap(json);
 }
 
 ofJson RGBPage::save()
@@ -379,7 +375,7 @@ ofJson RGBPage::save()
 		}
 		jSave["points"].push_back(curPoint);
 	}
-	jSave["MIDIMap"]["x"] = _CCXY[0];
-	jSave["MIDIMap"]["y"] = _CCXY[1];
+	
+	saveMidiMap(jSave);
 	return jSave;
 }

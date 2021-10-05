@@ -110,12 +110,12 @@ void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else if (name == "x" || name == "y")
 	{
-		_lastSelectedControl = name;
+		_lastControl = "slider/" + name;
 		if (!_controlLearn)
 		{
 			ofVec2f cursor = _map.getCursor();
 			if (name == "x") cursor.x = e.value;
-			if (name == "y") cursor.y = 1 - e.value;
+			if (name == "y") cursor.y = e.value;
 			_map.setCursor(cursor);
 		}
 	}
@@ -130,9 +130,17 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "controlLearn") _controlLearn = e.checked;
 	if (e.target->getName() == "active")
 	{
-		_map.setActive(e.checked);
-		_gui->getToggle("controlLearn")->setChecked(false);
-		_controlLearn = false;
+		if (_controlLearn)
+		{
+			_lastControl = "toggle/active";
+			e.target->setChecked(false);
+			_map.setActive(e.checked);
+		}
+		else
+		{
+			_map.setActive(e.checked);
+			_gui->getToggle("parameterLearn")->setChecked(false);
+		}
 	}
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 	if (e.target->getName() == "complete") {
@@ -232,6 +240,8 @@ void CBCSPage::load(ofJson & json)
 		curPoint.setValue("position", point["pos"]);
 		_map.addPoint(curPoint);
 	}
+
+	loadMidiMap(json);
 	_map.build();
 }
 
@@ -250,7 +260,6 @@ ofJson CBCSPage::save()
 		jSave["points"].push_back(curPoint);
 	}
 
-	jSave["MIDIMap"]["x"] = _CCXY[0];
-	jSave["MIDIMap"]["y"] = _CCXY[1];
+	saveMidiMap(jSave);
 	return jSave;
 }
