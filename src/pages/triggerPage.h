@@ -9,6 +9,7 @@ public:
 	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
 	void setupGui();
 
+	void buttonEvent(ofxDatGuiButtonEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
 	void textInputEvent(ofxDatGuiTextInputEvent e);

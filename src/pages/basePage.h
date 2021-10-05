@@ -58,8 +58,8 @@ inline void BasePage<T>::setupGui(string name)
 	_gui = new ScrollGui();
 	_gui->addHeader(name, false)->setName("Header");
 	_gui->addToggle("active");
-	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
-	_controlFolder->addButton("clear MIDI")->setName("clearMIDI");
+	_gui->addToggle("MIDI learn")->setName("controlLearn");
+	_gui->addButton("clear MIDI")->setName("clearMIDI");
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("Mouse Control");
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");

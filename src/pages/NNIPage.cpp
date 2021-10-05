@@ -107,6 +107,10 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 		_audioDr.setParameter("--technique", 1);
 		if (!_audioDr.getRunning()) _audioDr.start(save());
 	}
+	else if (e.target->getName() == "clearMIDI")
+	{
+		clearMidiMap();
+	}
 }
 
 void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)

@@ -38,6 +38,7 @@ void TriggerPage::setupGui()
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
 	_gui->addToggle("Learn parameters")->setName("parameterLearn");
+	_gui->onButtonEvent(this, &TriggerPage::buttonEvent);
 	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
 	_gui->onSliderEvent(this, &TriggerPage::sliderEvent);
 	_gui->onTextInputEvent(this, &TriggerPage::textInputEvent);
@@ -50,6 +51,14 @@ void TriggerPage::setupGui()
 	_gui->setVisible(false);
 	_gui->setEnabled(false);
 	_gui->update();
+}
+
+void TriggerPage::buttonEvent(ofxDatGuiButtonEvent e)
+{
+	if (e.target->getName() == "clearMIDI")
+	{
+		clearMidiMap();
+	}
 }
 
 void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)

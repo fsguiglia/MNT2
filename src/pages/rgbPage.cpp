@@ -41,6 +41,7 @@ void RGBPage::setupGui()
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");
 	_gui->addToggle("Learn parameters")->setName("parameterLearn");
+	_gui->onButtonEvent(this, &RGBPage::buttonEvent);
 	_gui->onToggleEvent(this, &RGBPage::toggleEvent);
 	_gui->onSliderEvent(this, &RGBPage::sliderEvent);
 	_gui->onTextInputEvent(this, &RGBPage::textInputEvent);
@@ -53,6 +54,14 @@ void RGBPage::setupGui()
 	_gui->setVisible(false);
 	_gui->setEnabled(false);
 	_gui->update();
+}
+
+void RGBPage::buttonEvent(ofxDatGuiButtonEvent e)
+{
+	if (e.target->getName() == "clearMIDI")
+	{
+		clearMidiMap();
+	}
 }
 
 void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)

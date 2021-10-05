@@ -41,9 +41,6 @@ public:
 	bool getOscOutput();
 	bool getStringOutput();
 
-	//mapping
-	void clearMappings();
-
 	//io
 	void MIDIIn(string port, int control, int channel, float value);
 	map<string, float> getMidiOut(bool clear = false);

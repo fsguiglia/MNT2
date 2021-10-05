@@ -86,18 +86,22 @@ void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 		_dr.setParameter("--technique", 0);
 		if (!_dr.getRunning()) _dr.start();
 	}
-	if (e.target->getName() == "pca")
+	else if (e.target->getName() == "pca")
 	{
 		_dr.setParameter("--technique", 1);
 		if (!_dr.getRunning()) _dr.start();
 	}
-	if (e.target->getName() == "Normalize")
+	else if (e.target->getName() == "Normalize")
 	{
 		_map.normalize();
 	}
-	if (e.target->getName() == "Export")
+	else if (e.target->getName() == "Export")
 	{
 		exportFileList();
+	}
+	else if (e.target->getName() == "clearMIDI")
+	{
+		clearMidiMap();
 	}
 }
 
