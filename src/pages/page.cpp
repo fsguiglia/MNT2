@@ -99,16 +99,24 @@ void Page::MIDIIn(string port, int control, int channel, float value)
 			}
 			if (!mapExists)
 			{
-				_midiMap[_lastControl] = controlName;
-				if (vLastControl[0] == "toggle")
+				if (_lastControl != "")
 				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getToggle(vLastControl[1])->setLabel(newName);
-				}
-				else if (vLastControl[0] == "slider")
-				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getSlider(vLastControl[1])->setLabel(newName);
+					_midiMap[_lastControl] = controlName;
+					if (vLastControl[0] == "toggle")
+					{
+						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						_gui->getToggle(vLastControl[1])->setLabel(newName);
+					}
+					else if (vLastControl[0] == "slider")
+					{
+						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						_gui->getSlider(vLastControl[1])->setLabel(newName);
+					}
+					else if (vLastControl[0] == "button")
+					{
+						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						_gui->getButton(vLastControl[1])->setLabel(newName);
+					}
 				}
 			}
 		}

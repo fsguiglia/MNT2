@@ -1,10 +1,10 @@
 #pragma once
 #include "ofMain.h"
-#include "basePage.h"
+#include "mapPage.h"
 #include "../ML/pythonML.h"
 #include "../maps/NNI.h"
 
-class NNIPage : public BasePage<NNI> {
+class NNIPage : public MapPage<NNI> {
 public:
 	NNIPage();
 	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);

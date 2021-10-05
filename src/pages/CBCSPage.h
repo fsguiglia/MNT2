@@ -1,10 +1,10 @@
 #pragma once
 #include "ofMain.h"
-#include "basePage.h"
+#include "mapPage.h"
 #include "../ML/pythonML.h"
 #include "../maps/CBCS.h"
 
-class CBCSPage : public BasePage<CBCS>
+class CBCSPage : public MapPage<CBCS>
 {
 public:
 	CBCSPage();

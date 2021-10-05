@@ -12,7 +12,7 @@
 #include "pages/CBCSPage.h"
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
-#include "gestures/gesturePage.h"
+#include "pages/gesturePage.h"
 #include "generators/noiseGenerator.h"
 #include "utils/mntUtils.h"
 

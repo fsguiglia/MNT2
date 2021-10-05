@@ -20,7 +20,7 @@ void TriggerPage::setup(string name, int w, int h, int guiWidth, int maxMessages
 	vector<ofVec2f> initialCursors = { ofVec2f(0,0) };
 	_map.setCursors(initialCursors);
 
-	BasePage::setup(name, w, h, guiWidth, maxMessages);
+	MapPage::setup(name, w, h, guiWidth, maxMessages);
 	setupGui();
 }
 

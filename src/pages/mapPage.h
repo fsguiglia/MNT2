@@ -2,9 +2,9 @@
 #include "ofMain.h"
 #include "page.h"
 
-template<typename T> class BasePage : public Page {
+template<typename T> class MapPage : public Page {
 public:
-	BasePage();
+	MapPage();
 
 	void setup(string name, int w, int h, int guiWidth, int maxMessages);
 	void setupGui(string name);
@@ -32,7 +32,7 @@ protected:
 };
 
 template<typename T>
-inline BasePage<T>::BasePage()
+inline MapPage<T>::MapPage()
 {
 	_lastSelectedPoint = -1;
 	_minClickDistance = 0.1;
@@ -44,7 +44,7 @@ inline BasePage<T>::BasePage()
 }
 
 template<typename T>
-inline void BasePage<T>::setup(string name, int w, int h, int guiWidth, int maxMessages)
+inline void MapPage<T>::setup(string name, int w, int h, int guiWidth, int maxMessages)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
@@ -53,7 +53,7 @@ inline void BasePage<T>::setup(string name, int w, int h, int guiWidth, int maxM
 }
 
 template<typename T>
-inline void BasePage<T>::setupGui(string name)
+inline void MapPage<T>::setupGui(string name)
 {
 	_gui = new ScrollGui();
 	_gui->addHeader(name, false)->setName("Header");
@@ -69,13 +69,13 @@ inline void BasePage<T>::setupGui(string name)
 }
 
 template<typename T>
-inline void BasePage<T>::setColorPallete(vector<ofColor> colorPallete)
+inline void MapPage<T>::setColorPallete(vector<ofColor> colorPallete)
 {
 	_map.setColorPallete(colorPallete);
 }
 
 template<typename T>
-inline void BasePage<T>::update()
+inline void MapPage<T>::update()
 {
 	_map.update();
 	if (_map.getActive())
@@ -99,7 +99,7 @@ inline void BasePage<T>::update()
 }
 
 template<typename T>
-inline void BasePage<T>::draw(ofTrueTypeFont font)
+inline void MapPage<T>::draw(ofTrueTypeFont font)
 {
 	ofPushStyle();
 	_map.draw(_position.x, _position.y, _position.getWidth(), _position.getHeight(), font);
@@ -111,25 +111,25 @@ inline void BasePage<T>::draw(ofTrueTypeFont font)
 
 
 template<typename T>
-inline void BasePage<T>::setMinClickDistance(float distance)
+inline void MapPage<T>::setMinClickDistance(float distance)
 {
 	_minClickDistance = distance;
 }
 
 template<typename T>
-inline void BasePage<T>::setUseGlobalParameters(bool globalParameters)
+inline void MapPage<T>::setUseGlobalParameters(bool globalParameters)
 {
 	_useGlobalParameters = globalParameters;
 }
 
 template<typename T>
-inline bool BasePage<T>::getUseGlobalParameters()
+inline bool MapPage<T>::getUseGlobalParameters()
 {
 	return _useGlobalParameters;
 }
 
 template<typename T>
-inline void BasePage<T>::moduleMIDIIn(string port, int control, int channel, float value)
+inline void MapPage<T>::moduleMIDIIn(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -174,7 +174,7 @@ inline void BasePage<T>::moduleMIDIIn(string port, int control, int channel, flo
 }
 
 template<typename T>
-inline void BasePage<T>::moduleMIDIMap(string port, int control, int channel, float value)
+inline void MapPage<T>::moduleMIDIMap(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -208,7 +208,7 @@ inline void BasePage<T>::moduleMIDIMap(string port, int control, int channel, fl
 }
 
 template<typename T>
-inline void BasePage<T>::moduleOSCIn(string address, float value)
+inline void MapPage<T>::moduleOSCIn(string address, float value)
 {
 	vector<string> split = ofSplitString(address, "/");
 	if (split.size() > 0)

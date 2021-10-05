@@ -1,28 +1,22 @@
 #pragma once
 #include "ofMain.h"
-#include "gesture.h"
-#include "ofxDatGui.h"
+#include "page.h"
+#include "../gestures/gesture.h"
 #include "../ML/pythonML.h"
-#include "../utils/mntUtils.h"
 
-class GesturePage {
+class GesturePage : public Page {
 public:
 	GesturePage();
-	void setup(string name, int w, int h, int guiWidth);
-	void setupGui();
-	void setHeader(string label);
+	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
+	void setupGui(string name);
 	void setupLSTM();
 
 	void update();
 	void updateGui();
 	void draw(ofTrueTypeFont font);
 	
-	ofVec2f getPosition();
-	int getHeight();
-	int getWidth();
-	void resize(int w, int h);
 	void setColorPallete(vector<ofColor> colorPalette);
-	void setVisible(bool visible);
+	void resize(int w, int h);
 	
 	void record();
 	void startRecording();
@@ -47,22 +41,9 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
-	void setMidiOutput(bool midiOutput);
-	void setOscOutput(bool oscOutput);
-	void setStringOutput(bool stringOutput);
-	bool getMidiOutput();
-	bool getOscOutput();
-	bool getStringOutput();
-
-	void MIDIIn(string port, int control, int channel, float value);
-	map<string, float> getMidiOut();
-	map<string, float> getMidiDump();
-	void OSCIn(string address, float value);
-	map<string, float> getOscOut();
-	string getAddress();
-	vector<string> getStringOut();
-	void clearMessages();
-	void clearMappings();
+	void moduleMIDIIn(string port, int control, int channel, float value);
+	void moduleMIDIMap(string port, int control, int channel, float value);
+	void moduleOSCIn(string address, float value);
 
 	void load(ofJson& json);
 	ofJson save();
@@ -81,6 +62,7 @@ private:
 	string _curGestureName;
 	int _curGestureIndex;
 	bool _recording;
+	bool _mouseControl;
 	
 	Gesture _playGesture;
 	ofPolyline _playPoly, _scrubPoly;
@@ -89,20 +71,12 @@ private:
 	int _lastPointTime;
 	bool _playing;
 
-	ofxDatGui* _gui;
+	int _guiHeight;
 	ofxDatGuiFolder* _transportFolder;
 	ofxDatGuiFolder* _controlFolder;
 	ofxDatGuiFolder* _generateFolder;
 	ofxDatGuiScrollView* _scrollView;
 	vector<ofColor> _colorPallete;
-	ofRectangle _position;
-	int _guiWidth, _guiHeight;
-	bool _inside, _visible, _mouseControl, _learn;
-
-	map<string, float> _output;
-	map<string, string> _midiMap;
-	string _lastControl;
-	bool _midiOutput, _oscOutput, _stringOutput;
 
 	ofVec2f _cursor, _prevCursor;
 

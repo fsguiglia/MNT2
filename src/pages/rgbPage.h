@@ -1,9 +1,9 @@
 #pragma once
 #include "ofMain.h"
-#include "basePage.h"
+#include "mapPage.h"
 #include "../maps/RGBMap.h"
 
-class RGBPage : public BasePage<RGBMap> {
+class RGBPage : public MapPage<RGBMap> {
 public:
 	RGBPage();
 	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);

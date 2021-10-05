@@ -88,9 +88,6 @@
     <ClCompile Include="src\gestures\gesture.cpp">
       <Filter>src\gestures</Filter>
     </ClCompile>
-    <ClCompile Include="src\gestures\gesturePage.cpp">
-      <Filter>src\gestures</Filter>
-    </ClCompile>
     <ClCompile Include="src\gui\scrollGui.cpp">
       <Filter>src\gui</Filter>
     </ClCompile>
@@ -137,6 +134,9 @@
       <Filter>src\utils</Filter>
     </ClCompile>
     <ClCompile Include="src\pages\page.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\gesturePage.cpp">
       <Filter>src\pages</Filter>
     </ClCompile>
   </ItemGroup>
@@ -437,9 +437,6 @@
     <ClInclude Include="src\gestures\gesture.h">
       <Filter>src\gestures</Filter>
     </ClInclude>
-    <ClInclude Include="src\gestures\gesturePage.h">
-      <Filter>src\gestures</Filter>
-    </ClInclude>
     <ClInclude Include="src\gui\scrollGui.h">
       <Filter>src\gui</Filter>
     </ClInclude>
@@ -473,9 +470,6 @@
     <ClInclude Include="src\nodes\node.h">
       <Filter>src\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="src\pages\basePage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
     <ClInclude Include="src\pages\CBCSPage.h">
       <Filter>src\pages</Filter>
     </ClInclude>
@@ -502,6 +496,12 @@
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\pages\page.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\mapPage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\gesturePage.h">
       <Filter>src\pages</Filter>
     </ClInclude>
   </ItemGroup>

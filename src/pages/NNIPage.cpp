@@ -17,7 +17,7 @@ void NNIPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 	_map.setDrawInterpolation(true);
 	_map.setDrawSelected(true);
 	
-	BasePage::setup(name, w, h, guiWidth, maxMessages);
+	MapPage::setup(name, w, h, guiWidth, maxMessages);
 	setupPca();
 	setupTsne();
 	setupGui();
@@ -88,7 +88,7 @@ void NNIPage::update()
 		else _pca.check();
 	}
 
-	BasePage::update();
+	MapPage::update();
 }
 
 void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)

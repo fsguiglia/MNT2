@@ -18,7 +18,7 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 	_map.setDrawSelected(true);
 	_map.setCursor(ofVec2f(-1, -1));
 
-	BasePage::setup(name, w, h, guiWidth, maxMessages);
+	MapPage::setup(name, w, h, guiWidth, maxMessages);
 	setupTsne();
 	setupGui();
 }
@@ -76,7 +76,7 @@ void CBCSPage::update()
 		else _dr.check();
 	}
 
-	BasePage::update();
+	MapPage::update();
 }
 
 void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)

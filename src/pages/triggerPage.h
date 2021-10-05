@@ -1,9 +1,9 @@
 #pragma once
 #include "ofMain.h"
-#include "basePage.h"
+#include "mapPage.h"
 #include "../maps/triggerMap.h"
 
-class TriggerPage : public BasePage<TriggerMap> {
+class TriggerPage : public MapPage<TriggerMap> {
 public:
 	TriggerPage();
 	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);

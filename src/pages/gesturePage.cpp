@@ -11,26 +11,25 @@ GesturePage::GesturePage()
 	_playing = false;
 	_mouseControl = false;
 	_inside = false;
-	_learn = false;
 	_cursor.set(-1, -1);
 	_lastControl = "";
 	_index = 0;
 	_scrubPolySpacing = 0.02;
 }
 
-void GesturePage::setup(string name, int w, int h, int guiWidth)
+void GesturePage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	setupLSTM();
-	setupGui();
-	setHeader(name);
+	setupGui(name);
+	//maxMessages does nothing...
 }
 
-void GesturePage::setupGui()
+void GesturePage::setupGui(string name)
 {
-	_gui = new ofxDatGui();
-	_gui->addHeader("Gesture", false);
+	_gui = new ScrollGui();
+	_gui->addHeader(name, false)->setName("Header");
 	_transportFolder = _gui->addFolder("Transport");
 	_transportFolder->addToggle("Record")->setName("Record");
 	_transportFolder->addButton("Play")->setName("Play");
@@ -77,11 +76,6 @@ void GesturePage::setupGui()
 	_scrollView->update();
 }
 
-void GesturePage::setHeader(string label)
-{
-	_gui->getHeader()->setLabel(label);
-}
-
 void GesturePage::setupLSTM()
 {
 	_lstmTrain.setup("../../ML/lstm/mnt_lstm.py", "gest", "python");
@@ -115,8 +109,8 @@ void GesturePage::update()
 	{
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_output["control/x"] = _cursor.x;
-			_output["control/y"] = _cursor.y;
+			_OSCOutMessages["global/control/x"] = _cursor.x;
+			_OSCOutMessages["global/control/y"] = _cursor.y;
 		}
 	}
 	_prevCursor = _cursor;
@@ -174,38 +168,16 @@ void GesturePage::draw(ofTrueTypeFont font)
 	ofPopStyle();
 }
 
-ofVec2f GesturePage::getPosition()
-{
-	return ofVec2f(_position.x, _position.y);
-}
-
-int GesturePage::getHeight()
-{
-	return _position.height;
-}
-
-int GesturePage::getWidth()
-{
-	return _position.width + _guiWidth;
-}
-
-void GesturePage::resize(int w, int h)
-{
-	_position = centerSquarePosition(w - _guiWidth, h);
-	_gui->setPosition(_position.x + _position.getWidth(), 0);
-	_gui->update();
-	_scrollView->setPosition(_position.x + _position.getWidth(), _gui->getHeight());
-	_scrollView->update();
-}
-
 void GesturePage::setColorPallete(vector<ofColor> colorPalette)
 {
 	_colorPallete = colorPalette;
 }
 
-void GesturePage::setVisible(bool visible)
+void GesturePage::resize(int w, int h)
 {
-	_visible = visible;
+	Page::resize(w, h);
+	_scrollView->setPosition(_position.x + _position.getWidth(), _gui->getHeight());
+	_scrollView->update();
 }
 
 void GesturePage::record()
@@ -335,27 +307,27 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 	}
 	if (e.target->getName() == "Play")
 	{
-		if(_learn) _lastControl = "button/Play";
+		if(_controlLearn) _lastControl = "button/Play";
 		else startPlaying();
 	}
 	if (e.target->getName() == "Next")
 	{
-		if (_learn) _lastControl = "button/Next";
+		if (_controlLearn) _lastControl = "button/Next";
 		else next();
 	}
 	if (e.target->getName() == "Previous")
 	{
-		if (_learn) _lastControl = "button/Previous";
+		if (_controlLearn) _lastControl = "button/Previous";
 		else previous();
 	}
 	if (e.target->getName() == "Random")
 	{
-		if (_learn) _lastControl = "button/Random";
+		if (_controlLearn) _lastControl = "button/Random";
 		else random();
 	}
 	if (e.target->getName() == "Clear mappings")
 	{
-		clearMappings();
+		clearMidiMap();
 	}
 	//------------------------------
 	if (e.target->getName() == "Train") _lstmTrain.start(save());
@@ -366,7 +338,7 @@ void GesturePage::toggleEvent(ofxDatGuiToggleEvent e)
 {
 	if (e.target->getName() == "Record")
 	{
-		if (_learn)
+		if (_controlLearn)
 		{
 			_lastControl = "toggle/Record";
 			e.target->setChecked(false);
@@ -379,7 +351,7 @@ void GesturePage::toggleEvent(ofxDatGuiToggleEvent e)
 	}
 	if (e.target->getName() == "Learn")
 	{
-		_learn = e.target->getChecked();
+		_controlLearn = e.target->getChecked();
 	}
 }
 
@@ -388,7 +360,7 @@ void GesturePage::sliderEvent(ofxDatGuiSliderEvent e)
 	string name = e.target->getName();
 	if (name == "x" || name == "y" || name == "Scrub")
 	{
-		if (_learn) _lastControl = "slider/" + name;
+		if (_controlLearn) _lastControl = "slider/" + name;
 		else
 		{
 			if (name == "x") _cursor.x = e.value;
@@ -440,37 +412,11 @@ void GesturePage::mouseScrolled(int scroll)
 {
 }
 
-void GesturePage::setMidiOutput(bool midiOutput)
+void GesturePage::moduleMIDIIn(string port, int control, int channel, float value)
 {
-	_midiOutput = midiOutput;
 }
 
-void GesturePage::setOscOutput(bool oscOutput)
-{
-	_oscOutput = oscOutput;
-}
-
-void GesturePage::setStringOutput(bool stringOutput)
-{
-	_stringOutput = stringOutput;
-}
-
-bool GesturePage::getMidiOutput()
-{
-	return _midiOutput;
-}
-
-bool GesturePage::getOscOutput()
-{
-	return _oscOutput;
-}
-
-bool GesturePage::getStringOutput()
-{
-	return _stringOutput;
-}
-
-void GesturePage::MIDIIn(string port, int control, int channel, float value)
+void GesturePage::moduleMIDIMap(string port, int control, int channel, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -483,125 +429,46 @@ void GesturePage::MIDIIn(string port, int control, int channel, float value)
 	valid = valid && value >= 0 && value <= 1;
 	if (valid)
 	{
-		if (_learn)
+		for (auto element : _midiMap)
 		{
-			if (_lastControl != "")
+			if (element.second == controlName)
 			{
-				vector<string> vLastControl = ofSplitString(_lastControl, "/");
-				_midiMap[_lastControl] = controlName;
-				
-				if (vLastControl[0] == "toggle")
+				vector<string> name = ofSplitString(element.first, "/");
+				if (name[0] == "toggle")
 				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getToggle(vLastControl[1])->setLabel(newName);
-				}
-				else if (vLastControl[0] == "button")
-				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getButton(vLastControl[1])->setLabel(newName);
-				}
-				else if (vLastControl[0] == "slider")
-				{
-					string newName = vLastControl[1] + "(" + controlLabel + ")";
-					_gui->getSlider(vLastControl[1])->setLabel(newName);
-				}
-				
-			}
-
-		}
-		else
-		{
-			for (auto element : _midiMap)
-			{
-				if (element.second == controlName)
-				{
-					vector<string> name = ofSplitString(element.first, "/");
-					if (name[0] == "toggle")
+					bool checked = value >= 0.75;
+					_gui->getToggle(name[1])->setChecked(checked);
+					if (name[1] == "Record")
 					{
-						bool checked = value >= 0.75;
-						_gui->getToggle(name[1])->setChecked(checked);
-						if (name[1] == "Record")
-						{
-							if (checked) startRecording();
-							else endRecording();
-						}
+						if (checked) startRecording();
+						else endRecording();
 					}
-					if (name[0] == "button")
+				}
+				if (name[0] == "button")
+				{
+					if (value >= 0.75)
 					{
-						if (value >= 0.75)
-						{
-							if (name[1] == "Next") next();
-							if (name[1] == "Previous") previous();
-							if (name[1] == "Random") random();
-							if (name[1] == "Play") startPlaying();
-						}
+						if (name[1] == "Next") next();
+						if (name[1] == "Previous") previous();
+						if (name[1] == "Random") random();
+						if (name[1] == "Play") startPlaying();
 					}
-					else if (name[0] == "slider")
-					{
-						_gui->getSlider(name[1])->setValue(value, false);
-						if (name[1] == "x") _cursor.x = value;
-						else if(name[1] == "y") _cursor.y = 1 - value;
-						else if (name[1] == "Scrub") getCursorAtPercent(value);
-					}
+				}
+				else if (name[0] == "slider")
+				{
+					_gui->getSlider(name[1])->setValue(value, false);
+					if (name[1] == "x") _cursor.x = value;
+					else if (name[1] == "y") _cursor.y = 1 - value;
+					else if (name[1] == "Scrub") getCursorAtPercent(value);
 				}
 			}
 		}
 	}
 }
 
-map<string, float> GesturePage::getMidiOut()
+void GesturePage::moduleOSCIn(string address, float value)
 {
-	return map<string, float>();
-}
 
-map<string, float> GesturePage::getMidiDump()
-{
-	return map<string, float>();
-}
-
-void GesturePage::OSCIn(string address, float value)
-{
-}
-
-map<string, float> GesturePage::getOscOut()
-{
-	return _output;
-}
-
-string GesturePage::getAddress()
-{
-	return string();
-}
-
-vector<string> GesturePage::getStringOut()
-{
-	return vector<string>();
-}
-
-void GesturePage::clearMessages()
-{
-	_output.clear();
-}
-
-void GesturePage::clearMappings()
-{
-	for (auto element : _midiMap)
-	{
-		vector<string> split = ofSplitString(element.first, "/");
-		if (split[0] == "button")
-		{
-			_gui->getButton(split[1])->setLabel(_gui->getButton(split[1])->getName());
-		}
-		if (split[0] == "toggle")
-		{
-			_gui->getToggle(split[1])->setLabel(_gui->getToggle(split[1])->getName());
-		}
-		if (split[0] == "slider")
-		{
-			_gui->getSlider(split[1])->setLabel(_gui->getSlider(split[1])->getName());
-		}
-	}
-	_midiMap.clear();
 }
 
 void GesturePage::load(ofJson & json)
@@ -609,33 +476,7 @@ void GesturePage::load(ofJson & json)
 	_midiMap.clear();
 	_index = 0;
 
-	for (auto element : json["midi"])
-	{
-		string name = element["name"].get<string>();
-		string value = element["value"].get<string>();
-		string sChannel = ofSplitString(value, "/")[0];
-		string sControl = ofSplitString(value, "/")[1];
-		string controlName = sChannel + "/" + sControl;
-		string controlLabel = "ch" + sChannel + "/cc" + sControl;
-
-		vector<string> vLastControl = ofSplitString(name, "/");
-		_midiMap[name] = controlName;
-		if (vLastControl[0] == "toggle")
-		{
-			string newName = vLastControl[1] + "(" + controlLabel + ")";
-			_gui->getToggle(vLastControl[1])->setLabel(newName);
-		}
-		else if (vLastControl[0] == "button")
-		{
-			string newName = vLastControl[1] + "(" + controlLabel + ")";
-			_gui->getButton(vLastControl[1])->setLabel(newName);
-		}
-		else if (vLastControl[0] == "slider")
-		{
-			string newName = vLastControl[1] + "(" + controlLabel + ")";
-			_gui->getSlider(vLastControl[1])->setLabel(newName);
-		}
-	}
+	loadMidiMap(json);
 
 	for (auto element : json["gestures"])
 	{
@@ -655,25 +496,18 @@ void GesturePage::load(ofJson & json)
 
 ofJson GesturePage::save()
 {
-	ofJson save;
-
-	for (auto element : _midiMap)
-	{
-		ofJson mapping;
-		mapping["name"] = element.first;
-		mapping["value"] = element.second;
-		save["midi"].push_back(mapping);
-	}
+	ofJson jSave;
 
 	for (auto element : _gestures)
 	{
 		ofJson gesture;
 		gesture["name"] = element.first;
 		gesture["data"] = element.second.save();
-		save["gestures"].push_back(gesture);
+		jSave["gestures"].push_back(gesture);
 	}
 	
-	return save;
+	saveMidiMap(jSave);
+	return jSave;
 }
 
 void GesturePage::selectGesture(int index)
