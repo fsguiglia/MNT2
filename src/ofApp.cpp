@@ -29,6 +29,7 @@ void ofApp::setup(){
 	_lastWidth = ofGetWidth();
 	_lastHeight = ofGetHeight();
 	_tileIcon.load("tile_icon.png");
+	_tileIcon.resize(30, 30);
 	_shift = false;
 	_mode = false;
 	_selected = "";
@@ -56,11 +57,15 @@ void ofApp::draw(){
 		drawConnectionMode();
 		break;
 	case TILE_MODE:
-		drawConnectionMode();
-		ofSetColor(0, 185);
-		ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-		ofSetColor(0);
-		drawTileMode();
+		if (_moduleNodes.size() > 0)
+		{
+			drawConnectionMode();
+			ofSetColor(0, 185);
+			ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+			ofSetColor(0);
+			drawTileMode();
+		}
+		else _mode = CONNECT_MODE;
 		break;
 	}
 }
@@ -68,16 +73,23 @@ void ofApp::draw(){
 void ofApp::drawConnectionMode()
 {
 	//draw nodes and connections
+	ofPushStyle();
 	for (auto connection : _connections) drawConnection(connection);
 	for (auto& node : _moduleNodes) node->draw();
 	for (auto& node : _inputNodes) node.draw();
 	for (auto& node : _outputNodes) node.draw();
+	if (!_tileIconHovered) ofSetColor(255, 80);
+	else ofSetColor(255);
+	_tileIcon.draw(ofGetWidth() - (_tileIcon.getWidth() + _tileIconMargin), ofGetHeight() - (_tileIcon.getHeight() + _tileIconMargin));
+	ofSetColor(0);
 	_gui->draw();
+	ofPopStyle();
 }
 
 void ofApp::drawEditMode()
 {
 	//draw selected page
+	ofPushStyle();
 	ofSetColor(0);
 	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
 	for (auto& node : _moduleNodes)
@@ -103,11 +115,13 @@ void ofApp::drawEditMode()
 		ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
 		ofVec2f(_pageMarginRight + 2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
 	);
+	ofPopStyle();
 }
 
 void ofApp::drawTileMode()
 {
 	//only active pages?
+	ofPushStyle();
 	ofSetColor(0);
 	int rows = int(ceil((float)_moduleNodes.size() / COLUMNS));
 	int cell_width = ofGetWidth() / COLUMNS;
@@ -136,6 +150,7 @@ void ofApp::drawTileMode()
 			index++;
 		}
 	}
+	ofPopStyle();
 }
 
 void ofApp::drawConnection(Connection& connection)
@@ -1158,12 +1173,6 @@ void ofApp::keyReleased(int key){
 	case(19):
 		if(_control) save();
 		break;
-	case('t'):
-	case('T'):
-		if(_mode == TILE_MODE) _mode = CONNECT_MODE;
-		else _mode = TILE_MODE;
-		for (auto& node : _moduleNodes) node->setVisible(false);
-		break;
 	case(OF_KEY_TAB):
 		if (_mode == EDIT_MODE)
 		{
@@ -1191,25 +1200,29 @@ void ofApp::keyReleased(int key){
 }
 
 void ofApp::mouseMoved(int x, int y){
-	if (_mode)
+	switch (_mode)
 	{
+	case CONNECT_MODE:
+		_tileIconHovered = x > ofGetWidth() - (_tileIcon.getWidth() + _tileIconMargin);
+		_tileIconHovered = _tileIconHovered && x < ofGetWidth() - _tileIconMargin;
+		_tileIconHovered = _tileIconHovered && y > ofGetHeight() - (_tileIcon.getHeight() + _tileIconMargin);
+		_tileIconHovered = _tileIconHovered && y < ofGetHeight() - _tileIconMargin;
+		break;
+	case EDIT_MODE:
 		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mouseMoved(x, y);
 		}
+		break;
+	case TILE_MODE:
+		break;
 	}
 }
 
 void ofApp::mouseDragged(int x, int y, int button){
-	
-	if (_mode)
+	switch (_mode)
 	{
-		for (auto& node : _moduleNodes)
-		{
-			if (node->getVisible()) node->mouseDragged(x, y, button);
-		}
-	}
-	else
+	case CONNECT_MODE:
 	{
 		ofVec2f curPos;
 		curPos.x = (x - _selectionOffset.x) / (float)ofGetWidth();
@@ -1227,6 +1240,18 @@ void ofApp::mouseDragged(int x, int y, int button){
 		{
 			if (node.getName() == _selected) node.setPosition(curPos.x, curPos.y);
 		}
+	}
+		break;
+
+	case EDIT_MODE:
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible()) node->mouseDragged(x, y, button);
+		}
+		break;
+
+	case TILE_MODE:
+		break;
 	}
 }
 
@@ -1379,6 +1404,13 @@ void ofApp::mouseReleased(int x, int y, int button){
 			}
 			_selected = "";
 			_selectionOffset.set(0, 0);
+		}
+		//tile icon
+		if (button == 0 && _tileIconHovered && _moduleNodes.size() > 0)
+		{
+			if (_mode == TILE_MODE) _mode = CONNECT_MODE;
+			else _mode = TILE_MODE;
+			for (auto& node : _moduleNodes) node->setVisible(false);
 		}
 		break;
 

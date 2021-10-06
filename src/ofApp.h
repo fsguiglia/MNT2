@@ -100,7 +100,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofxDatGuiFolder* _oscFolder;
 		ofColor _moduleColor, _generatorColor, _ioColor;
 		float _scale;
+		
+		//tile mode
 		ofImage _tileIcon;
+		const int _tileIconMargin = 20;
+		bool _tileIconHovered = false;
 		const int COLUMNS = 2;
 
 		//Modes
