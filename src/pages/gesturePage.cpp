@@ -17,12 +17,13 @@ GesturePage::GesturePage()
 	_scrubPolySpacing = 0.02;
 }
 
-void GesturePage::setup(string name, int w, int h, int guiWidth, int maxMessages)
+void GesturePage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	setupLSTM();
 	setupGui(name);
+	_font = font;
 	//maxMessages does nothing...
 }
 
@@ -134,23 +135,42 @@ void GesturePage::updateGui()
 	_scrollView->update();
 }
 
-void GesturePage::draw(ofTrueTypeFont font)
+void GesturePage::draw()
+{
+	drawGestures(_position.x, _position.y, _position.width, _position.height);
+	//draw gui
+	ofSetColor(50);
+	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
+	_scrollView->draw();
+	_gui->draw();
+}
+
+void GesturePage::drawTile(int x, int y, int w, int h, int margin)
+{
+	ofPushStyle();
+	ofSetColor(0);
+	ofDrawRectangle(x, y, w, h);
+	drawGestures(x + margin / 2, y + margin / 2, w - margin, h - margin);
+	ofPopStyle();
+}
+
+void GesturePage::drawGestures(int x, int y, int w, int h)
 {
 	ofPushStyle();
 	ofSetColor(255);
-	ofDrawRectangle(_position);
+	ofDrawRectangle(x, y, w, h);
 	//draw current gesture polyline
 	ofSetColor(_colorPallete[0]);
 	ofPolyline curPolyline = _curGesture.getPolyline();
-	curPolyline.scale(_position.width, _position.height);
-	curPolyline.translate(ofVec2f(_position.x, _position.y));
+	curPolyline.scale(w, h);
+	curPolyline.translate(ofVec2f(x, y));
 	curPolyline.draw();
 	//draw played polyline
 	ofSetColor(100, 20, 20);
-	ofDrawEllipse(_cursor.x *_position.width + _position.x, _cursor.y * _position.height + _position.y, 10, 10);
+	ofDrawEllipse(_cursor.x * w + x, _cursor.y * h + y, 10, 10);
 	ofPolyline playPolyline = _playPoly;
-	playPolyline.scale(_position.width, _position.height);
-	playPolyline.translate(ofVec2f(_position.x, _position.y));
+	playPolyline.scale(w, h);
+	playPolyline.translate(ofVec2f(x, y));
 	playPolyline.draw();
 	//draw gesture name
 	ofSetColor(50);
@@ -158,13 +178,8 @@ void GesturePage::draw(ofTrueTypeFont font)
 	{
 		string text = "Gesture: " + _curGestureName;
 		text += ": " + ofToString(_curGesture.getPoints().size()) + " points";
-		font.drawString(text, _position.x + 10, _position.y + _position.height - 10);
+		_font.drawString(text, x + 10, y + h - 10);
 	}
-	//draw gui
-	ofSetColor(50);
-	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
-	_scrollView->draw();
-	_gui->draw();
 	ofPopStyle();
 }
 

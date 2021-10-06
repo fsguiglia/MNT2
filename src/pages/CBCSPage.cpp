@@ -9,7 +9,7 @@ CBCSPage::CBCSPage()
 	setAddress("/cbcs");
 }
 
-void CBCSPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
+void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
 	_map.setup(w, h);
 	_map.setRadius(0.05);
@@ -18,7 +18,7 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 	_map.setDrawSelected(true);
 	_map.setCursor(ofVec2f(-1, -1));
 
-	MapPage::setup(name, w, h, guiWidth, maxMessages);
+	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
 	setupTsne();
 	setupGui();
 }

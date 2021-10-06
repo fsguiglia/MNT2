@@ -7,10 +7,11 @@ public:
 	ModuleNode();
 	~ModuleNode();
 
-	void setupPage(string name, int w, int h, int guiWidth, vector<ofColor> colorPalette);
+	void setupPage(string name, int w, int h, int guiWidth, ofTrueTypeFont font, vector<ofColor> colorPalette);
 	void setPageHeader(string label);
 	void update();
-	void drawPage(ofTrueTypeFont& font);
+	void drawPage();
+	void drawTile(int x, int y, int w, int h, int margin);
 	void resizePage(int w, int h);
 
 	ofVec2f getPagePosition();
@@ -66,9 +67,9 @@ inline ModuleNode<T>::~ModuleNode()
 }
 
 template<typename T>
-inline void ModuleNode<T>::setupPage(string name, int w, int h, int guiWidth, vector<ofColor> colorPalette)
+inline void ModuleNode<T>::setupPage(string name, int w, int h, int guiWidth, ofTrueTypeFont font, vector<ofColor> colorPalette)
 {
-	_page->setup(name, w, h, guiWidth);
+	_page->setup(name, w, h, guiWidth, font);
 	_page->setColorPallete(colorPalette);
 	_page->setVisible(false);
 }
@@ -87,9 +88,15 @@ inline void ModuleNode<T>::update()
 }
 
 template<typename T>
-inline void ModuleNode<T>::drawPage(ofTrueTypeFont & font)
+inline void ModuleNode<T>::drawPage()
 {
-	_page->draw(font);
+	_page->draw();
+}
+
+template<typename T>
+inline void ModuleNode<T>::drawTile(int x, int y, int w, int h, int margin)
+{
+	_page->drawTile(x, y, w, h, margin);
 }
 
 template<typename T>

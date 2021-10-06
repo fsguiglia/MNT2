@@ -8,7 +8,7 @@ class CBCSPage : public MapPage<CBCS>
 {
 public:
 	CBCSPage();
-	void setup(string name, int w, int h, int guiWidth, int maxMessages = 50);
+	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 50);
 	void setupGui();
 	void setupTsne();
 

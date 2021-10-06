@@ -28,7 +28,7 @@ void ofApp::setup(){
 	_verdana.load("Verdana2.ttf", 8 * _scale);
 	_lastWidth = ofGetWidth();
 	_lastHeight = ofGetHeight();
-
+	_tileIcon.load("tile_icon.png");
 	_shift = false;
 	_mode = false;
 	_selected = "";
@@ -40,50 +40,101 @@ void ofApp::update() {
 	for (auto& node : _moduleNodes) node->update();
 	updateConnections();
 	
-	_gui->setVisible(!_mode);
-	_gui->setEnabled(!_mode);
+	_gui->setVisible(_mode != EDIT_MODE);
+	_gui->setEnabled(_mode == CONNECT_MODE);
 	_gui->update();
 }
 
 void ofApp::draw(){
 	ofClear(255);
-	if (_mode)
+	switch (_mode)
 	{
-		//draw selected page
-		ofSetColor(0);
+	case EDIT_MODE:
+		drawEditMode();
+		break;
+	case CONNECT_MODE:
+		drawConnectionMode();
+		break;
+	case TILE_MODE:
+		drawConnectionMode();
+		ofSetColor(0, 185);
 		ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-		for (auto& node : _moduleNodes)
-		{
-			if (node->getVisible()) node->drawPage(_verdana);
-		};
-		//draw prev next areas
-		if (mouseX < _pageMarginLeft) ofSetColor(35);
-		else ofSetColor(0);
-		ofDrawRectangle(0, 0, _pageMarginLeft, ofGetHeight());
-		if (mouseX > _pageMarginRight) ofSetColor(35);
-		else ofSetColor(0);
-		ofDrawRectangle(_pageMarginRight, 0, ofGetWidth() - _pageMarginRight, ofGetHeight());
-		//draw prev next icons
-		ofSetColor(60);
-		ofDrawTriangle(
-			ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
-			ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
-			ofVec2f(2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
-		);
-		ofDrawTriangle(
-			ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
-			ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
-			ofVec2f(_pageMarginRight + 2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
-		);
+		ofSetColor(0);
+		drawTileMode();
+		break;
 	}
-	else
+}
+
+void ofApp::drawConnectionMode()
+{
+	//draw nodes and connections
+	for (auto connection : _connections) drawConnection(connection);
+	for (auto& node : _moduleNodes) node->draw();
+	for (auto& node : _inputNodes) node.draw();
+	for (auto& node : _outputNodes) node.draw();
+	_gui->draw();
+}
+
+void ofApp::drawEditMode()
+{
+	//draw selected page
+	ofSetColor(0);
+	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+	for (auto& node : _moduleNodes)
 	{
-		//draw nodes and connections
-		for (auto connection : _connections) drawConnection(connection);
-		for (auto& node : _moduleNodes) node->draw();
-		for (auto& node : _inputNodes) node.draw();
-		for (auto& node : _outputNodes) node.draw();
-		_gui->draw();
+		if (node->getVisible()) node->drawPage();
+	};
+	//draw prev next areas
+	if (mouseX < _pageMarginLeft) ofSetColor(35);
+	else ofSetColor(0);
+	ofDrawRectangle(0, 0, _pageMarginLeft, ofGetHeight());
+	if (mouseX > _pageMarginRight) ofSetColor(35);
+	else ofSetColor(0);
+	ofDrawRectangle(_pageMarginRight, 0, ofGetWidth() - _pageMarginRight, ofGetHeight());
+	//draw prev next icons
+	ofSetColor(60);
+	ofDrawTriangle(
+		ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
+		ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
+		ofVec2f(2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
+	);
+	ofDrawTriangle(
+		ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
+		ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
+		ofVec2f(_pageMarginRight + 2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
+	);
+}
+
+void ofApp::drawTileMode()
+{
+	//only active pages?
+	ofSetColor(0);
+	int rows = int(ceil((float)_moduleNodes.size() / COLUMNS));
+	int cell_width = ofGetWidth() / COLUMNS;
+	int cell_height = ofGetHeight() / rows;
+	int tile_size = cell_width;
+	if (cell_height < cell_width) tile_size = cell_height;
+	tile_size -= 10;
+	int spacing_x = int(floor((float)(ofGetWidth() - COLUMNS * tile_size) / (COLUMNS + 1)));
+	int spacing_y = int(floor((float)(ofGetHeight() - rows * tile_size) / (rows + 1)));
+	int index = 0;
+
+	for (int i = 0; i < COLUMNS; i++)
+	{
+		for (int j = 0; j < rows; j++)
+		{
+			if (index < _moduleNodes.size())
+			{
+				_moduleNodes[index]->drawTile(
+					i * tile_size + spacing_x * (i + 1),
+					j * tile_size + spacing_y * (j + 1),
+					tile_size,
+					tile_size,
+					4
+				);
+			}
+			index++;
+		}
 	}
 }
 
@@ -221,6 +272,7 @@ void ofApp::moduleButtonEvent(ofxDatGuiButtonEvent e)
 		_moduleSize,
 		_moduleSize,
 		_guiWidth,
+		_verdana,
 		_colorPallete
 	);
 }
@@ -868,7 +920,7 @@ void ofApp::load()
 	ofFileDialogResult loadFile = ofSystemLoadDialog("Load MNT set", false, _folder);
 	if (loadFile.bSuccess)
 	{
-		_mode = false;
+		_mode = CONNECT_MODE;
 		clear();
 		path = loadFile.getPath();
 		ofJson jLoad = ofLoadJson(path);
@@ -950,6 +1002,7 @@ void ofApp::load()
 					_moduleSize,
 					_moduleSize,
 					_guiWidth,
+					_verdana,
 					_colorPallete
 				);
 				ofJson data = element["data"];
@@ -1095,23 +1148,29 @@ void ofApp::keyPressed(int key){
 void ofApp::keyReleased(int key){
 	switch (key)
 	{
-	case(OF_KEY_TAB):
-		if (_mode)
-		{
-			_page += 1;
-			if (_page >= _moduleNodes.size()) _page = 0;
-			changePage(_page);
-		}
+	case('L'):
+	case('l'):
+	case(12):
+		if (_control) load();
 		break;
 	case('S'):
 	case('s'):
 	case(19):
 		if(_control) save();
 		break;
-	case('L'):
-	case('l'):
-	case(12):
-		if(_control) load();
+	case('t'):
+	case('T'):
+		if(_mode == TILE_MODE) _mode = CONNECT_MODE;
+		else _mode = TILE_MODE;
+		for (auto& node : _moduleNodes) node->setVisible(false);
+		break;
+	case(OF_KEY_TAB):
+		if (_mode == EDIT_MODE)
+		{
+			_page += 1;
+			if (_page >= _moduleNodes.size()) _page = 0;
+			changePage(_page);
+		}
 		break;
 	case(OF_KEY_SHIFT):
 		_shift = false;
@@ -1121,7 +1180,7 @@ void ofApp::keyReleased(int key){
 		_control = false;
 		break;
 	case(OF_KEY_ESC):
-		_mode = false;
+		_mode = CONNECT_MODE;
 		for (auto& node : _moduleNodes)
 		{
 			_page = -1;
@@ -1172,8 +1231,9 @@ void ofApp::mouseDragged(int x, int y, int button){
 }
 
 void ofApp::mousePressed(int x, int y, int button){
-	if (!_mode)
+	switch (_mode)
 	{
+	case CONNECT_MODE:
 		if (button == 0)
 		{
 			if (_shift)
@@ -1223,9 +1283,9 @@ void ofApp::mousePressed(int x, int y, int button){
 				}
 			}
 		}
-	}
-	else
-	{
+		break;
+
+	case EDIT_MODE:
 		for (auto& node : _moduleNodes)
 		{
 			bool doubleClick = false;
@@ -1235,34 +1295,19 @@ void ofApp::mousePressed(int x, int y, int button){
 			}
 			if (node->getVisible()) node->mousePressed(x, y, button, doubleClick);
 		}
+		break;
+
+	case TILE_MODE:
+		break;
 	}
+
 	if(button == 0) _lastClick = ofGetElapsedTimeMillis();
 }
 
 void ofApp::mouseReleased(int x, int y, int button){
-	if (_mode)
+	switch (_mode)
 	{
-		for (auto& node : _moduleNodes)
-		{
-			if (node->getVisible()) node->mouseReleased(x, y, button);
-		}
-		if (x < _pageMarginLeft - 15 || x > _pageMarginRight + 15)
-		{
-			if (x < _pageMarginLeft)
-			{
-				_page--;
-				if (_page < 0) _page = _moduleNodes.size() - 1;
-			}
-			if (x > _pageMarginRight)
-			{
-				_page++;
-				if (_page >= _moduleNodes.size()) _page = 0;
-			}
-			changePage(_page);
-		}
-	}
-	else
-	{
+	case CONNECT_MODE:
 		if (button == 2)
 		{
 			string curSelected = "";
@@ -1276,7 +1321,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 					break;
 				}
 			}
-			
+
 			if (curIndex != -1)
 			{
 				vector<int> deleteConnection;
@@ -1335,17 +1380,31 @@ void ofApp::mouseReleased(int x, int y, int button){
 			_selected = "";
 			_selectionOffset.set(0, 0);
 		}
+		break;
+
+	case EDIT_MODE:
+		
+		break;
+
+	case TILE_MODE:
+		break;
 	}
 }
 
 void ofApp::mouseScrolled(ofMouseEventArgs& mouse)
 {
-	if (_mode)
+	switch (_mode)
 	{
+	case CONNECT_MODE:
+		break;
+	case EDIT_MODE:
 		for (auto& node : _moduleNodes)
 		{
 			if (node->getVisible()) node->mouseScrolled(mouse.scrollY * 5);
 		}
+		break;
+	case TILE_MODE:
+		break;
 	}
 }
 

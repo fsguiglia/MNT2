@@ -7,14 +7,15 @@
 class GesturePage : public Page {
 public:
 	GesturePage();
-	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
+	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 20);
 	void setupGui(string name);
 	void setupLSTM();
 
 	void update();
 	void updateGui();
-	void draw(ofTrueTypeFont font);
-	
+	void draw();
+	void drawTile(int x, int y, int w, int h, int margin);
+
 	void setColorPallete(vector<ofColor> colorPalette);
 	void resize(int w, int h);
 	
@@ -49,6 +50,7 @@ public:
 	ofJson save();
 
 private:
+	void drawGestures(int x, int y, int w, int h);
 	void selectGesture(int index);
 	void addGesture(Gesture gesture, string name);
 	void removeGesture(string name);

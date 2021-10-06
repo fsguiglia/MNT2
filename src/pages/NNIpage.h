@@ -7,7 +7,7 @@
 class NNIPage : public MapPage<NNI> {
 public:
 	NNIPage();
-	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
+	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 20);
 	void setupGui();
 	void setupTsne();
 	void setupPca();

@@ -13,7 +13,7 @@
 #include "pages/triggerPage.h"
 #include "pages/rgbPage.h"
 #include "pages/gesturePage.h"
-#include "generators/noiseGenerator.h"
+#include "pages/noiseGenerator.h"
 #include "utils/mntUtils.h"
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
@@ -21,6 +21,9 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void setup();
 		void update();
 		void draw();
+		void drawConnectionMode();
+		void drawEditMode();
+		void drawTileMode();
 		void drawConnection(Connection& connection);
 		void exit();
 		//--------------------------------------------------------------
@@ -88,7 +91,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		int _lastWidth, _lastHeight;
 		int _pageMarginLeft, _pageMarginRight;
 		int _page;
-		bool _mode;
 		vector<ofColor> _colorPallete;
 		ofTrueTypeFont _verdana;
 		ofxDatGui* _gui;
@@ -98,6 +100,14 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofxDatGuiFolder* _oscFolder;
 		ofColor _moduleColor, _generatorColor, _ioColor;
 		float _scale;
+		ofImage _tileIcon;
+		const int COLUMNS = 2;
+
+		//Modes
+		int _mode = 0;
+		static constexpr int CONNECT_MODE = 0;
+		static constexpr int EDIT_MODE = 1;
+		static constexpr int TILE_MODE = 2;
 
 		//IO
 		string _folder, _file;

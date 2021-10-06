@@ -9,7 +9,7 @@ NNIPage::NNIPage()
 	setAddress("");
 }
 
-void NNIPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
+void NNIPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
 	_map.setup(w, h);
 	_map.setActive(false);
@@ -17,7 +17,7 @@ void NNIPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 	_map.setDrawInterpolation(true);
 	_map.setDrawSelected(true);
 	
-	MapPage::setup(name, w, h, guiWidth, maxMessages);
+	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
 	setupPca();
 	setupTsne();
 	setupGui();

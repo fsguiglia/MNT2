@@ -8,10 +8,11 @@ class Page {
 public:
 	Page();
 
-	virtual void setup(string name, int w, int h, int guiWidth, int maxMessages = 20) = 0;
+	virtual void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 20) = 0;
 	virtual void setupGui(string name) = 0;
 	virtual void update() = 0;
-	virtual void draw(ofTrueTypeFont font) = 0;
+	virtual void draw() = 0;
+	virtual void drawTile(int x, int y, int w, int h, int margin) = 0;
 	void setHeader(string label);
 
 	//gui
@@ -79,6 +80,7 @@ protected:
 	int _guiWidth;
 	bool _visible, _inside;
 	bool _controlLearn, _parameterLearn; //parameterlearn no tiene sentido para los generadores
+	ofTrueTypeFont _font;
 
 	//mapping
 	string _lastControl;

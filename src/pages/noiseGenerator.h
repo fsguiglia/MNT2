@@ -1,14 +1,16 @@
 #pragma once
 #include "ofMain.h"
-#include "../pages/page.h"
+#include "page.h"
 
 class NoiseGenerator : public Page {
 public:
 	NoiseGenerator();
-	void setup(string name, int w, int h, int guiWidth, int maxMessages = 20);
+	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 20);
 	void setupGui(string name);
 	void update();
-	void draw(ofTrueTypeFont font);
+	void draw();
+	void drawTile(int x, int y, int w, int h, int margin);
+	
 
 	void setColorPallete(vector<ofColor> colorPalette);
 
@@ -31,6 +33,7 @@ public:
 
 private:
 	void generate();
+	void drawNoise(int x, int y, int w, int h);
 
 	ofVec2f _cursor, _prevCursor;
 	float _seed;

@@ -6,11 +6,12 @@ template<typename T> class MapPage : public Page {
 public:
 	MapPage();
 
-	void setup(string name, int w, int h, int guiWidth, int maxMessages);
+	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 20);
 	void setupGui(string name);
-
+	
 	void update();
-	void draw(ofTrueTypeFont font);
+	void draw();
+	void drawTile(int x, int y, int w, int h, int margin);
 
 	void setColorPallete(vector<ofColor> colorPallete);
 	void setMinClickDistance(float distance);
@@ -29,6 +30,7 @@ protected:
 	bool _mouseControl, _useGlobalParameters;
 	int _lastSelectedPoint;
 	float _minClickDistance;
+	ofFbo test;
 };
 
 template<typename T>
@@ -44,12 +46,13 @@ inline MapPage<T>::MapPage()
 }
 
 template<typename T>
-inline void MapPage<T>::setup(string name, int w, int h, int guiWidth, int maxMessages)
+inline void MapPage<T>::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	_maxMessages = maxMessages;
 	setupGui(name);
+	_font = font;
 }
 
 template<typename T>
@@ -99,16 +102,25 @@ inline void MapPage<T>::update()
 }
 
 template<typename T>
-inline void MapPage<T>::draw(ofTrueTypeFont font)
+inline void MapPage<T>::draw()
 {
 	ofPushStyle();
-	_map.draw(_position.x, _position.y, _position.getWidth(), _position.getHeight(), font);
+	_map.draw(_position.x, _position.y, _position.getWidth(), _position.getHeight(), _font);
 	ofSetColor(50);
 	ofDrawRectangle(_position.x + _position.getWidth(), 0, _guiWidth, _position.getHeight());
 	_gui->draw();
 	ofPopStyle();
 }
 
+template<typename T>
+inline void MapPage<T>::drawTile(int x, int y, int w, int h, int margin)
+{
+	ofPushStyle();
+	ofSetColor(0);
+	ofDrawRectangle(x, y, w, h);
+	_map.draw(x + margin / 2, y + margin / 2, w - margin, h - margin, _font);
+	ofPopStyle();
+}
 
 template<typename T>
 inline void MapPage<T>::setMinClickDistance(float distance)

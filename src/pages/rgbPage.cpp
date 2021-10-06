@@ -9,7 +9,7 @@ RGBPage::RGBPage()
 	setAddress("");
 }
 
-void RGBPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
+void RGBPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
 	_radius = 0.05;
 	_map.setup(w, h);
@@ -20,7 +20,7 @@ void RGBPage::setup(string name, int w, int h, int guiWidth, int maxMessages)
 	vector<ofVec2f> initialCursors = { ofVec2f(0,0) };
 	_map.setCursors(initialCursors);
 	
-	MapPage::setup(name, w, h, guiWidth, maxMessages);
+	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
 	setupGui();
 }
 

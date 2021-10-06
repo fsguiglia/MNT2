@@ -4,10 +4,11 @@
 
 class ModuleInterface : public Node {
 public:
-	virtual void setupPage(string name, int w, int h, int guiWidth, vector<ofColor> colorPalette) = 0;
+	virtual void setupPage(string name, int w, int h, int guiWidth, ofTrueTypeFont font, vector<ofColor> colorPalette) = 0;
 	virtual void setPageHeader(string label) = 0;
 	virtual void update() = 0;
-	virtual void drawPage(ofTrueTypeFont& font) = 0;
+	virtual void drawPage() = 0;
+	virtual void drawTile(int x, int y, int w, int h, int margin) = 0;
 	virtual void resizePage(int w, int h) = 0;
 
 	virtual ofVec2f getPagePosition() = 0;

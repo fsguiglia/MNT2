@@ -18,11 +18,12 @@ NoiseGenerator::NoiseGenerator()
 	_yFrame = _seed + 1000;
 }
 
-void NoiseGenerator::setup(string name, int w, int h, int guiWidth, int maxMessages)
+void NoiseGenerator::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
 	_guiWidth = guiWidth;
 	_position = centerSquarePosition(ofGetWidth() - _guiWidth, ofGetHeight());
 	setupGui(name);
+	_font = font;
 	//maxMessage does nothing...
 }
 
@@ -72,27 +73,47 @@ void NoiseGenerator::update()
 	_gui->update();
 }
 
-void NoiseGenerator::draw(ofTrueTypeFont font)
+void NoiseGenerator::draw()
+{
+	drawNoise(_position.x, _position.y, _position.width, _position.height);
+	//draw gui
+	ofSetColor(50);
+	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
+	_gui->draw();
+	ofPopStyle();
+}
+
+void NoiseGenerator::drawTile(int x, int y, int w, int h, int margin)
+{
+	ofPushStyle();
+	ofSetColor(0, 100);
+	ofDrawRectangle(x, y, w, h);
+	ofSetColor(0);
+	drawNoise(x + margin / 2, y + margin / 2, w - margin, h - margin);
+	ofPopStyle();
+}
+
+void NoiseGenerator::drawNoise(int x, int y, int w, int h)
 {
 	ofPushStyle();
 	ofSetColor(0);
-	ofDrawRectangle(_position);
+	ofDrawRectangle(x, y, w, h);
 
 	//scale center, radius and cursor for drawing
-	ofVec2f scaledCenter = _center * ofVec2f(_position.width, _position.height);
-	scaledCenter += ofVec2f(_position.x, _position.y);
-	ofVec2f scaledRadius = _radius * ofVec2f(_position.width, _position.height);
-	ofVec3f scaledCursor = _cursor * ofVec2f(_position.width, _position.height);
-	scaledCursor += ofVec2f(_position.x, _position.y);
+	ofVec2f scaledCenter = _center * ofVec2f(w, h);
+	scaledCenter += ofVec2f(x, y);
+	ofVec2f scaledRadius = _radius * ofVec2f(w, h);
+	ofVec3f scaledCursor = _cursor * ofVec2f(w, h);
+	scaledCursor += ofVec2f(w, h);
 
 	//draw movement area
-	ofSetColor(255); 
+	ofSetColor(255);
 	ofDrawRectangle(scaledCenter - scaledRadius, scaledRadius.x * 2, scaledRadius.y * 2);
 
 	//draw black rectangle to mask movement area
 	ofSetColor(0);
-	ofDrawRectangle(0, 0, _position.x, ofGetHeight());
-	ofDrawRectangle(_position.x + _position.width + _guiWidth, 0, ofGetWidth(), ofGetHeight());
+	ofDrawRectangle(0, 0, x, h);
+	//ofDrawRectangle(x + _position.width + _guiWidth, 0, ofGetWidth(), ofGetHeight());
 
 	//draw cross on center
 	ofSetColor(160);
@@ -102,12 +123,6 @@ void NoiseGenerator::draw(ofTrueTypeFont font)
 	//draw cursor
 	ofSetColor(255, 100, 100);
 	ofDrawEllipse(scaledCursor, 10, 10);
-
-	//draw gui
-	ofSetColor(50);
-	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
-	_gui->draw();
-	ofPopStyle();
 }
 
 void NoiseGenerator::setColorPallete(vector<ofColor> colorPalette)

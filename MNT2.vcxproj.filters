@@ -82,9 +82,6 @@
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscTypes.cpp">
       <Filter>addons\ofxOsc\libs\oscpack\src\osc</Filter>
     </ClCompile>
-    <ClCompile Include="src\generators\noiseGenerator.cpp">
-      <Filter>src\generators</Filter>
-    </ClCompile>
     <ClCompile Include="src\gestures\gesture.cpp">
       <Filter>src\gestures</Filter>
     </ClCompile>
@@ -109,18 +106,6 @@
     <ClCompile Include="src\nodes\node.cpp">
       <Filter>src\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="src\pages\CBCSPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pages\NNIPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pages\rgbPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pages\triggerPage.cpp">
-      <Filter>src\pages</Filter>
-    </ClCompile>
     <ClCompile Include="src\points\point.cpp">
       <Filter>src\points</Filter>
     </ClCompile>
@@ -133,10 +118,25 @@
     <ClCompile Include="src\utils\mntUtils.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\pages\gesturePage.cpp">
+      <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\CBCSPage.cpp">
+      <Filter>src\pages\mapPage</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\NNIPage.cpp">
+      <Filter>src\pages\mapPage</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\rgbPage.cpp">
+      <Filter>src\pages\mapPage</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pages\triggerPage.cpp">
+      <Filter>src\pages\mapPage</Filter>
+    </ClCompile>
     <ClCompile Include="src\pages\page.cpp">
       <Filter>src\pages</Filter>
     </ClCompile>
-    <ClCompile Include="src\pages\gesturePage.cpp">
+    <ClCompile Include="src\pages\noiseGenerator.cpp">
       <Filter>src\pages</Filter>
     </ClCompile>
   </ItemGroup>
@@ -231,9 +231,6 @@
     <Filter Include="addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx">
       <UniqueIdentifier>{C5DFD7B1-CA65-5751-2D16-D0C6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\generators">
-      <UniqueIdentifier>{82af4c6e-4329-48e7-9e7d-9d73d9818088}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\gestures">
       <UniqueIdentifier>{da136e0f-e5bc-432d-be81-0faa6a49e53b}</UniqueIdentifier>
     </Filter>
@@ -257,6 +254,9 @@
     </Filter>
     <Filter Include="src\utils">
       <UniqueIdentifier>{4849d40a-596f-4a07-ab25-292654a5bae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\pages\mapPage">
+      <UniqueIdentifier>{0b864a5d-8329-4c1b-bfe3-64d042e335bd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -431,9 +431,6 @@
     <ClInclude Include="..\..\..\addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx\KDTree.h">
       <Filter>addons\ofxSpatialHash\libs\ofxSpatialHash\include\ofx</Filter>
     </ClInclude>
-    <ClInclude Include="src\generators\noiseGenerator.h">
-      <Filter>src\generators</Filter>
-    </ClInclude>
     <ClInclude Include="src\gestures\gesture.h">
       <Filter>src\gestures</Filter>
     </ClInclude>
@@ -470,18 +467,6 @@
     <ClInclude Include="src\nodes\node.h">
       <Filter>src\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="src\pages\CBCSPage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\NNIpage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\rgbPage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\triggerPage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
     <ClInclude Include="src\points\point.h">
       <Filter>src\points</Filter>
     </ClInclude>
@@ -495,13 +480,28 @@
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\pages\gesturePage.h">
+      <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\CBCSPage.h">
+      <Filter>src\pages\mapPage</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\mapPage.h">
+      <Filter>src\pages\mapPage</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\NNIpage.h">
+      <Filter>src\pages\mapPage</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\rgbPage.h">
+      <Filter>src\pages\mapPage</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pages\triggerPage.h">
+      <Filter>src\pages\mapPage</Filter>
+    </ClInclude>
     <ClInclude Include="src\pages\page.h">
       <Filter>src\pages</Filter>
     </ClInclude>
-    <ClInclude Include="src\pages\mapPage.h">
-      <Filter>src\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pages\gesturePage.h">
+    <ClInclude Include="src\pages\noiseGenerator.h">
       <Filter>src\pages</Filter>
     </ClInclude>
   </ItemGroup>
