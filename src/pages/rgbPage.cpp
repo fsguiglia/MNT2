@@ -258,7 +258,7 @@ void RGBPage::mousePressed(int x, int y, int button, bool doubleClick)
 			{
 				_lastSelectedPoint = int(selection[0]);
 				_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
-				if (int(selection[0]) != lastSelected)
+				if (int(selection[0]) != lastSelected && _map.getPoints().size() > 0)
 				{
 					RGBPoint point = _map.getPoint(int(selection[0]));
 					updateSelected(int(selection[0]), point);

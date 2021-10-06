@@ -73,8 +73,6 @@ void RGBMap::resizePoint(int index, int w, int h)
 	_points[index].setSize(w, h);
 }
 
-
-
 void RGBMap::setTrigger(int index, bool isTrigger)
 {
 	_points[index].setTrigger(isTrigger);
@@ -113,7 +111,7 @@ void RGBMap::updateFbo()
 	ofSetColor(255);
 	ofDrawRectangle(0, 0, _width, _height);
 	for (int i = 0; i < _points.size(); i++) {
-		ofSetColor(_colorPallete[i % _colorPallete.size()]);
+		//ofSetColor(_colorPallete[i % _colorPallete.size()]);
 		ofVec2f pos = _points[i].getPosition();
 		pos.x *= _width;
 		pos.y *= _height;
