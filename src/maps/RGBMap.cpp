@@ -123,13 +123,30 @@ void RGBMap::updateFbo()
 		{
 			int radius = _radius * _width;
 			cursor *= ofVec2f(_width, _height);
+			cursor.x = int(cursor.x);
+			cursor.y = int(cursor.y);
+			ofSetColor(80, 50);
+			ofSetRectMode(ofRectMode::OF_RECTMODE_CENTER);
+			ofDrawRectangle(cursor, radius * 2, radius * 2);
 			ofSetColor(0);
-			ofDrawLine(0, cursor.y, cursor.x - radius, cursor.y);
-			ofDrawLine(cursor.x + radius, cursor.y, _width, cursor.y);
-			ofDrawLine(cursor.x, 0, cursor.x, cursor.y - radius);
-			ofDrawLine(cursor.x, cursor.y + radius, cursor.x, _height);
-			ofNoFill();
-			ofDrawRectangle(cursor.x - radius, cursor.y - radius, radius * 2, radius * 2);
+			ofSetRectMode(ofRectMode::OF_RECTMODE_CORNER);
+			ofDrawRectangle(cursor.x - radius, cursor.y - radius, 5, radius * 2);
+			ofDrawRectangle(cursor.x - radius, cursor.y - radius, radius * 2, 5);
+			ofDrawRectangle(cursor.x + radius, cursor.y - radius, 5, radius * 2);
+			ofDrawRectangle(cursor.x - radius, cursor.y + radius, radius * 2 + 5, 5);
+			/*
+			//ofSetLineWidth doesnt seem to work, so we draw rectangles...
+			ofSetColor(80);
+			const int thickness = 4;
+			ofDrawRectangle(0, cursor.y, cursor.x - radius, thickness);
+			ofDrawRectangle(cursor.x + radius, cursor.y, _width, thickness);
+			ofDrawRectangle(cursor.x, 0, thickness, cursor.y - radius);
+			ofDrawRectangle(cursor.x, cursor.y + radius, thickness, _height);
+			ofDrawRectangle(cursor.x - radius, cursor.y - radius, thickness, radius * 2);
+			ofDrawRectangle(cursor.x - radius, cursor.y - radius, radius * 2, thickness);
+			ofDrawRectangle(cursor.x + radius, cursor.y - radius, thickness, radius * 2);
+			ofDrawRectangle(cursor.x - radius, cursor.y + radius, radius * 2 + thickness, thickness);
+			*/
 		}
 	}
 	_fbo.end();
