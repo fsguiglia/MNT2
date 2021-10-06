@@ -78,7 +78,7 @@ void ofApp::drawConnectionMode()
 	for (auto& node : _moduleNodes) node->draw();
 	for (auto& node : _inputNodes) node.draw();
 	for (auto& node : _outputNodes) node.draw();
-	if (!_tileIconHovered) ofSetColor(255, 80);
+	if (!_tileIconHovered) ofSetColor(255, 150);
 	else ofSetColor(255);
 	_tileIcon.draw(ofGetWidth() - (_tileIcon.getWidth() + _tileIconMargin), ofGetHeight() - (_tileIcon.getHeight() + _tileIconMargin));
 	ofSetColor(0);
@@ -1195,6 +1195,7 @@ void ofApp::keyReleased(int key){
 			_page = -1;
 			node->setVisible(false);
 		}
+		_tileIconHovered = false;
 		break;
 	}
 }

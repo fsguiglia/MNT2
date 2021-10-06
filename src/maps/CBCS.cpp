@@ -18,14 +18,20 @@ void CBCS::setup(int width, int height)
 {
 	_width = width;
 	_height = height;
-	_fbo.allocate(_width, _height);
-	_fbo.begin();
+	
+	_analysisFbo.allocate(_width, _height);
+	_analysisFbo.begin();
 	ofPushStyle();
 	ofClear(255);
 	ofSetColor(255);
 	ofDrawRectangle(0, 0, _width, _height);
 	ofPopStyle();
-	_fbo.end();
+	_analysisFbo.end();
+
+	_drawFbo.allocate(_width, _height);
+	_drawFbo.begin();
+	ofClear(255);
+	_drawFbo.end();
 }
 
 void CBCS::update()
@@ -48,41 +54,26 @@ void CBCS::update()
 		}
 		_prevCursor = _cursor;
 	}
+	updateDrawFbo();
 }
 
 void CBCS::draw(int x, int y, int w, int h, ofTrueTypeFont& font)
 {
 	ofPushStyle();
 	ofSetColor(255);
-	ofDrawRectangle(x, y, w, h);
-	_fbo.draw(x, y, w, h);
-	ofSetColor(150, 150, 255, 100);
-	ofSetCircleResolution(100);
-	ofVec2f scaledCursor = _cursor * ofVec2f(w, h);
-	scaledCursor.x += x;
-	scaledCursor.y += y;
-	ofDrawEllipse(scaledCursor, _radius * _width, _radius * _height);
-
-	for (int i = 0; i < _selection.size(); i++)
-	{
-		ofSetColor(150,150,255);
-		ofVec2f curPos = _points[_selection[i]].getPosition() * ofVec2f(w, h);
-		curPos.x += x;
-		curPos.y += y;
-		ofDrawEllipse(curPos, 10, 10);
-	}
+	_drawFbo.draw(x, y, w, h);
 	ofSetColor(50);
 	if (_selection.size() > 0) font.drawString(_points[_selection[0]].getName(), x + 10, y + w - 10);
 	ofPopStyle();
 }
 
-void CBCS::updateFbo()
+void CBCS::updateAnalysisFbo()
 {
-	_fbo.begin();
+	_analysisFbo.begin();
 	ofPushStyle();
 	ofSetCircleResolution(100);
 	ofSetColor(255);
-	ofDrawRectangle(0, 0, _fbo.getWidth(), _fbo.getHeight());
+	ofDrawRectangle(0, 0, _analysisFbo.getWidth(), _analysisFbo.getHeight());
 	
 	ofSetColor(175);
 	for (auto point : _points)
@@ -103,7 +94,33 @@ void CBCS::updateFbo()
 		ofDrawEllipse(curPos, 10, 10);
 	}
 	ofPopStyle();
-	_fbo.end();
+	_analysisFbo.end();
+}
+
+void CBCS::updateDrawFbo()
+{
+	ofPushStyle();
+	_drawFbo.begin();
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, _width, _height);
+	_analysisFbo.draw(0, 0, _width, _height);
+	ofSetColor(150, 150, 255, 100);
+	ofSetCircleResolution(100);
+	ofVec2f scaledCursor = _cursor * ofVec2f(_width, _height);
+	//scaledCursor.x += x;
+	//scaledCursor.y += y;
+	ofDrawEllipse(scaledCursor, _radius * _width * 2, _radius * _height * 2);
+
+	for (int i = 0; i < _selection.size(); i++)
+	{
+		ofSetColor(150, 150, 255);
+		ofVec2f curPos = _points[_selection[i]].getPosition() * ofVec2f(_width, _height);
+		//curPos.x += x;
+		//curPos.y += y;
+		ofDrawEllipse(curPos, 10, 10);
+	}
+	_drawFbo.end();
+	ofPopStyle();
 }
 
 void CBCS::addPoint(Point point)
@@ -203,7 +220,7 @@ void CBCS::normalize()
 void CBCS::build()
 {
 	_mesh.clear();
-	updateFbo();
+	updateAnalysisFbo();
 	_hash.buildIndex();
 }
 

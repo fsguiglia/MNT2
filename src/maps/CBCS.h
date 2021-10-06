@@ -13,7 +13,8 @@ public:
 	void update();
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
 
-	void updateFbo();
+	void updateAnalysisFbo();
+	void updateDrawFbo();
 
 	void addPoint(Point point);
 	void clearPoints();
@@ -48,7 +49,7 @@ private:
 	ofx::KDTree<ofVec2f>::SearchResults _searchResults;
 	ofMesh _mesh;
 
-	ofFbo _fbo;
+	ofFbo _analysisFbo, _drawFbo;
 	ofVec2f _cursor, _prevCursor;
 	float _radius;
 	int _maxN;

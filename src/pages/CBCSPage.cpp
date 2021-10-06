@@ -143,7 +143,6 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 		else
 		{
 			_map.setActive(e.checked);
-			_gui->getToggle("parameterLearn")->setChecked(false);
 		}
 	}
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
