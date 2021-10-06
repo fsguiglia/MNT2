@@ -1416,7 +1416,24 @@ void ofApp::mouseReleased(int x, int y, int button){
 		break;
 
 	case EDIT_MODE:
-		
+		for (auto& node : _moduleNodes)
+		{
+			if (node->getVisible()) node->mouseReleased(x, y, button);
+		}
+		if (x < _pageMarginLeft - 15 || x > _pageMarginRight + 15)
+		{
+			if (x < _pageMarginLeft)
+			{
+				_page--;
+				if (_page < 0) _page = _moduleNodes.size() - 1;
+			}
+			if (x > _pageMarginRight)
+			{
+				_page++;
+				if (_page >= _moduleNodes.size()) _page = 0;
+			}
+			changePage(_page);
+		}
 		break;
 
 	case TILE_MODE:
