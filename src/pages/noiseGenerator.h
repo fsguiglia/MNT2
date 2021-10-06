@@ -8,9 +8,10 @@ public:
 	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 20);
 	void setupGui(string name);
 	void update();
+	void updateFbo();
 	void draw();
 	void drawTile(int x, int y, int w, int h, int margin);
-	
+
 
 	void setColorPallete(vector<ofColor> colorPalette);
 
@@ -44,4 +45,7 @@ private:
 	float _xSpeed, _ySpeed;
 	ofVec2f _center, _radius;
 	bool _active;
+
+	int _width, _height;
+	ofFbo _fbo;
 };
