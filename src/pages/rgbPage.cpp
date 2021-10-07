@@ -244,10 +244,14 @@ void RGBPage::mousePressed(int x, int y, int button, bool doubleClick)
 		if (doubleClick)
 		{
 			ofFileDialogResult openFile = ofSystemLoadDialog("load image", false);
+			ofFile file = openFile.getPath();
 			if (openFile.bSuccess)
 			{
-				ofImage img;
-				if (img.load(openFile.filePath)) _map.addPoint(pos, img, openFile.filePath);
+				if (ofToLower(file.getExtension()) == "png")
+				{
+					ofImage img;
+					if (img.load(openFile.filePath)) _map.addPoint(pos, img, openFile.filePath);
+				}
 			}
 		}
 		if (button < 2)

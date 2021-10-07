@@ -7,23 +7,24 @@ RGBPoint::RGBPoint()
 	_state = false;
 }
 
-RGBPoint::RGBPoint(int width, int height, int maxAnalysisPixels)
+RGBPoint::RGBPoint(int width, int height, int maxPixels)
 {
 	setPosition(0,0);
 	_width = width;
 	_height = height;
-	_img.allocate(_width, _height, ofImageType::OF_IMAGE_COLOR_ALPHA);
-	_img.setColor(200);
+	//_img.allocate(_width, _height, ofImageType::OF_IMAGE_COLOR_ALPHA);
 	_isTrigger = false;
 	_state = false;
-	_maxSamples = maxAnalysisPixels;
+	_maxPixels = maxPixels;
 }
 
 void RGBPoint::setImage(ofImage img)
 {
+	//img.setImageType(ofImageType::OF_IMAGE_GRAYSCALE);
 	_img = img;
-	_width = img.getWidth();
-	_height = img.getHeight();
+	_pixels = _img.getPixels();
+	_width = _img.getWidth();
+	_height = _img.getHeight();
 }
 
 void RGBPoint::setImage(ofImage img, string path)
@@ -46,7 +47,7 @@ float RGBPoint::getAverageColor(ofVec2f position, float radius)
 {
 	float average = 0;
 	int step = 1;
-	if (radius > _maxSamples) step = int(radius / _maxSamples);
+	if (radius > _maxPixels) step = ceil(radius / _maxPixels);
 	if (_img.isAllocated())
 	{
 		int n = 0;
@@ -61,12 +62,11 @@ float RGBPoint::getAverageColor(ofVec2f position, float radius)
 				bool inX = x >= 0 && x < _width;
 				bool inY = y >= 0 && y < _height;
 				if (inX && inY) {
-					float r = (float)_img.getColor(x, y).r;
-					float a = (float)_img.getColor(x, y).a / 255.;
-					average += r * a + 255. * (1 - a);
+					average += (float)_pixels.getColor(x, y).r;
+					//float a = (float)_pixels.getColor(x, y).a / 255.;
+					//average += r * a + 255. * (1 - a);
+					n++;
 				}
-				else average += 255.;
-				n++;
 			}
 		}
 		average /= (float)n;
@@ -98,6 +98,7 @@ void RGBPoint::setSize(int w, int h)
 	if (_img.isAllocated())
 	{
 		_img.resize(w, h);
+		_pixels = _img.getPixels();
 		_width = w;
 		_height = h;
 	}
@@ -125,7 +126,7 @@ void RGBPoint::draw(int x, int y, int w, int h)
 		ofPushStyle();
 		ofSetColor(255);
 		ofDrawRectangle(x, y, w, h);
-		_img.getTexture().draw(x, y, w, h);
+		_img.draw(x, y, w, h);
 		ofSetColor(255, 0, 0);
 		ofNoFill();
 		ofDrawRectangle(x, y, w, h);
