@@ -939,16 +939,22 @@ void ofApp::load()
 		clear();
 		path = loadFile.getPath();
 		ofJson jLoad = ofLoadJson(path);
-		auto obj = jLoad.get<ofJson::object_t>();
 		bool mntFile = false;
-		for (auto element : obj)
+
+		//is it a mnt file
+		if (path.substr(path.size() - 3, string::npos) == "mnt")
 		{
-			if (element.first == "MNT_Version")
+			auto obj = jLoad.get<ofJson::object_t>();
+			for (auto element : obj)
 			{
-				mntFile = true;
-				break;
+				if (element.first == "MNT_Version")
+				{
+					mntFile = true;
+					break;
+				}
 			}
 		}
+		//load
 		if (mntFile)
 		{
 			map<string, string> names;

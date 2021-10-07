@@ -105,7 +105,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofImage _tileIcon;
 		const int _tileIconMargin = 20;
 		bool _tileIconHovered = false;
-		const int COLUMNS = 2;
+		const int COLUMNS = 3;
 
 		//Modes
 		int _mode = 0;

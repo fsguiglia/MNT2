@@ -151,12 +151,10 @@ void TriggerMap::updateFbo()
 	for (auto cursor : _cursors)
 	{
 		cursor *= ofVec2f(_width, _height);
-		ofSetColor(0, 50);
-		ofDrawEllipse(cursor, 60, 60);
-		ofSetColor(40);
 		ofSetRectMode(ofRectMode::OF_RECTMODE_CENTER);
-		ofDrawRectangle(cursor.x, cursor.y, 60, 5);
-		ofDrawRectangle(cursor.x, cursor.y, 5, 60);
+		ofSetColor(80, 50);
+		ofDrawRectangle(cursor.x, cursor.y, 20, _height * 2);
+		ofDrawRectangle(cursor.x, cursor.y, _width * 2, 20);
 		/*
 		//ofSetLineWidth doesnt seem to work, so we draw rectangles...
 		const int thickness = 4;
