@@ -5,7 +5,7 @@
 class RGBPoint : public Point {
 public:
 	RGBPoint();
-	RGBPoint(int width, int height);
+	RGBPoint(int width, int height, int maxSample = 100);
 	void setImage(ofImage img);
 	void setImage(ofImage img, string path);
 	ofImage getImage();
@@ -21,8 +21,8 @@ public:
 	void draw(int x, int y);
 
 private:
-	bool _isTrigger, _state; 
-	int _width, _height;
+	bool _isTrigger, _state;
+	int _width, _height, _maxSamples;
 	ofImage _img;
 	string _imgPath;
 };

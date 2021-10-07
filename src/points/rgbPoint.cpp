@@ -7,7 +7,7 @@ RGBPoint::RGBPoint()
 	_state = false;
 }
 
-RGBPoint::RGBPoint(int width, int height)
+RGBPoint::RGBPoint(int width, int height, int maxAnalysisPixels)
 {
 	setPosition(0,0);
 	_width = width;
@@ -16,6 +16,7 @@ RGBPoint::RGBPoint(int width, int height)
 	_img.setColor(200);
 	_isTrigger = false;
 	_state = false;
+	_maxSamples = maxAnalysisPixels;
 }
 
 void RGBPoint::setImage(ofImage img)
@@ -44,7 +45,8 @@ string RGBPoint::getImagePath()
 float RGBPoint::getAverageColor(ofVec2f position, float radius)
 {
 	float average = 0;
-
+	int step = 1;
+	if (radius > _maxSamples) step = int(radius / _maxSamples);
 	if (_img.isAllocated())
 	{
 		int n = 0;
@@ -52,9 +54,9 @@ float RGBPoint::getAverageColor(ofVec2f position, float radius)
 		int x1 = position.x + radius;
 		int y0 = position.y - radius;
 		int y1 = position.y + radius;
-		for (int y = y0; y < y1; y++)
+		for (int y = y0; y < y1; y+= step)
 		{
-			for (int x = x0; x < x1; x++)
+			for (int x = x0; x < x1; x+= step)
 			{
 				bool inX = x >= 0 && x < _width;
 				bool inY = y >= 0 && y < _height;

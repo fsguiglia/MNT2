@@ -127,7 +127,8 @@ void RGBMap::updateFbo()
 			cursor.y = int(cursor.y);
 			ofSetColor(80, 50);
 			ofSetRectMode(ofRectMode::OF_RECTMODE_CENTER);
-			ofDrawRectangle(cursor, radius * 2, radius * 2);
+			ofDrawRectangle(cursor.x, cursor.y, radius * 2, _height * 2);
+			ofDrawRectangle(cursor.x, cursor.y, _width * 2, radius * 2);
 			ofSetColor(0);
 			ofSetRectMode(ofRectMode::OF_RECTMODE_CORNER);
 			ofDrawRectangle(cursor.x - radius, cursor.y - radius, 5, radius * 2);
