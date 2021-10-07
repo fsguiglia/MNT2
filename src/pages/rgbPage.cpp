@@ -357,11 +357,12 @@ void RGBPage::load(ofJson & json)
 	}
 
 	loadMidiMap(json);
+	MapPage::load(json);
 }
 
 ofJson RGBPage::save()
 {
-	ofJson jSave;
+	ofJson jSave = MapPage::save();
 	map<string, float> parameters = _map.getParameters();
 	for (auto element : parameters) jSave["parameters"].push_back(element.first);
 	jSave["radius"] = _radius;

@@ -12,7 +12,6 @@ public:
 	void draw();
 	void drawTile(int x, int y, int w, int h, int margin);
 
-
 	void setColorPallete(vector<ofColor> colorPalette);
 
 	void buttonEvent(ofxDatGuiButtonEvent e);

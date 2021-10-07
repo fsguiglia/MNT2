@@ -279,12 +279,16 @@ void NoiseGenerator::load(ofJson & json)
 	_gui->getSlider("radius y")->setValue(_radius.y, false);
 	_gui->getSlider("x speed")->setValue(_xSpeed, false);
 	_gui->getSlider("y speed")->setValue(_ySpeed, false);
+
+	_active = json["active"];
+	_gui->getToggle("active")->setChecked(json["active"]);
 }
 
 ofJson NoiseGenerator::save()
 {
 	ofJson jSave;
 
+	jSave["active"] = _active;
 	jSave["center x"] = _center.x;
 	jSave["center y"] = _center.y;
 	jSave["radius x"] = _radius.x;

@@ -40,6 +40,6 @@ private:
 	ofColor _color;
 
 	string _name;
-	static int ID;
+	//static int ID;
 	int _id;
 };

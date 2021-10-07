@@ -345,11 +345,12 @@ void NNIPage::load(ofJson& json)
 	}
 
 	loadMidiMap(json);
+	MapPage::load(json);
 }
 
 ofJson NNIPage::save()
 {
-	ofJson jSave;
+	ofJson jSave = MapPage::save();
 	map<string, float> nniParameters = _map.getParameters();
 	for (auto element : nniParameters) jSave["parameters"].push_back(element.first);
 	vector<Point> points = _map.getPoints();

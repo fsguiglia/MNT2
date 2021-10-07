@@ -246,11 +246,12 @@ void CBCSPage::load(ofJson & json)
 
 	loadMidiMap(json);
 	_map.build();
+	MapPage::load(json);
 }
 
 ofJson CBCSPage::save()
 {
-	ofJson jSave;
+	ofJson jSave = MapPage::save();
 	vector<Point> points = _map.getPoints();
 	for (int i = 0; i < points.size(); i++)
 	{

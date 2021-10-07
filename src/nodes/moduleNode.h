@@ -43,11 +43,13 @@ public:
 	void load(ofJson& json);
 	ofJson save();
 
+	static int ID;
+
 private:
 	T* _page;
 	bool _visible;
-	static int ID;
 };
+
 
 template<typename T>
 int ModuleNode<T>::ID = 0;

@@ -23,6 +23,9 @@ public:
 	void moduleMIDIMap (string port, int control, int channel, float value);
 	void moduleOSCIn(string address, float value);
 
+	void load(ofJson jLoad);
+	ofJson save();
+
 protected:
 	T _map;
 	ofxDatGuiFolder* _controlFolder;
@@ -257,4 +260,19 @@ inline void MapPage<T>::moduleOSCIn(string address, float value)
 			}
 		}
 	}
+}
+
+template<typename T>
+inline void MapPage<T>::load(ofJson jLoad)
+{
+	_map.setActive(jLoad["active"]);
+	_gui->getToggle("active")->setChecked(jLoad["active"]);
+}
+
+template<typename T>
+inline ofJson MapPage<T>::save()
+{
+	ofJson jSave;
+	jSave["active"] = _map.getActive();
+	return jSave;
 }

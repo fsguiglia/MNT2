@@ -902,6 +902,13 @@ void ofApp::clear()
 	_outputNodes.clear();
 	_inputNodes.clear();
 
+	ModuleNode<NNIPage>::ID = 0;
+	ModuleNode<CBCSPage>::ID = 0;
+	ModuleNode<TriggerPage>::ID = 0;
+	ModuleNode<RGBPage>::ID = 0;
+	ModuleNode<GesturePage>::ID = 0;
+	ModuleNode<NoiseGenerator>::ID = 0;
+
 	for (auto port : _MIDIInputs)
 	{
 		if (port.second.isOpen())
@@ -976,7 +983,7 @@ void ofApp::load()
 					if (isNumber)
 					{
 						createOscInput(split[1], element["x"], element["y"]);
-						names[curPort] = curPort;
+						//names[curPort] = curPort;
 					}
 				}
 				else
@@ -992,7 +999,7 @@ void ofApp::load()
 					if (portAvailable)
 					{
 						string name = createMIDIInput(split[1], element["x"], element["y"]);
-						names[name] = name;
+						//names[name] = name;
 					}
 				}
 			}
@@ -1016,7 +1023,20 @@ void ofApp::load()
 					_verdana,
 					_moduleColor);
 
+				int targetId = element["id"];
+				bool updateId = _moduleNodes[_moduleNodes.size() - 1]->getId() <= targetId;
+				_moduleNodes[_moduleNodes.size() - 1]->setId(targetId);
 				_moduleNodes[_moduleNodes.size() - 1]->setName(element["type"].get<string>(), true);
+				//There are two ids one in node accesible trough set and get and a static one in ModuleNode...
+				if (updateId)
+				{
+					if (element["type"].get<string>() == "interpolate") ModuleNode<NNIPage>::ID = targetId;
+					if (element["type"].get<string>() == "concatenate") ModuleNode<CBCSPage>::ID = targetId;
+					if (element["type"].get<string>() == "trigger") ModuleNode<TriggerPage>::ID = targetId;
+					if (element["type"].get<string>() == "draw") ModuleNode<RGBPage>::ID = targetId;
+					if (element["type"].get<string>() == "gesture") ModuleNode<GesturePage>::ID = targetId;
+					if (element["type"].get<string>() == "noise") ModuleNode<NoiseGenerator>::ID = targetId;
+				}
 
 				_moduleNodes[_moduleNodes.size() - 1]->setupPage(
 					_moduleNodes[_moduleNodes.size() - 1]->getName(),
@@ -1028,17 +1048,21 @@ void ofApp::load()
 				);
 				ofJson data = element["data"];
 				_moduleNodes[_moduleNodes.size() - 1]->load(data);
-				string oldName = element["type"].get<string>() + "/" + ofToString(element["id"]);
-				string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
-				names[oldName] = newName;
+				
+				//string oldName = element["type"].get<string>() + "/" + ofToString(element["id"]);
+				//string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
+				//names[oldName] = newName;
 			}
 			//CONNECTIONS
 			ofJson jConnections = jLoad["Connections"];
 			for (auto& element : jConnections)
 			{
+
 				Connection connection;
-				connection.fromId = names[element["fromId"].get<string>()];
-				connection.toId = names[element["toId"].get<string>()];
+				//connection.fromId = names[element["fromId"].get<string>()];
+				//connection.toId = names[element["toId"].get<string>()];
+				connection.fromId = element["fromId"].get<string>();
+				connection.toId = element["toId"].get<string>();
 				connection.fromOutput = element["fromOutput"];
 				connection.toInput = element["toInput"];
 				connection.fromInputNode = element["fromInputNode"];
