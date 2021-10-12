@@ -123,25 +123,27 @@ void ofApp::drawTileMode()
 	//only active pages?
 	ofPushStyle();
 	ofSetColor(0);
-	int rows = int(ceil((float)_moduleNodes.size() / COLUMNS));
-	int cell_width = ofGetWidth() / COLUMNS;
+	int columns = COLUMNS;
+	if (_moduleNodes.size() < COLUMNS) columns = _moduleNodes.size();
+	int rows = int(ceil((float)_moduleNodes.size() / columns));
+	int cell_width = ofGetWidth() / columns;
 	int cell_height = ofGetHeight() / rows;
 	int tile_size = cell_width;
 	if (cell_height < cell_width) tile_size = cell_height;
 	tile_size -= 10;
-	int spacing_x = int(floor((float)(ofGetWidth() - COLUMNS * tile_size) / (COLUMNS + 1)));
+	int spacing_x = int(floor((float)(ofGetWidth() - columns * tile_size) / (columns + 1)));
 	int spacing_y = int(floor((float)(ofGetHeight() - rows * tile_size) / (rows + 1)));
 	int index = 0;
 
-	for (int i = 0; i < COLUMNS; i++)
+	for (int i = 0; i < rows; i++)
 	{
-		for (int j = 0; j < rows; j++)
+		for (int j = 0; j < columns; j++)
 		{
 			if (index < _moduleNodes.size())
 			{
 				_moduleNodes[index]->drawTile(
-					i * tile_size + spacing_x * (i + 1),
-					j * tile_size + spacing_y * (j + 1),
+					j * tile_size + spacing_x * (j + 1),
+					i * tile_size + spacing_y * (i + 1),
 					tile_size,
 					tile_size,
 					4
