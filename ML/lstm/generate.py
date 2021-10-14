@@ -3,30 +3,21 @@ import sys
 import json
 import os
 import numpy as np
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-#import tensorflow as tf
+import easygui
+import random
+import progressbar
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tensorflow import keras
 from tensorflow.keras import layers
 import mdn
-import random
-import easygui
-import progressbar
-'''
-def main():
-	#args
-	args = process_arguments(sys.argv)
-	#exit if no file is provided	
-	if args['input_file'] is None: 
-		print('no file, exiting')
-		exit()
-		
-	json_path = args['input_file']
-	temperature = float(args['temperature'])  
-	mode = -1
-	mdn_components = -1
-	generate(input_file, temperature, mode, mdn_components)
-'''
-def generate(json_path, temperature, mode, mdn_components):	
+
+def generate(args):
+	json_path = args['file']
+	mode = int(args['mode'])
+	mdn_components = int(args['mdn_components'])
+	temperature = float(args['temperature'])
+	
 	data = dict()
 	new_path = json_path[:json_path.rfind('.')] + '_o.tmp'
 	print('select model file')
@@ -90,21 +81,6 @@ def generate(json_path, temperature, mode, mdn_components):
 	
 	with open(new_path, 'w+') as f:
 		json.dump(data, f, indent = 4)
-'''
-def process_arguments(args):
-	parser = argparse.ArgumentParser(description='gesture LSTM')
-	
-	parser.add_argument('-f', '--input_file',
-						action='store',
-						help='path to the input file')
-
-	parser.add_argument('-t', '--temperature',
-						action='store',
-						default=-1,
-						help='temperature')
-
-	return vars(parser.parse_args())
-'''
 
 def get_gestures(data):
 	time_sum = 0
@@ -214,5 +190,3 @@ def generate_sequences(model, n, gesture_list, temperature):
 		
 	bar.finish()
 	return gen_sequences
-
-#main()

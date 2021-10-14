@@ -10,26 +10,7 @@ from tensorflow.keras import layers
 import mdn
 import easygui
 
-'''
-def main():
-	args = process_arguments(sys.argv)
-	#exit if no file is provided
-	if args['input_file'] is None: 
-		print("no file, exiting")
-		exit()
-	
-	path = args['input_file']
-	length = int(args['window_size'])
-	h1_n = int(args['hidden_units'])
-	h2_n = int(args['hidden_units'])
-	epochs = int(args['epochs'])
-	batch_size = int(args['batch_size'])
-	mode = int(args['mode'])
-	mdn_components = -1
-	learning_rate = 0.001
-'''
-		
-def train(path, length, h1_n, h2_n, epochs, batch_size, mode, mdn_components, learning_rate):
+def train(args):
 	print('-----------------------------------------------------')
 	print('-----------------------------------------------------')
 	print('----------------go do something else-----------------')
@@ -37,6 +18,16 @@ def train(path, length, h1_n, h2_n, epochs, batch_size, mode, mdn_components, le
 	print('-----------------------------------------------------')
 	print('-----------------------------------------------------')
 		
+	path = args['file']
+	length = int(args['sequence_length'])
+	h1_n = int(args['hidden_units'])
+	h2_n = int(args['hidden_units'])
+	epochs = int(args['epochs'])
+	batch_size = int(args['batch_size'])
+	mode = int(args['mode'])
+	mdn_components = int(args['mdn_components'])
+	learning_rate = float(args['learning_rate'])
+
 	with open('../ML/lstm/hyperparameters.ini') as f:
 		hp = json.load(f)
 		if length == -1: length = hp['sequence_length']
@@ -86,41 +77,6 @@ def train(path, length, h1_n, h2_n, epochs, batch_size, mode, mdn_components, le
 		model.save(model_file)
 		print('saved as: ' + model_file)
 
-'''
-def process_arguments(args):
-	parser = argparse.ArgumentParser(description='gesture LSTM')
-	
-	parser.add_argument('-f', '--input_file',
-						action='store',
-						help='path to the input file')
-	
-	parser.add_argument('-ws', '--window_size',
-						action='store',
-						default=-1,
-						help='window size')
-						
-	parser.add_argument('-e', '--epochs',
-						action='store',
-						default=-1,
-						help='epochs')
-	
-	parser.add_argument('-b', '--batch_size',
-						action='store',
-						default=-1,
-						help='batch size')
-	
-	parser.add_argument('-hu', '--hidden_units',
-						action='store',
-						default=-1,
-						help='hidden units')
-	
-	parser.add_argument('-m', '--mode',
-						action='store',
-						default=-1,
-						help='mode: 0 for lstm, 1 for lstm + mdn')
-
-	return vars(parser.parse_args())
-'''
 def get_gestures(data):
 	time_sum = 0
 	num_points = 0
@@ -184,5 +140,3 @@ def lstm_mdn(h1n, h2n, batch_size, length, lr, mdn_components):
 	optimizer = keras.optimizers.Adam(learning_rate = lr)
 	model.compile(loss=mdn.get_mixture_loss_func(2,mdn_components), optimizer=optimizer)
 	return model
-	
-#main()

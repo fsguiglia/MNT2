@@ -23,6 +23,7 @@ def main():
 	
 	if script == 0:
 		train.train(file, length, h1_n, h2_n, epochs, batch_size, mode, mdn_components, lr)
+		train.train(args)
 	if script == 1:
 		generate.generate(file, temperature, mode, mdn_components)
 		
