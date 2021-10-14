@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-#!/usr/bin/env python
-
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import numpy as np
@@ -178,4 +176,3 @@ def min_max_normalize(a):
 def save(data, path):
 	with open(path, 'w+') as f:
 		json.dump(data, f, indent = 4)
-#main()	

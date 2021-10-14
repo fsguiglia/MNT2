@@ -55,8 +55,8 @@ def analyze(args):
 		X = np.concatenate((X, cur_X))
 		bar.update(index + 1)
 	bar.finish()
-	#save empty json and exit if less than 5 files are provided
 	
+	#save empty json and exit if less than 5 files are provided
 	if len(file_position) < 2:
 		error = 'not enough data to create map, exiting'
 		print(error)
@@ -186,5 +186,3 @@ def save_empty_file(error, output_file):
 	out["error"] = error
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
-		
-#main()
