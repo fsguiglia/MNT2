@@ -71,7 +71,7 @@ void CBCSPage::update()
 		if (_dr.getCompleted())
 		{
 			_map.clearPoints();
-			load(_dr.getData());
+			loadData(_dr.getData());
 		}
 		else _dr.check();
 	}
@@ -235,6 +235,13 @@ void CBCSPage::exportFileList()
 void CBCSPage::load(ofJson & json)
 {
 	_map.clearPoints();
+	loadData(json);
+	loadMidiMap(json);
+	MapPage::load(json);
+}
+
+void CBCSPage::loadData(ofJson & json)
+{
 	for (ofJson point : json["points"])
 	{
 		Point curPoint;
@@ -243,10 +250,7 @@ void CBCSPage::load(ofJson & json)
 		curPoint.setValue("position", point["pos"]);
 		_map.addPoint(curPoint);
 	}
-
-	loadMidiMap(json);
 	_map.build();
-	MapPage::load(json);
 }
 
 ofJson CBCSPage::save()

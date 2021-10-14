@@ -27,6 +27,7 @@ public:
 
 	void exportFileList();
 	void load(ofJson& json);
+	void loadData(ofJson& json);
 	ofJson save();
 private:
 	PythonML _dr;
