@@ -14,22 +14,18 @@ import argparse
 import sys
 import json
 
-'''
-def main():
-	args = process_arguments(sys.argv)
-	output_folder = args['output_folder']
+def analyze(args):
+	output_folder = args['file']
 	sample_rate = int(args['sample_rate'])
 	window_size = int(args['window_size'])
 	hop_length = int(args['hop_length'])
 	perplexity = int(args['perplexity'])
 	learning_rate = int(args['learning_rate'])
 	iterations = int(args['iterations'])
-	mode = int(args['mode'])
+	mode = int(args['cbcs_mode'])
 	technique = int(args['technique'])
-	analyze(output_folder, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, mode, technique)
-'''
 	
-def analyze(output_folder, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, mode, technique):
+	
 	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
 	file_position = list()
 	Y = np.array([])
@@ -80,66 +76,6 @@ def analyze(output_folder, sample_rate, window_size, hop_length, perplexity, lea
 	Y = min_max_normalize(Y)
 	
 	save(Y, file_position, new_path)
-
-'''
-def process_arguments(args):
-	parser = argparse.ArgumentParser(description='CBCS t-SNE')
-	
-	parser.add_argument('-i', '--input',
-						action='store',
-						help='path to the input directory')
-	
-	parser.add_argument('-f', '--output_folder',
-						action='store',
-						help='path to the output directory')
-
-	parser.add_argument('-d', '--dimentions',
-						action='store',
-						default=2,
-						help='Dimension of the embedded space (default: 2)')
-
-	parser.add_argument('-p', '--perplexity',
-						action='store',
-						default=30,
-						help='Perplexity (default: 30)')
-						
-	parser.add_argument('-l', '--learning_rate',
-						action='store',
-						default = 200,
-						help = 'Learning rate (default: 200)')
-						
-	parser.add_argument('-it', '--iterations',
-						action='store',
-						default=1000,
-						help='Iterations (default: 1000)')
-	
-	parser.add_argument('-sr', '--sample_rate',
-						action='store',
-						default=22500,
-						help='Sample rate (default: 22500)')
-						
-	parser.add_argument('-ws', '--window_size',
-						action='store',
-						default=2048,
-						help='Window size (default: 2048)')
-	
-	parser.add_argument('-hl', '--hop_length',
-						action='store',
-						default=512,
-						help='Hop length (default: 512)')
-	
-	parser.add_argument('-m', '--mode',
-					 action='store',
-					 default=0,
-					 help= 'mode (0:sample, 1:granular)')
-	
-	parser.add_argument('-t', '--technique',
-					 action='store',
-					 default=1,
-					 help='Dimensionality reduction technique (0: tsne, 1: pca)')
-
-	return vars(parser.parse_args())
-'''
 
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)

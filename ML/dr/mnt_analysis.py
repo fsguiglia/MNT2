@@ -24,11 +24,11 @@ def main():
 	technique = int(args['technique'])
 
 	if script == 0:
-		analysis_cbcs.analyze(file, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, cbcs_mode, technique)
+		analysis_cbcs.analyze(args)
 	elif script == 1:
-		analysis_nni.analyze(file, sample_rate, window_size, hop_length, perplexity, learning_rate, iterations, cbcs_mode, technique)
+		analysis_nni.analyze(args)
 	elif script == 2:
-		pca_nni.analyze(file, dimentions)
+		pca_nni.analyze(args)
 		
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='MNT Analysis')
