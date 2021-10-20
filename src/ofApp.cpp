@@ -1005,6 +1005,42 @@ void ofApp::load()
 					}
 				}
 			}
+			ofJson jOut = jLoad["out"];
+			for (auto& element : jOut)
+			{
+				string curPort = element["port"].get<string>();
+				bool osc = false;
+				vector<string> split = ofSplitString(curPort, ":");
+				if (split.size() > 0)
+				{
+					if (split[0] == "osc") osc = true;
+				}
+				if (osc)
+				{
+					bool isNumber = (split[2].find_first_not_of("0123456789") == std::string::npos);
+					if (isNumber)
+					{
+						createOscOutput(split[1], split[2], element["x"], element["y"]);
+						//names[curPort] = curPort;
+					}
+				}
+				else
+				{
+					bool portAvailable = false;
+					for (auto port : _MIDIOutPorts) {
+						if (port.first == split[1])
+						{
+							portAvailable = true;
+							break;
+						}
+					}
+					if (portAvailable)
+					{
+						string name = createMIDIOutput(split[1], element["x"], element["y"]);
+						//names[name] = name;
+					}
+				}
+			}
 			//Modules
 			ofJson jModules = jLoad["Modules"];
 			for (auto& element : jModules)
