@@ -180,7 +180,7 @@ void ofApp::drawConnection(Connection& connection)
 	in.y += in_rect.getHeight() * 0.5;
 	ofVec2f out;
 	out = out_rect.getPosition();
-	out.x += out_rect.getWidth() * 0.5;
+	//out.x += out_rect.getWidth() * 0.5;
 	out.y += out_rect.getHeight() * 0.5;
 	if (connection.isDump) ofSetColor(255, 0, 0);
 	else ofSetColor(0);
