@@ -931,6 +931,8 @@ void ofApp::clear()
 		}
 	}
 
+	_MIDIInputs.clear();
+	_MIDIOutputs.clear();
 	//for (auto port : _oscReceivers) port.second.stop();
 	//for (auto port : _oscSenders) port.second.clear();
 	
