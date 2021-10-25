@@ -417,7 +417,7 @@ void GesturePage::mousePressed(int x, int y, int button, bool doubleClick)
 void GesturePage::mouseReleased(int x, int y, int button)
 {
 	bool inside = _position.inside(x, y);
-	if (button = 0)
+	if (button == 0)
 	{
 		if(inside) _cursor.set(-1, -1);
 	}
