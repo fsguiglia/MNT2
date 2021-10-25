@@ -182,7 +182,7 @@ void GesturePage::drawGestures(int x, int y, int w, int h)
 	playPolyline.draw();
 	//draw gesture name
 	ofSetColor(50);
-	if (_curGestureName != "")
+	if (!_recording && _curGestureName != "")
 	{
 		string text = "Gesture: " + _curGestureName;
 		text += ": " + ofToString(_curGesture.getPoints().size()) + " points";
@@ -316,7 +316,16 @@ void GesturePage::getCursorAtPercent(float position)
 void GesturePage::scrollViewEvent(ofxDatGuiScrollViewEvent e)
 {
 	string sIndex = ofSplitString(e.target->getLabel(), " ")[1];
-	if (_gestures.find(sIndex) != _gestures.end()) selectGesture(ofToInt(sIndex));
+	int index = -1;
+	for (int i = 0; i < _gestureNames.size(); i++)
+	{
+		if (_gestureNames[i] == sIndex)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index != -1) selectGesture(index);
 }
 
 void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
@@ -571,6 +580,9 @@ void GesturePage::removeGesture(string name)
 		}
 	}
 	if (index != -1) _gestureNames.erase(_gestureNames.begin() + index);
+	for (auto name : _gestureNames) cout << name << endl;
+	cout << "---" << endl;
+	for (auto gesture : _gestures) cout << gesture.first << endl;
 	_curGestureIndex = _gestureNames.size() - 1;
 	previous();
 }
