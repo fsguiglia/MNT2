@@ -38,7 +38,6 @@ void GesturePage::setupGui(string name)
 	_transportFolder->addButton("Previous")->setName("Previous");
 	_transportFolder->addButton("Random")->setName("Random");
 	_transportFolder->addSlider("Scrub", 0, 1, 0)->setName("Scrub");
-	_transportFolder->addButton("Delete");
 	_transportFolder->collapse();
 	_generateFolder = _gui->addFolder("Generate");
 	_generateFolder->addButton("Generate neural network model")->setName("Train");
@@ -50,6 +49,9 @@ void GesturePage::setupGui(string name)
 	_gui->addSlider("y", 0, 1, 0)->setName("y");
 	_gui->addToggle("MIDI Learn")->setName("Learn");
 	_gui->addButton("Clear mappings");
+	_gui->addBreak();
+	_gui->addButton("Delete gesture")->setName("Delete");
+	_gui->addBreak();
 	_gui->onSliderEvent(this, &GesturePage::sliderEvent);
 	_gui->onButtonEvent(this, &GesturePage::buttonEvent);
 	_gui->onToggleEvent(this, &GesturePage::toggleEvent);
@@ -580,9 +582,6 @@ void GesturePage::removeGesture(string name)
 		}
 	}
 	if (index != -1) _gestureNames.erase(_gestureNames.begin() + index);
-	for (auto name : _gestureNames) cout << name << endl;
-	cout << "---" << endl;
-	for (auto gesture : _gestures) cout << gesture.first << endl;
 	_curGestureIndex = _gestureNames.size() - 1;
 	previous();
 }
