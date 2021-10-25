@@ -64,14 +64,15 @@ void GesturePage::setupGui(string name)
 	_gui->update();
 
 	_guiHeight = _gui->getHeight();
-	_scrollView = new ofxDatGuiScrollView("Gestures", 15);
+	_scrollView = new ofxDatGuiScrollView("Gestures", 5);
 	_scrollView->onScrollViewEvent(this, &GesturePage::scrollViewEvent);
 	_scrollView->setOpacity(0.5);
-	//_scrollView->setTheme(new ofxDatGuiThemeWireframe());
-	_scrollView->setWidth(_guiWidth -1, 0.3);
 	_scrollView->setPosition(_gui->getPosition().x + 1, _guiHeight);
 	//_scrollView->setHeight(40);
-	_scrollView->setBackgroundColor(50);
+	_scrollView->setTheme(new ofxDatGuiThemeWireframe());
+	_scrollView->setBackgroundColor(140);
+	_scrollView->setWidth(_guiWidth - 1, 0.3);
+	_scrollView->setHeight(140);
 	_scrollView->setEnabled(false);
 	_scrollView->setVisible(false);
 	_scrollView->update();
@@ -137,12 +138,19 @@ void GesturePage::updateGui()
 
 void GesturePage::draw()
 {
+	ofPushStyle();
 	drawGestures(_position.x, _position.y, _position.width, _position.height);
-	//draw gui
 	ofSetColor(50);
 	ofDrawRectangle(_position.x + _position.width, 0, _guiWidth, _position.height);
-	_scrollView->draw();
 	_gui->draw();
+	ofSetColor(140);
+	ofDrawRectangle(_scrollView->getX(), _scrollView->getY(), _guiWidth - 2, _scrollView->getHeight() + 5);
+	_scrollView->draw();
+	if (_scrollView->getNumItems() == 0) {
+		ofSetColor(110);
+		_font.drawString("gestures", _scrollView->getX() + _guiWidth / 2 - 30, _scrollView->getY() + _scrollView->getHeight() / 2);
+	}
+	ofPopStyle();
 }
 
 void GesturePage::drawTile(int x, int y, int w, int h, int margin)
@@ -309,7 +317,6 @@ void GesturePage::scrollViewEvent(ofxDatGuiScrollViewEvent e)
 {
 	string sIndex = ofSplitString(e.target->getLabel(), " ")[1];
 	if (_gestures.find(sIndex) != _gestures.end()) selectGesture(ofToInt(sIndex));
-
 }
 
 void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
