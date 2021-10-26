@@ -35,6 +35,7 @@ void ofApp::setup(){
 	_selected = "";
 	_selectionOffset.set(0, 0);
 	_shiftSelected = { "",-1,-1, ofVec2f(-1,-1) };
+	if (_scale > 1) ofSetWindowShape(ofGetWidth() * _scale, ofGetHeight() * _scale);
 }
 
 void ofApp::update() {

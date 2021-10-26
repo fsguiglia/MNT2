@@ -170,7 +170,7 @@ inline void MapPage<T>::moduleMIDIIn(string port, int control, int channel, floa
 				_gui->getSlider(sliderLabel)->setName(parameterName);
 				_gui->setRemovableSlider(parameterName);
 				_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
-				_gui->setWidth(300, 0.3);
+				_gui->setWidth(_guiWidth, 0.3);
 				_gui->setOpacity(0.5);
 				_gui->update();
 			}

@@ -5,7 +5,7 @@
 //========================================================================
 
 #if _DEBUG
-int main( ){
+int main() {
 	ofGLWindowSettings settings;
 	settings.setGLVersion(3, 2);
 	settings.setSize(900, 600);
@@ -16,6 +16,7 @@ int main( ){
 
 #else
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+	//float scale = ((ofAppGLFWWindow *)(ofGetWindowPtr()))->getWindowScale().x;
 	ofGLFWWindowSettings settings;
 	settings.setGLVersion(3, 2);
 	settings.setSize(900, 600);

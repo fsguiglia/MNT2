@@ -325,7 +325,7 @@ void NNIPage::load(ofJson& json)
 		_gui->getSlider(sliderLabel)->setName(parameter);
 		_gui->setRemovableSlider(parameter);
 		_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
-		_gui->setWidth(300, 0.3);
+		_gui->setWidth(_guiWidth, 0.3);
 		_gui->setOpacity(0.5);
 	}
 

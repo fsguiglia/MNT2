@@ -181,7 +181,7 @@ void TriggerPage::updateSelected(int selected, Trigger trigger)
 		_gui->getSlider(sliderLabel)->setName(value.first);
 		_gui->setRemovableSlider(value.first);
 		_gui->getSlider(value.first)->setTheme(new ofxDatGuiThemeWireframe());
-		_gui->setWidth(300, 0.3);
+		_gui->setWidth(_guiWidth, 0.3);
 		_gui->setOpacity(0.5);
 	}
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
