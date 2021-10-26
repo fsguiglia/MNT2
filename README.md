@@ -1,13 +1,14 @@
-# Fusión 2020
-## El mapa no es el territorio 2 (MNT2)
+## El mapa no es el territorio (MNT)
+#### Software de mapeo de parámetros. Primer premio de la categoría Tecnología Aplicada al Arte y la Cultura del premio [Fusión2020](https://fusion2020.frba.utn.edu.ar/).
 
-Pueden descargar un ejecutable para Windows (probado con Windows 10) desde [www.sguiglia.com.ar/soft/MNT2.zip](http://www.sguiglia.com.ar/soft/MNT2.zip). Este ejecutable se ofrece sólo a los fines de facilitar la evaluación en el marco del concurso, por lo que es posible que tenga algunos problemas que serán resueltos en etapas siguientes del proyecto. Entre ellos:  
-* Requiere [Microsoft Visual C++ Redistributable for VS 2017](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
-* openFrameworks no soporta displays HiDPI en Windows, aunque trabajé sobre este problema puede ser que algunos íconos se vean pequeños en algunos monitores.
-* Pyinstaller no se lleva bien con Tensorflow > 2.0, para acceder a los gestos generativos por ahora es necesario necesario instalar Python (probado con 3.9) con las siguientes librerías: tensorflow > 2.5, easygui, keras-mdn-layer, progressbar
+MNT2 incluye un sintetizador para Max For Live, disponible en [github.com/fsguiglia/concatenate](https://github.com/fsguiglia/concatenate). Todavía estoy trabajando en un manual, pero puede descargarse una [Guía de inicio rápido](http://www.sguiglia.com.ar/mnt/descargas/MNT_guia.pdf). Probado en windows 10, aunque debería funcionar en otros sistemas operativos.
 
-Si no, pueden compilar la solución y correr los scripts de python usando:
-* Visual Studio 2017
+#### +info: [mnt.com.ar](http://www.mnt.com.ar)
+
+---
+
+Para compilar la solución y correr los scripts de python es necesario:
+* Visual Studio 2017 (en Windows)
 * openFrameworks 0.11 con los siguientes addons:
   * ofxDatGui
   * ofxMidi
@@ -23,6 +24,3 @@ Si no, pueden compilar la solución y correr los scripts de python usando:
   * librosa
   
 
-Aún me encuentro trabajando en un manual, pero puede descargarse una guía de inicio rápido desde [www.sguiglia.com.ar/soft/MNT2_guia.pdf](http://www.sguiglia.com.ar/soft/MNT2_guia.pdf).
-
-MNT2 incluye un sintetizador para Max For Live, disponible en [github.com/fsguiglia/concatenate](https://github.com/fsguiglia/concatenate).
