@@ -8,7 +8,6 @@ MNT2 incluye un sintetizador para Max For Live, disponible en [github.com/fsguig
 ---
 
 Para compilar la solución y correr los scripts de python es necesario:
-* Visual Studio 2017 (en Windows)
 * openFrameworks 0.11 con los siguientes addons:
   * ofxDatGui
   * ofxMidi
