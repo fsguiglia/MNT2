@@ -1154,7 +1154,6 @@ void ofApp::save()
 	{
 		//MIDI/OSC
 		path = saveFile.getPath();
-		path = ofSplitString(path, ".")[0];
 		path += ".mnt";
 		ofJson jSave;
 		jSave["MNT_Version"] = 2;
