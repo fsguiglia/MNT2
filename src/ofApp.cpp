@@ -874,7 +874,7 @@ void ofApp::updateConnections()
 						{
 							if (vAddress[0] == "global") {
 								addressMatch = true;
-								curAddress = curAddress.substr(7, string::npos);
+								if(curAddress.length() >= 7) curAddress = curAddress.substr(7, string::npos);
 							}
 						}
 						if (vAddress.size() > 1)
@@ -883,7 +883,10 @@ void ofApp::updateConnections()
 							if (node->getName() == nodeAddress)
 							{
 								addressMatch = true;
-								curAddress = curAddress.substr(nodeAddress.length() + 1, string::npos);
+								if (curAddress.length() >= nodeAddress.length() + 1)
+								{
+									curAddress = curAddress.substr(nodeAddress.length() + 1, string::npos);
+								}
 							}
 						}
 						if (addressMatch)
