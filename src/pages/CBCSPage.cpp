@@ -54,7 +54,8 @@ void CBCSPage::setupGui()
 
 void CBCSPage::setupTsne()
 {
-	_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //ver valores por defecto
+	_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //py
+	//_dr.setup("../ML/dr/mnt_analysis.exe", "cbcs"); //exe
 	map<string, float> drParameters;
 	drParameters["--script"] = 0;
 	drParameters["--perplexity"] = 30;

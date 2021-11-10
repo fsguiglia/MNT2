@@ -57,7 +57,8 @@ void NNIPage::setupGui()
 
 void NNIPage::setupTsne()
 {
-	_audioDr.setup("../../ML/dr/mnt_analysis.py", "nni_audio", "python"); //ver valores por defecto
+	_audioDr.setup("../../ML/dr/mnt_analysis.py", "nni_audio", "python"); //py
+	//_audioDr.setup("../ML/dr/mnt_analysis.exe", "nni_audio"); //exe
 	map<string, float> audioDrParameters;
 	audioDrParameters["--script"] = 1;
 	audioDrParameters["--perplexity"] = 5;
@@ -68,7 +69,8 @@ void NNIPage::setupTsne()
 
 void NNIPage::setupPca()
 {
-	_pca.setup("../../ML/dr/mnt_analysis.py", "pca_nni", "python"); //ver valores por defecto
+	_pca.setup("../../ML/dr/mnt_analysis.py", "pca_nni", "python"); //py
+	//_pca.setup("../ML/dr/mnt_analysis.exe", "pca_nni"); //exe
 	map<string, float> audioDrParameters;
 	audioDrParameters["--script"] = 2;
 	_pca.setParameters(audioDrParameters);
