@@ -8,7 +8,7 @@ class Page {
 public:
 	Page();
 
-	virtual void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 20) = 0;
+	virtual void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 50) = 0;
 	virtual void setupGui(string name) = 0;
 	virtual void update() = 0;
 	virtual void draw() = 0;
