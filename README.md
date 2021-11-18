@@ -3,6 +3,7 @@
 
 MNT2 incluye un sintetizador para Max For Live, disponible en [github.com/fsguiglia/concatenate](https://github.com/fsguiglia/concatenate). Todavía estoy trabajando en un manual, pero puede descargarse una [Guía de inicio rápido](http://www.sguiglia.com.ar/mnt/descargas/MNT_guia.pdf). Probado en windows 10, aunque debería funcionar en otros sistemas operativos.
 
+#### [Ejecutable (Windows x64)](http://www.sguiglia.com.ar/mnt/descargas/MNT2.zip). Requiere [Microsoft Visual C++ Redistributable for VS 2017](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 #### +info: [mnt.com.ar](http://www.mnt.com.ar)
 
 ---
