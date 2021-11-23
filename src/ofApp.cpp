@@ -480,7 +480,7 @@ void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 {
 	if (e.target->getName() == "oscIn")
 	{
-		bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos);
+		bool isNumber = (e.text.find_first_not_of("0123456789") == std::string::npos) && e.text.size() > 0;
 		if (_oscReceivers.find(e.text) == _oscReceivers.end() && isNumber)
 		{
 			createOscInput(e.text, 0.15, 0.5);
@@ -494,10 +494,22 @@ void ofApp::OSCTextInput(ofxDatGuiTextInputEvent e)
 	{
 		vector<string> split = ofSplitString(e.text, ":");
 		if (split.size() == 2) {
-			bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos);
+			bool isNumber = (split[1].find_first_not_of("0123456789") == std::string::npos) && split[1].size() > 0;
 			if (isNumber)
 			{
 				createOscOutput(split[0], split[1], 0.85, 0.5);
+				_outputNodes[_outputNodes.size() - 1].setPosition(
+					0.85 - (_outputNodes[_outputNodes.size() - 1].getWidth() / (float)ofGetWidth()),
+					(ofGetHeight() - _outputNodes[_outputNodes.size() - 1].getHeight()) * 0.5 / (float)ofGetHeight()
+				);
+			}
+		}
+		else if (split.size() == 1)
+		{
+			bool isNumber = (split[0].find_first_not_of("0123456789") == std::string::npos) && split[0].size() > 0;
+			if (isNumber)
+			{
+				createOscOutput("127.0.0.1", split[0], 0.85, 0.5);
 				_outputNodes[_outputNodes.size() - 1].setPosition(
 					0.85 - (_outputNodes[_outputNodes.size() - 1].getWidth() / (float)ofGetWidth()),
 					(ofGetHeight() - _outputNodes[_outputNodes.size() - 1].getHeight()) * 0.5 / (float)ofGetHeight()
