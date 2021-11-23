@@ -14,11 +14,9 @@ Para compilar la solución y correr los scripts de python es necesario:
   * ofxMidi
   * ofxOsc
   * ofxSpatialHash
-* Python 3.9 con los siguientes paquetes:
-  * tensorflow > 2.5
+* Python 3.9 con los siguientes paquetes: 
   * easygui
   * progressbar
-  * keras-mdn-layer
   * progressbar
   * sklearn
   * librosa
