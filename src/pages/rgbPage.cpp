@@ -196,7 +196,7 @@ void RGBPage::updateSelected(int selected, RGBPoint point)
 	for (auto value : point.getValues())
 	{
 		vector<string> split = ofSplitString(value.first, "/");
-		string sliderLabel = "cc" + split[split.size() - 1];
+		string sliderLabel = "ch" + split[0] + "/cc" + split[1];
 		_gui->addSlider(sliderLabel, 0., 1., value.second);
 		_gui->getSlider(sliderLabel)->setName(value.first);
 		_gui->setRemovableSlider(value.first);

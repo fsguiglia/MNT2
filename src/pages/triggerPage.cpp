@@ -176,7 +176,7 @@ void TriggerPage::updateSelected(int selected, Trigger trigger)
 	for (auto value : trigger.getValues())
 	{
 		vector<string> split = ofSplitString(value.first, "/");
-		string sliderLabel = "cc" + split[split.size() -1];
+		string sliderLabel = "ch" + split[0] + "/cc" + split[1];
 		_gui->addSlider(sliderLabel, 0., 1., value.second);
 		_gui->getSlider(sliderLabel)->setName(value.first);
 		_gui->setRemovableSlider(value.first);

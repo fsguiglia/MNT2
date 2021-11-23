@@ -322,7 +322,7 @@ void NNIPage::load(ofJson& json)
 	{
 		_map.addGlobalParameter(parameter, 0);
 		//GUI
-		string sliderLabel = "cc" + ofSplitString(parameter, "/").back();
+		 string sliderLabel = "ch" + ofSplitString(parameter, "/")[0] + "/cc" + ofSplitString(parameter, "/")[1];
 		_gui->addSlider(sliderLabel, 0., 1.);
 		_gui->getSlider(sliderLabel)->setName(parameter);
 		_gui->setRemovableSlider(parameter);
