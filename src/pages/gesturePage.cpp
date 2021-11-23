@@ -461,7 +461,7 @@ void GesturePage::moduleMIDIMap(string port, int control, int channel, float val
 	string controlLabel = "ch" + sChannel + "/cc" + sControl;
 
 	bool valid = true;
-	valid = valid && channel >= 0 && channel < 128;
+	valid = valid && channel >= 0 && channel < 16;
 	valid = valid && control >= 0 && control < 128;
 	valid = valid && value >= 0 && value <= 1;
 	if (valid)
@@ -505,7 +505,22 @@ void GesturePage::moduleMIDIMap(string port, int control, int channel, float val
 
 void GesturePage::moduleOSCIn(string address, float value)
 {
-
+	vector<string> split = ofSplitString(address, "/");
+	if (split.size() > 0)
+	{
+		if (split.size() > 1)
+		{
+			if (split[0] == "control")
+			{
+				ofVec2f cursor = _cursor;
+				if (value > 1) value = 1;
+				if (value < 0) value = 0;
+				if (split[1] == "x") cursor.x = value;
+				if (split[1] == "y") cursor.y = value;
+				_cursor = cursor;
+			}
+		}
+	}
 }
 
 void GesturePage::load(ofJson & json)
