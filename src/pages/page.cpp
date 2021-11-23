@@ -76,7 +76,7 @@ bool Page::getStringOutput()
 	return _stringOutput;
 }
 
-void Page::MIDIIn(string port, int control, int channel, float value)
+void Page::MIDIIn(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -84,9 +84,10 @@ void Page::MIDIIn(string port, int control, int channel, float value)
 	string controlLabel = "ch" + sChannel + "/cc" + sControl;
 
 	bool valid = true;
-	valid = valid && channel >= 0 && channel < 128;
+	valid = valid && channel >= 0 && channel < 16;
 	valid = valid && control >= 0 && control < 128;
 	valid = valid && value >= 0 && value <= 1;
+
 	if (valid)
 	{
 		if (_controlLearn)
@@ -122,10 +123,10 @@ void Page::MIDIIn(string port, int control, int channel, float value)
 		}
 		else
 		{
-			moduleMIDIMap(port, control, channel, value);
+			moduleMIDIMap(port, channel, control, value);
 		}
 		
-		moduleMIDIIn(port, control, channel, value);
+		moduleMIDIIn(port, channel, control, value);
 	}
 }
 

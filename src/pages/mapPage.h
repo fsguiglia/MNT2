@@ -19,8 +19,8 @@ public:
 	void setUseGlobalParameters(bool globalParameters);
 	bool getUseGlobalParameters();
 
-	void moduleMIDIIn(string port, int control, int channel, float value);
-	void moduleMIDIMap (string port, int control, int channel, float value);
+	void moduleMIDIIn(string port, int channel, int control, float value);
+	void moduleMIDIMap (string port, int channel, int control, float value);
 	void moduleOSCIn(string address, float value);
 
 	void load(ofJson jLoad);
@@ -144,7 +144,7 @@ inline bool MapPage<T>::getUseGlobalParameters()
 }
 
 template<typename T>
-inline void MapPage<T>::moduleMIDIIn(string port, int control, int channel, float value)
+inline void MapPage<T>::moduleMIDIIn(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
@@ -160,13 +160,12 @@ inline void MapPage<T>::moduleMIDIIn(string port, int control, int channel, floa
 		{
 			if (_useGlobalParameters) curParameters = _map.getParameters();
 			else curParameters = _map.getPoint(lastSelected).getValues();
-			
 			if (curParameters.find(parameterName) == curParameters.end())
 			{
 				if (_useGlobalParameters) _map.addGlobalParameter(parameterName, value);
 				else _map.addPointParameter(lastSelected, parameterName, value);
 				
-				_gui->addSlider(sliderLabel, 0., 1.);
+				_gui->addSlider(sliderLabel, 0., 1., value);
 				_gui->getSlider(sliderLabel)->setName(parameterName);
 				_gui->setRemovableSlider(parameterName);
 				_gui->getSlider(parameterName)->setTheme(new ofxDatGuiThemeWireframe());
@@ -189,7 +188,7 @@ inline void MapPage<T>::moduleMIDIIn(string port, int control, int channel, floa
 }
 
 template<typename T>
-inline void MapPage<T>::moduleMIDIMap(string port, int control, int channel, float value)
+inline void MapPage<T>::moduleMIDIMap(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);

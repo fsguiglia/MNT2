@@ -44,7 +44,7 @@ public:
 	bool getStringOutput();
 
 	//io
-	void MIDIIn(string port, int control, int channel, float value);
+	void MIDIIn(string port, int channel, int control, float value);
 	map<string, float> getMidiOut(bool clear = false);
 	map<string, float> getMidiDump(bool clear = false);
 
@@ -61,8 +61,8 @@ public:
 	virtual ofJson save() = 0;
 
 protected:
-	virtual void moduleMIDIIn(string port, int control, int channel, float value) = 0;
-	virtual void moduleMIDIMap(string port, int control, int channel, float value) = 0;
+	virtual void moduleMIDIIn(string port, int channel, int control, float value) = 0;
+	virtual void moduleMIDIMap(string port, int channel, int control, float value) = 0;
 	virtual void moduleOSCIn(string address, float value) = 0;
 
 	void saveMidiMap(ofJson& json);
