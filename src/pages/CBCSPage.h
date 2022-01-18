@@ -25,6 +25,8 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
+	void moduleOSCIn(string address, float value);
+
 	void exportFileList();
 	void load(ofJson& json);
 	void loadData(ofJson& json);

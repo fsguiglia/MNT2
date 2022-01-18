@@ -39,14 +39,12 @@ void GesturePage::setupGui(string name)
 	_transportFolder->addButton("Random")->setName("Random");
 	_transportFolder->addSlider("Scrub", 0, 1, 0)->setName("Scrub");
 	_transportFolder->collapse();
-	/*
 	_generateFolder = _gui->addFolder("Generate");
 	_generateFolder->addButton("Generate neural network model")->setName("Train");
 	_generateFolder->addBreak();
 	_generateFolder->addButton("Load model and generate gestures")->setName("Generate");
 	_generateFolder->addSlider("Temperature", 0, 1, _lstmGen.getParameter("--temperature"));
 	_generateFolder->collapse();
-	*/
 	_gui->addSlider("x", 0, 1, 0)->setName("x");
 	_gui->addSlider("y", 0, 1, 0)->setName("y");
 	_gui->addToggle("MIDI Learn")->setName("Learn");

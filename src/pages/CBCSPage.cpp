@@ -201,6 +201,23 @@ void CBCSPage::mouseScrolled(int scroll)
 	//zoom
 }
 
+void CBCSPage::moduleOSCIn(string address, float value)
+{
+	vector<string> split = ofSplitString(address, "/");
+	if (split.size() > 0)
+	{
+		if (split[0] == "radius")
+		{
+			if (value > 0 && value <= 1)
+			{
+				_gui->getSlider("radius")->setValue(value, false);
+				_map.setRadius(value * 0.5);
+			}
+		}
+	}
+	MapPage::moduleOSCIn(address, value);
+}
+
 void CBCSPage::exportFileList()
 {
 	//exports list of filenames to load in synth
