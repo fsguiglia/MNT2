@@ -36,6 +36,7 @@ void ofApp::setup(){
 	_selectionOffset.set(0, 0);
 	_shiftSelected = { "",-1,-1, ofVec2f(-1,-1) };
 	if (_scale > 1) ofSetWindowShape(ofGetWidth() * _scale, ofGetHeight() * _scale);
+	_prevNextButton = false;
 }
 
 void ofApp::update() {
@@ -98,25 +99,30 @@ void ofApp::drawEditMode()
 		if (node->getVisible()) node->drawPage();
 	};
 	//draw prev next areas
-	if (mouseX < _pageMarginLeft) ofSetColor(35);
-	else ofSetColor(0);
-	ofDrawRectangle(0, 0, _pageMarginLeft, ofGetHeight());
-	if (mouseX > _pageMarginRight) ofSetColor(35);
-	else ofSetColor(0);
-	ofDrawRectangle(_pageMarginRight, 0, ofGetWidth() - _pageMarginRight, ofGetHeight());
-	//draw prev next icons
-	ofSetColor(60);
-	ofDrawTriangle(
-		ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
-		ofVec2f(3 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
-		ofVec2f(2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
-	);
-	ofDrawTriangle(
-		ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 - 30),
-		ofVec2f(_pageMarginRight + _pageMarginLeft * 0.25, ofGetHeight() * 0.5 + 30),
-		ofVec2f(_pageMarginRight + 2 * _pageMarginLeft * 0.25, ofGetHeight() * 0.5)
-	);
-	ofPopStyle();
+	if (_pageMarginLeft > 80)
+	{
+		_prevNextButton = true;
+		if (mouseX < 40) ofSetColor(35);
+		else ofSetColor(0);
+		ofDrawRectangle(0, 0, _pageMarginLeft, ofGetHeight());
+		if (mouseX > ofGetWidth() - 40) ofSetColor(35);
+		else ofSetColor(0);
+		ofDrawRectangle(_pageMarginRight, 0, ofGetWidth() - _pageMarginRight, ofGetHeight());
+		//draw prev next icons
+		ofSetColor(60);
+		ofDrawTriangle(
+			ofVec2f(40, ofGetHeight() * 0.5 - 30),
+			ofVec2f(40, ofGetHeight() * 0.5 + 30),
+			ofVec2f(10, ofGetHeight() * 0.5)
+		);
+		ofDrawTriangle(
+			ofVec2f(ofGetWidth() - 40, ofGetHeight() * 0.5 - 30),
+			ofVec2f(ofGetWidth() - 40, ofGetHeight() * 0.5 + 30),
+			ofVec2f(ofGetWidth() - 10, ofGetHeight() * 0.5)
+		);
+		ofPopStyle();
+	}
+	else _prevNextButton = false;
 }
 
 void ofApp::drawTileMode()
@@ -1506,19 +1512,22 @@ void ofApp::mouseReleased(int x, int y, int button){
 		{
 			if (node->getVisible()) node->mouseReleased(x, y, button);
 		}
-		if (x < _pageMarginLeft - 15 || x > _pageMarginRight + 15)
+		if (_prevNextButton)
 		{
-			if (x < _pageMarginLeft)
+			if (x < 40 || x > ofGetWidth() - 40)
 			{
-				_page--;
-				if (_page < 0) _page = _moduleNodes.size() - 1;
+				if (x < 40)
+				{
+					_page--;
+					if (_page < 0) _page = _moduleNodes.size() - 1;
+				}
+				if (x > ofGetWidth() - 40)
+				{
+					_page++;
+					if (_page >= _moduleNodes.size()) _page = 0;
+				}
+				changePage(_page);
 			}
-			if (x > _pageMarginRight)
-			{
-				_page++;
-				if (_page >= _moduleNodes.size()) _page = 0;
-			}
-			changePage(_page);
 		}
 		break;
 

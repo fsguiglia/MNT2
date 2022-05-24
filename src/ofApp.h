@@ -100,6 +100,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofxDatGuiFolder* _oscFolder;
 		ofColor _moduleColor, _generatorColor, _ioColor;
 		float _scale;
+		bool _prevNextButton;
 		
 		//tile mode
 		ofImage _tileIcon;
