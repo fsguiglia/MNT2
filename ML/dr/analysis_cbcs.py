@@ -13,6 +13,7 @@ import easygui
 import argparse
 import sys
 import json
+import time
 
 def analyze(args):
 	output_folder = args['file']
@@ -25,57 +26,59 @@ def analyze(args):
 	mode = int(args['cbcs_mode'])
 	technique = int(args['technique'])
 	
-	
+	error = 'something went wrong, please check path and folder contents'
 	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
-	file_position = list()
-	Y = np.array([])
 	
-	#save empty json and exit if no file is provided
-	init_path = os.environ['USERPROFILE'] + '//Desktop//'
-	audio_files = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
-	if audio_files is None:
-		error = 'no file to analize'
-		print(error)
-		save_empty_file(error, new_path)
-		sys.exit()
+	try:
+		file_position = list()
+		Y = np.array([])
+		
+		#save empty json and exit if no file is provided
+		init_path = os.environ['USERPROFILE'] + '//Desktop//'
+		audio_files = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
+		if audio_files is None:
+			error = 'no files found'
+			exit()
 
-	files = getListOfFiles(audio_files, ['.wav'])
-	
-	X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
-	
-	#load audio files and get features
-	print('loading ' + str(len(files)) + ' files')
-	bar = progressbar.ProgressBar(maxval=len(files), \
-    widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-	bar.start()
-	for index, file in enumerate(files):
-		cur_file_position, cur_X = getFilePosition(file, sample_rate, mode)
-		for file in cur_file_position:
-			file_position.append(file)
-		X = np.concatenate((X, cur_X))
-		bar.update(index + 1)
-	bar.finish()
-	
-	#save empty json and exit if less than 5 files are provided
-	if len(file_position) < 2:
-		error = 'not enough data to create map, exiting'
-		print(error)
-		save_empty_file(error, new_path)
-		sys.exit()
+		files = getListOfFiles(audio_files, ['.wav', '.WAV'])
+		
+		X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
+		
+		#load audio files and get features
+		print('loading ' + str(len(files)) + ' file(s):')
+		for index, file in enumerate(files):
+			print('[' + str(index + 1) + ' / ' + str(len(files)) + ']: converting sample...')
+			try:
+				cur_file_position, cur_X = getFilePosition(file, sample_rate, mode)
+				for file in cur_file_position:
+					file_position.append(file)
+				X = np.concatenate((X, cur_X))
+			except:
+				border_msg(file + ' is not a valid file')
+		
+		#save empty json and exit if less than 5 files are provided
+		if len(file_position) < 2:
+			error = 'not enough data to create map'
+			sys.exit()
 
-	D = getFeatures(X, window_size, hop_length)
-	Y = np.zeros((len(file_position),2))
-	
-	#pca or pca+tsne (0.8 variance needs to be tested)
-	if technique == 1:
-		Y = getPCA(D, 2)
-	elif technique == 0:
-		pca = getPCA(D, 0.8)
-		Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
-	
-	Y = min_max_normalize(Y)
-	
-	save(Y, file_position, new_path)
+		D = getFeatures(X, window_size, hop_length)
+		Y = np.zeros((len(file_position),2))
+		
+		#pca or pca+tsne (0.8 variance needs to be tested)
+		if technique == 1:
+			Y = getPCA(D, 2)
+		elif technique == 0:
+			pca = getPCA(D, 0.8)
+			Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
+		
+		Y = min_max_normalize(Y)
+		
+		save(Y, file_position, new_path)
+		
+	except:
+		border_msg(error)
+		save_empty_file(error, new_path)
+		time.sleep(3)
 
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
@@ -105,6 +108,9 @@ def getFilePosition(file, sample_rate, mode=0):
 	X = list()
 	D = np.array([]).reshape(0, shape)
 	
+	bar = progressbar.ProgressBar(maxval=windows+1, \
+		widgets=['loading ', progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+	bar.start()
 	for i in range(windows + 1):
 		start = int(shape * i)
 		end = int(shape * (i + 1))
@@ -116,6 +122,9 @@ def getFilePosition(file, sample_rate, mode=0):
 		padded[:end-start] = y[start:end]
 		padded = padded.reshape(1, shape)
 		D = np.concatenate((D,padded))
+		bar.update(i)
+	bar.finish()
+	
 	return X, D
 	
 def getFeatures(samples, window_size, hop_length):
@@ -123,9 +132,8 @@ def getFeatures(samples, window_size, hop_length):
 	shape = int((1 + window_size * 0.5))
 	shape *= int(samples[0].shape[0] / hop_length) + 1
 	D = np.array([]).reshape(0, shape)
-	print('extracting features')
 	bar = progressbar.ProgressBar(maxval=samples.shape[0], \
-    widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    widgets=['extracting features ', progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 	bar.start()
 	for index,sample in enumerate(samples):
 		sample = sample.T
@@ -186,3 +194,11 @@ def save_empty_file(error, output_file):
 	out["error"] = error
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
+		
+def border_msg(msg):
+	row = len(msg)
+	h = ''.join(['-' *row])
+	result= h + '\n' +msg+ '\n' + h
+	print('\n')
+	print(result)
+	print('\n')
