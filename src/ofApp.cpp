@@ -31,44 +31,80 @@ void ofApp::setup(){
 	_tileIcon.load("tile_icon.png");
 	_tileIcon.resize(30, 30);
 	_shift = false;
+	_connectorSelected = false;
 	_mode = false;
 	_selected = "";
 	_selectionOffset.set(0, 0);
-	_shiftSelected = { "",-1,-1, ofVec2f(-1,-1) };
+	_shiftSelected = { "",-1,-1, ofVec2f(-1,-1), -1 };
 	if (_scale > 1) ofSetWindowShape(ofGetWidth() * _scale, ofGetHeight() * _scale);
 	_prevNextButton = false;
+	
+
+	//intro
+	ofDirectory dir;
+	int n = dir.listDir("animated_logo");
+	_introSequence.resize(n);
+	for (int i = 0; i < n; i++) _introSequence[i].load(dir.getPath(i));
+	_intro = true;
 }
 
 void ofApp::update() {
-	for (auto& node : _moduleNodes) node->update();
-	updateConnections();
-	
-	_gui->setVisible(_mode != EDIT_MODE);
-	_gui->setEnabled(_mode == CONNECT_MODE);
-	_gui->update();
+	if(!_intro)
+	{
+		for (auto& node : _moduleNodes) node->update();
+		updateConnections();
+
+		_gui->setVisible(_mode != EDIT_MODE);
+		_gui->setEnabled(_mode == CONNECT_MODE);
+		_gui->update();
+	}
 }
 
 void ofApp::draw(){
-	ofClear(255);
-	switch (_mode)
+	ofBackground(255);
+	if (_intro) drawIntro();
+	else
 	{
-	case EDIT_MODE:
-		drawEditMode();
-		break;
-	case CONNECT_MODE:
-		drawConnectionMode();
-		break;
-	case TILE_MODE:
-		if (_moduleNodes.size() > 0)
+		switch (_mode)
 		{
+		case EDIT_MODE:
+			drawEditMode();
+			break;
+		case CONNECT_MODE:
 			drawConnectionMode();
-			ofSetColor(0, 185);
-			ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-			ofSetColor(0);
-			drawTileMode();
+			break;
+		case TILE_MODE:
+			if (_moduleNodes.size() > 0)
+			{
+				drawConnectionMode();
+				ofSetColor(0, 185);
+				ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+				ofSetColor(0);
+				drawTileMode();
+			}
+			else _mode = CONNECT_MODE;
+			break;
 		}
-		else _mode = CONNECT_MODE;
-		break;
+	}
+}
+
+void ofApp::drawIntro()
+{
+	static float i = 0;
+	if (i < _introSequence.size())
+	{
+		_introSequence[int(i)].draw(290, 210);
+		i+=0.5;
+	}
+	else if (i < _introSequence.size() + 30)
+	{
+		_introSequence[_introSequence.size() - 1].draw(290, 210);
+		i++;
+	}
+	else
+	{
+		_intro = false;
+		_introSequence.clear();
 	}
 }
 
@@ -76,6 +112,7 @@ void ofApp::drawConnectionMode()
 {
 	//draw nodes and connections
 	ofPushStyle();
+	if(_connectorSelected) drawCurConnection();
 	for (auto connection : _connections) drawConnection(connection);
 	for (auto& node : _moduleNodes) node->draw();
 	for (auto& node : _inputNodes) node.draw();
@@ -160,6 +197,34 @@ void ofApp::drawTileMode()
 		}
 	}
 	ofPopStyle();
+}
+
+void ofApp::drawCurConnection()
+{
+	ofRectangle output;
+	bool valid = false;
+	
+	for (auto& node : _moduleNodes)
+	{
+		if (get<0>(_shiftSelected) == node->getName()) {
+			output = node->getOutputConnector(0);
+			valid = true;
+			break;
+		}
+	}
+	for (auto& node : _inputNodes)
+	{
+		if (get<0>(_shiftSelected) == node.getName()) {
+			output = node.getOutputConnector(0);
+			valid = true;
+			break;
+		}
+	}
+	if (valid)
+	{
+		ofSetColor(0);
+		ofDrawLine(output.x + output.width, output.y + output.height * 0.5, mouseX, mouseY);
+	}
 }
 
 void ofApp::drawConnection(Connection& connection)
@@ -608,12 +673,14 @@ void ofApp::deleteOscOutput(string ip, string port)
 }
 
 
-tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
+tuple<string, int, int, ofVec2f, int> ofApp::selectNode(int x, int y)
 {
-	tuple<string, int, int, ofVec2f> parameters = { "", -1, -1, ofVec2f(-1, -1)};
+	tuple<string, int, int, ofVec2f, int> parameters = { "", -1, -1, ofVec2f(-1, -1), -1};
 	for (int i = _moduleNodes.size() - 1; i >= 0; i--)
 	{
-		if (_moduleNodes[i]->inside(x, y))
+		int inside = _moduleNodes[i]->inside(x, y, true);
+		get<4>(parameters) = inside;
+		if (inside >= 0)
 		{
 			get<0>(parameters) = _moduleNodes[i]->getName();
 			get<1>(parameters) = _moduleNodes[i]->getInputs();
@@ -627,7 +694,9 @@ tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
 	}
 	for (int i = _inputNodes.size() - 1; i >= 0; i--)
 	{
-		if (_inputNodes[i].inside(x, y))
+		int inside = _inputNodes[i].inside(x, y, true);
+		get<4>(parameters) = inside;
+		if (inside >= 0)
 		{
 			get<0>(parameters) = _inputNodes[i].getName();
 			get<1>(parameters) = _inputNodes[i].getInputs();
@@ -641,7 +710,9 @@ tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
 	}
 	for (int i = _outputNodes.size() - 1; i >= 0; i--)
 	{
-		if (_outputNodes[i].inside(x, y))
+		int inside = _outputNodes[i].inside(x, y, true);
+		get<4>(parameters) = inside;
+		if (inside >= 0)
 		{
 			get<0>(parameters) = _outputNodes[i].getName();
 			get<1>(parameters) = _outputNodes[i].getInputs();
@@ -656,7 +727,7 @@ tuple<string, int, int, ofVec2f> ofApp::selectNode(int x, int y)
 	return parameters;
 }
 
-void ofApp::createDeleteConnection(tuple<string, int, int, ofVec2f> out, tuple<string, int, int, ofVec2f> in, bool dump)
+void ofApp::createDeleteConnection(tuple<string, int, int, ofVec2f, int> out, tuple<string, int, int, ofVec2f, int> in, bool dump)
 {
 	bool connectionExists = false;
 	for (int i = 0; i < _connections.size(); i++)
@@ -664,7 +735,7 @@ void ofApp::createDeleteConnection(tuple<string, int, int, ofVec2f> out, tuple<s
 		if (_connections[i].fromId == get<0>(out) && _connections[i].toId == get<0>(in))
 		{
 			connectionExists = true;
-			_connections.erase(_connections.begin() + i);
+			//_connections.erase(_connections.begin() + i);
 			break;
 		}
 	}
@@ -1275,7 +1346,6 @@ void ofApp::keyReleased(int key){
 		break;
 	case(OF_KEY_SHIFT):
 		_shift = false;
-		_shiftSelected = { "",-1,-1, ofVec2f(-1, -1) };
 		break;
 	case(OF_KEY_CONTROL):
 		_control = false;
@@ -1296,6 +1366,12 @@ void ofApp::mouseMoved(int x, int y){
 	switch (_mode)
 	{
 	case CONNECT_MODE:
+		//module
+		selectNode(x, y);
+		for (auto connection : _connections)
+		{
+		}
+		//tile
 		_tileIconHovered = x > ofGetWidth() - (_tileIcon.getWidth() + _tileIconMargin);
 		_tileIconHovered = _tileIconHovered && x < ofGetWidth() - _tileIconMargin;
 		_tileIconHovered = _tileIconHovered && y > ofGetHeight() - (_tileIcon.getHeight() + _tileIconMargin);
@@ -1354,29 +1430,30 @@ void ofApp::mousePressed(int x, int y, int button){
 	case CONNECT_MODE:
 		if (button == 0)
 		{
-			if (_shift)
+			if (_connectorSelected)
 			{
 				_selected = "";
 				if (get<0>(_shiftSelected) == "")
 				{
-					tuple<string, int, int, ofVec2f> curSelected = selectNode(x, y);
-					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
-					else _shiftSelected = { "", -1 , -1, ofVec2f(-1, -1) };
+					tuple<string, int, int, ofVec2f, int> curSelected = selectNode(x, y);
+					if (get<4>(curSelected) > 0) _shiftSelected = curSelected;
 				}
 				else
 				{
-					tuple<string, int, int, ofVec2f> curSelected = selectNode(x, y);
+					tuple<string, int, int, ofVec2f, int> curSelected = selectNode(x, y);
 					bool keep = get<0>(curSelected) != get<0>(_shiftSelected) && get<1>(curSelected) > 0;
 					if (keep) createDeleteConnection(_shiftSelected, curSelected, _control);
-					if (get<2>(curSelected) > 0) _shiftSelected = curSelected;
-					else _shiftSelected = { "", -1 , -1, ofVec2f(-1, -1) };
 				}
+				_connectorSelected = false;
+				_shiftSelected = { "", -1 , -1, ofVec2f(-1, -1), -1 };
 			}
 			else
 			{
 				string lastSelected = _selected;
 				auto curSelected = selectNode(x, y);
-				_selected = get<0>(curSelected);
+				_connectorSelected = get<4>(curSelected) > 0;
+				if (_connectorSelected) _shiftSelected = curSelected;
+				else _selected = get<0>(curSelected);
 				_selectionOffset = get<3>(curSelected);
 				bool doubleClick = _selected != "" && lastSelected == _selected;
 				doubleClick = doubleClick && ofGetElapsedTimeMillis() - _lastClick < 500;
@@ -1423,37 +1500,58 @@ void ofApp::mousePressed(int x, int y, int button){
 }
 
 void ofApp::mouseReleased(int x, int y, int button){
+	if (_intro)
+	{
+		_intro = false;
+		_introSequence.clear();
+	}
 	switch (_mode)
 	{
 	case CONNECT_MODE:
 		if (button == 2)
 		{
-			string curSelected = "";
+			auto node = selectNode(x, y);
+			string curSelected = get<0>(node);
+			int mode = get<4>(node);
 			int curIndex = -1;
 			for (int i = 0; i < _moduleNodes.size(); i++)
 			{
-				if (_moduleNodes[i]->inside(x, y))
+				if (_moduleNodes[i]->getName() == curSelected)
 				{
-					curSelected = _moduleNodes[i]->getName();
 					curIndex = i;
 					break;
 				}
 			}
-
-			if (curIndex != -1)
+			if (curIndex > -1)
 			{
 				vector<int> deleteConnection;
-				_moduleNodes.erase(_moduleNodes.begin() + curIndex);
 				for (int i = 0; i < _connections.size(); i++)
 				{
-					if (_connections[i].fromId == curSelected || _connections[i].toId == curSelected)
+					if (mode == 0)
 					{
-						deleteConnection.push_back(i);
+						if (_connections[i].fromId == curSelected || _connections[i].toId == curSelected)
+						{
+							deleteConnection.push_back(i);
+						}
+					}
+					else
+					{
+						if (_connections[i].fromId == curSelected)
+						{
+							deleteConnection.push_back(i);
+						}
 					}
 				}
-				for (int i = deleteConnection.size() - 1; i >= 0; i--)
+				if (deleteConnection.size() == 0)
 				{
-					_connections.erase(_connections.begin() + deleteConnection[i]);
+					if(mode == 0) _moduleNodes.erase(_moduleNodes.begin() + curIndex);
+				}
+				else
+				{
+					for (int i = deleteConnection.size() - 1; i >= 0; i--)
+					{
+						_connections.erase(_connections.begin() + deleteConnection[i]);
+					}
 				}
 			}
 			else {

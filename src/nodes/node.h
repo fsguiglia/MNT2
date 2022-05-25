@@ -24,7 +24,7 @@ public:
 	string getName();
 	void setId(int id);
 	int getId();
-	bool inside(int x, int y);
+	int inside(int x, int y, bool select = false);
 	void setAsInput(bool isInput);
 	void setAsOutput(bool isOutput);
 	bool isInput();
@@ -34,6 +34,7 @@ public:
 private:
 	bool _isInput, _isOutput;
 	int _inputs, _outputs, _selectedIn, _selectedOut;
+	int _connectorWidth;
 	ofRectangle _rect, _name_bb;
 	vector<ofRectangle> _inPositions, _outPositions;
 	ofTrueTypeFont _font;

@@ -21,9 +21,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void setup();
 		void update();
 		void draw();
+		void drawIntro();
 		void drawConnectionMode();
 		void drawEditMode();
 		void drawTileMode();
+		void drawCurConnection();
 		void drawConnection(Connection& connection);
 		void exit();
 		//--------------------------------------------------------------
@@ -51,8 +53,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void createOscOutput(string ip, string port, float x, float y);
 		void deleteOscOutput(string ip, string port);
 		//--------------------------------------------------------------
-		tuple<string, int, int, ofVec2f> selectNode(int x, int y);
-		void createDeleteConnection(tuple<string, int, int, ofVec2f> out, tuple<string, int, int, ofVec2f> in, bool dump);
+		tuple<string, int, int, ofVec2f, int> selectNode(int x, int y);
+		void createDeleteConnection(tuple<string, int, int, ofVec2f, int> out, tuple<string, int, int, ofVec2f, int> in, bool dump);
 		void updateConnections();
 		//--------------------------------------------------------------
 		void clear();
@@ -81,8 +83,9 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		string _selected = ""; 
 		ofVec2f _selectionOffset;
 		int _lastClick = 0;
-		tuple<string, int, int, ofVec2f> _shiftSelected;
-		bool _shift, _control;
+		tuple<string, int, int, ofVec2f, int> _shiftSelected;
+		bool _control, _shift;
+		bool _connectorSelected;
 		
 		//GUI
 		const size_t _maxPages = 1;
@@ -101,7 +104,9 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		ofColor _moduleColor, _generatorColor, _ioColor;
 		float _scale;
 		bool _prevNextButton;
-		
+		vector<ofImage> _introSequence;
+		bool _intro;
+
 		//tile mode
 		ofImage _tileIcon;
 		const int _tileIconMargin = 20;

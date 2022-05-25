@@ -16,7 +16,16 @@ Node::Node()
 
 void Node::setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeFont font, ofColor color)
 {
+	setName("node", false);
 	_rect.height = h;
+	_rect.width = 50;
+	_connectorWidth = 5;
+	_color = ofColor(80, 80, 80);
+	
+	_isInput = false;
+	_isOutput = false;
+	_selectedOut = -1;
+
 	setPosition(x,y);
 	setInputs(inputs);
 	setOutputs(outputs);
@@ -28,12 +37,14 @@ void Node::setInputs(int inputs)
 {
 	_inputs = inputs;
 	_inPositions.clear();
-	for (int i = 0; i < inputs; i++)
+	for (int i = 0; i < _inputs; i++)
 	{
-		float x = 0;
-		float y = float(i + 1) / (inputs + 1);
-		float r = 0.1;
-		_inPositions.push_back(ofRectangle(x, y, r, r));
+		ofRectangle rect;
+		rect.x = _rect.x * ofGetWidth() + _rect.width;
+		rect.y = _rect.y * ofGetHeight();
+		rect.height = _rect.height;
+		rect.width = _connectorWidth;
+		_inPositions.push_back(rect);
 	}
 }
 
@@ -41,12 +52,14 @@ void Node::setOutputs(int outputs)
 {
 	_outputs = outputs;
 	_outPositions.clear();
-	for (int i = 0; i < outputs; i++)
+	for (int i = 0; i < _inputs; i++)
 	{
-		float x = 0.95;
-		float y = float(i + 1) / (outputs + 1);
-		float r = 0.1;
-		_outPositions.push_back(ofRectangle(x, y, r, r));
+		ofRectangle rect;
+		rect.x = _rect.x + _rect.width;
+		rect.y = _rect.y;
+		rect.height = _rect.height;
+		rect.width = _connectorWidth;
+		_outPositions.push_back(rect);
 	}
 }
 
@@ -66,17 +79,13 @@ void Node::draw()
 	ofSetColor(255);
 	// a ojo...
 	_font.drawString(_name, r.x + r.width * 0.08, r.y + (r.height + _font.getLineHeight() * 0.75) * 0.5);
-	for (int i = 0; i < _inputs; i++)
-	{
-		if (i == _selectedIn) ofSetColor(150, 0, 0);
-		else ofSetColor(150);
-		ofDrawCircle(r.x, r.y + _inPositions[i].y * r.height, r.height * _inPositions[i].width);
-	}
 	for (int i = 0; i < _outputs; i++)
 	{
-		if (i == _selectedOut) ofSetColor(150, 0, 0);
+		if (i == _selectedOut) ofSetColor(180);
 		else ofSetColor(150);
-		ofDrawCircle(r.x + r.getWidth(), r.y + _outPositions[i].y * r.height, r.height * _outPositions[i].width);
+		_outPositions[i].x = r.x + r.width;
+		_outPositions[i].y = r.y;
+		ofDrawRectangle(_outPositions[i]);
 	}
 	ofPopStyle();
 }
@@ -119,25 +128,16 @@ int Node::getOutputs()
 
 ofRectangle Node::getInputConnector(int index)
 {
-	ofRectangle connector = _inPositions[index];
-	connector.x *= _rect.width;
-	connector.x += _rect.x * ofGetWidth();
-	connector.y *= _rect.height;
-	connector.y += _rect.y * ofGetHeight();
-	connector.width *= _rect.width;
-	connector.height *= _rect.height;
+	ofRectangle connector = _rect;
+	connector.width = 30;
+	connector.x *= ofGetWidth();
+	connector.y *= ofGetHeight();
 	return connector;
 }
 
 ofRectangle Node::getOutputConnector(int index)
 {
 	ofRectangle connector = _outPositions[index];
-	connector.x *= _rect.width;
-	connector.x += _rect.x * ofGetWidth();
-	connector.y *= _rect.height;
-	connector.y += _rect.y * ofGetHeight();
-	connector.width *= _rect.width;
-	connector.height *= _rect.height;
 	return connector;
 }
 
@@ -164,27 +164,41 @@ int Node::getId()
 	return _id;
 }
 
-bool Node::inside(int x, int y)
+int Node::inside(int x, int y, bool select)
 {
+	int in = -1;
+	_selectedOut = -1;
 	ofRectangle translated = _rect;
 	translated.x *= ofGetWidth();
 	translated.y *= ofGetHeight();
-	bool in = translated.inside(x, y);
+	if (translated.inside(x, y)) in = 0;
+	else
+	{
+		for (int i = 0; i < _outPositions.size(); i++)
+		{
+			if (_outPositions[i].inside(x, y))
+			{
+				if (select) _selectedOut = i;
+				in = 1;
+				break;
+			}
+		}
+	}
 	return in;
 }
 
 void Node::setAsInput(bool isInput)
 {
 	_isInput = isInput;
-	setInputs(0);
-	setOutputs(1);
+	_inputs = 0;
+	_outputs = 1;
 }
 
 void Node::setAsOutput(bool isOutput)
 {
 	_isOutput = isOutput;
-	setInputs(1);
-	setOutputs(0);
+	_inputs = 1;
+	_outputs = 0;
 }
 
 bool Node::isInput()
