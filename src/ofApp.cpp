@@ -93,12 +93,16 @@ void ofApp::drawIntro()
 	static float i = 0;
 	if (i < _introSequence.size())
 	{
-		_introSequence[int(i)].draw(290, 210);
+		int x = ((float)ofGetWidth() - _introSequence[int(i)].getWidth()) * 0.5;
+		int y = ((float)ofGetHeight() - _introSequence[int(i)].getHeight()) * 0.5;
+		_introSequence[int(i)].draw(x, y);
 		i+=0.5;
 	}
 	else if (i < _introSequence.size() + 30)
 	{
-		_introSequence[_introSequence.size() - 1].draw(290, 210);
+		int x = ((float)ofGetWidth() - _introSequence[_introSequence.size() - 1].getWidth()) * 0.5;
+		int y = ((float)ofGetHeight() - _introSequence[_introSequence.size() - 1].getHeight()) * 0.5;
+		_introSequence[_introSequence.size() - 1].draw(x, y);
 		i++;
 	}
 	else
