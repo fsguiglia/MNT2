@@ -52,7 +52,7 @@ void Node::setOutputs(int outputs)
 {
 	_outputs = outputs;
 	_outPositions.clear();
-	for (int i = 0; i < _inputs; i++)
+	for (int i = 0; i < _outputs; i++)
 	{
 		ofRectangle rect;
 		rect.x = _rect.x + _rect.width;

@@ -679,12 +679,12 @@ tuple<string, int, int, ofVec2f, int> ofApp::selectNode(int x, int y)
 	for (int i = _moduleNodes.size() - 1; i >= 0; i--)
 	{
 		int inside = _moduleNodes[i]->inside(x, y, true);
-		get<4>(parameters) = inside;
 		if (inside >= 0)
 		{
 			get<0>(parameters) = _moduleNodes[i]->getName();
 			get<1>(parameters) = _moduleNodes[i]->getInputs();
 			get<2>(parameters) = _moduleNodes[i]->getOutputs();
+			get<4>(parameters) = inside;
 			ofVec2f offset;
 			offset.x = x - _moduleNodes[i]->getPosition().x * ofGetWidth();
 			offset.y = y - _moduleNodes[i]->getPosition().y * ofGetHeight();
@@ -695,12 +695,12 @@ tuple<string, int, int, ofVec2f, int> ofApp::selectNode(int x, int y)
 	for (int i = _inputNodes.size() - 1; i >= 0; i--)
 	{
 		int inside = _inputNodes[i].inside(x, y, true);
-		get<4>(parameters) = inside;
 		if (inside >= 0)
 		{
 			get<0>(parameters) = _inputNodes[i].getName();
 			get<1>(parameters) = _inputNodes[i].getInputs();
 			get<2>(parameters) = _inputNodes[i].getOutputs();
+			get<4>(parameters) = inside;
 			ofVec2f offset;
 			offset.x = x - _inputNodes[i].getPosition().x * ofGetWidth();
 			offset.y = y - _inputNodes[i].getPosition().y * ofGetHeight();
@@ -711,12 +711,12 @@ tuple<string, int, int, ofVec2f, int> ofApp::selectNode(int x, int y)
 	for (int i = _outputNodes.size() - 1; i >= 0; i--)
 	{
 		int inside = _outputNodes[i].inside(x, y, true);
-		get<4>(parameters) = inside;
 		if (inside >= 0)
 		{
 			get<0>(parameters) = _outputNodes[i].getName();
 			get<1>(parameters) = _outputNodes[i].getInputs();
 			get<2>(parameters) = _outputNodes[i].getOutputs();
+			get<4>(parameters) = inside;
 			ofVec2f offset;
 			offset.x = x - _outputNodes[i].getPosition().x * ofGetWidth();
 			offset.y = y - _outputNodes[i].getPosition().y * ofGetHeight();
@@ -1368,9 +1368,6 @@ void ofApp::mouseMoved(int x, int y){
 	case CONNECT_MODE:
 		//module
 		selectNode(x, y);
-		for (auto connection : _connections)
-		{
-		}
 		//tile
 		_tileIconHovered = x > ofGetWidth() - (_tileIcon.getWidth() + _tileIconMargin);
 		_tileIconHovered = _tileIconHovered && x < ofGetWidth() - _tileIconMargin;
@@ -1455,6 +1452,7 @@ void ofApp::mousePressed(int x, int y, int button){
 				if (_connectorSelected) _shiftSelected = curSelected;
 				else _selected = get<0>(curSelected);
 				_selectionOffset = get<3>(curSelected);
+				
 				bool doubleClick = _selected != "" && lastSelected == _selected;
 				doubleClick = doubleClick && ofGetElapsedTimeMillis() - _lastClick < 500;
 				if (doubleClick)
@@ -1513,16 +1511,8 @@ void ofApp::mouseReleased(int x, int y, int button){
 			auto node = selectNode(x, y);
 			string curSelected = get<0>(node);
 			int mode = get<4>(node);
-			int curIndex = -1;
-			for (int i = 0; i < _moduleNodes.size(); i++)
-			{
-				if (_moduleNodes[i]->getName() == curSelected)
-				{
-					curIndex = i;
-					break;
-				}
-			}
-			if (curIndex > -1)
+		
+			if (mode != -1)
 			{
 				vector<int> deleteConnection;
 				for (int i = 0; i < _connections.size(); i++)
@@ -1542,53 +1532,67 @@ void ofApp::mouseReleased(int x, int y, int button){
 						}
 					}
 				}
-				if (deleteConnection.size() == 0)
-				{
-					if(mode == 0) _moduleNodes.erase(_moduleNodes.begin() + curIndex);
-				}
-				else
+				if (deleteConnection.size() > 0)
 				{
 					for (int i = deleteConnection.size() - 1; i >= 0; i--)
 					{
 						_connections.erase(_connections.begin() + deleteConnection[i]);
 					}
 				}
-			}
-			else {
-				for (int i = 0; i < _inputNodes.size(); i++)
+				else
 				{
-					if (_inputNodes[i].inside(x, y))
+					int index = -1;
+					for (int i = 0; i < _moduleNodes.size(); i++)
 					{
-						curSelected = _inputNodes[i].getName();
-						vector<string> split = ofSplitString(curSelected, ":");
-						bool osc = false;
-						curIndex = i;
-						if (split.size() > 1)
+						if (_moduleNodes[i]->getName() == curSelected)
 						{
-							if (split[0] == "osc") osc = true;
+							index = i;
+							break;
 						}
-						if (osc) deleteOscInput(split[1]);
-						else deleteMIDIInput(split[1]);
-						break;
 					}
-				}
-				if (curIndex == -1)
-				{
-					for (int i = 0; i < _outputNodes.size(); i++)
+					if(index != -1) _moduleNodes.erase(_moduleNodes.begin() + index);
+					else
 					{
-						if (_outputNodes[i].inside(x, y))
+						for (int i = 0; i < _inputNodes.size(); i++)
 						{
-							curSelected = _outputNodes[i].getName();
+							if (_inputNodes[i].getName() == curSelected)
+							{
+								index = i;
+								break;
+							}
+						}
+						if (index != -1)
+						{
 							vector<string> split = ofSplitString(curSelected, ":");
 							bool osc = false;
-							curIndex = i;
 							if (split.size() > 1)
 							{
 								if (split[0] == "osc") osc = true;
 							}
-							if (osc) deleteOscOutput(split[1], split[2]);
-							else deleteMIDIOutput(split[1]);
-							break;
+							if (osc) deleteOscInput(split[1]);
+							else deleteMIDIInput(split[1]);
+						}
+						else
+						{
+							for (int i = 0; i < _outputNodes.size(); i++)
+							{
+								if (_outputNodes[i].getName() == curSelected)
+								{
+									index = i;
+									break;
+								}
+							}
+							if (index != -1)
+							{
+								vector<string> split = ofSplitString(curSelected, ":");
+								bool osc = false;
+								if (split.size() > 1)
+								{
+									if (split[0] == "osc") osc = true;
+								}
+								if (osc) deleteOscOutput(split[1],split[2]);
+								else deleteMIDIOutput(split[1]);
+							}
 						}
 					}
 				}
