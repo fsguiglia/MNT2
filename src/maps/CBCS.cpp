@@ -5,7 +5,7 @@ CBCS::CBCS() :
 {
 	_selectedFeatures.first = "";
 	_selectedFeatures.second = "";
-	_maxN = 10;
+	_maxN = 1;
 }
 
 void CBCS::setup(int width, int height, vector<string> features)
@@ -227,10 +227,12 @@ void CBCS::build()
 vector<int> CBCS::getKnn(ofVec2f position, int max_n)
 {
 	vector<int> selection;
+	int n = max_n;
 	_searchResults.clear();
 	_searchResults.resize(max_n);
 	_hash.findPointsWithinRadius(position, _radius, _searchResults);
-	for (auto result : _searchResults) selection.push_back(result.first);
+	if (_searchResults.size() < n) n = _searchResults.size();
+	for (int i = 0; i < n; i++)	selection.push_back(_searchResults[i].first);
 	return selection;
 }
 

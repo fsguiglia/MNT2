@@ -12,6 +12,7 @@ CBCSPage::CBCSPage()
 void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
 	_map.setup(w, h);
+	_map.setMaxSamples(15);
 	_map.setRadius(0.05);
 	_map.setActive(false);
 	_map.setRandomize(0.);
@@ -35,6 +36,8 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addButton("Normalize");
 	_arrangeFolder->collapse();
 	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
+	_gui->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
+	_gui->getSlider("units")->setPrecision(0);
 	_gui->addTextInput("address", getAddress());
 	_gui->addButton("Export file list")->setName("Export");
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
@@ -127,6 +130,10 @@ void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 	else if (name == "radius")
 	{
 		_map.setRadius(e.value * 0.5);
+	}
+	else if (name == "units")
+	{
+		_map.setMaxSamples(int(e.value));
 	}
 }
 
