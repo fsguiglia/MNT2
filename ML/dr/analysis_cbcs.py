@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 import numpy as np
 import librosa
 
-import progressbar
+import enlighten
 
 import os
 import easygui
@@ -45,23 +45,30 @@ def analyze(args):
 		X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
 		
 		#load audio files and get features
-		print('loading ' + str(len(files)) + ' file(s):')
+		manager = enlighten.get_manager()
+		file_progress = manager.counter(total=len(files), desc='Files', unit='file', leave=True)
+		print('loading ' + str(len(files)) + ' file(s)...')
+		
 		for index, file in enumerate(files):
-			print('[' + str(index + 1) + ' / ' + str(len(files)) + ']: converting sample...')
+			#print('[' + str(index + 1) + ' / ' + str(len(files)) + ']: converting sample...')
 			try:
-				cur_file_position, cur_X = getFilePosition(file, sample_rate, mode)
+				cur_file_position, cur_X = getFilePosition(manager, file, sample_rate, mode)
 				for file in cur_file_position:
 					file_position.append(file)
 				X = np.concatenate((X, cur_X))
 			except:
 				border_msg(file + ' is not a valid file')
+			file_progress.update()
 		
+		print('done')
 		#save empty json and exit if less than 5 files are provided
 		if len(file_position) < 2:
 			error = 'not enough data to create map'
 			sys.exit()
 
-		D = getFeatures(X, window_size, hop_length)
+		print('getting features...')
+		D = getFeatures(manager, X, window_size, hop_length)
+		print('done')
 		Y = np.zeros((len(file_position),2))
 		
 		#pca or pca+tsne (0.8 variance needs to be tested)
@@ -74,12 +81,16 @@ def analyze(args):
 		Y = min_max_normalize(Y)
 		
 		save(Y, file_position, new_path)
-		
-	except:
+		manager.stop()
+	except Exception as ex:
+		'''
+		print(ex)
+		input("Press key to exit.")
+		'''
 		border_msg(error)
 		save_empty_file(error, new_path)
 		time.sleep(3)
-
+		
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
 	allFiles = list()
@@ -97,7 +108,7 @@ def getListOfFiles(dirName, extensions):
 				allFiles.append(fullPath)
 	return allFiles
 
-def getFilePosition(file, sample_rate, mode=0):
+def getFilePosition(manager, file, sample_rate, mode=0):
 	y, sr = librosa.load(file, sample_rate)
 	y = librosa.to_mono(y)
 	shape = int(sample_rate * 0.5)
@@ -108,9 +119,13 @@ def getFilePosition(file, sample_rate, mode=0):
 	X = list()
 	D = np.array([]).reshape(0, shape)
 	
+	
+	bar = manager.counter(total=windows+1, leave=False)
+	'''
 	bar = progressbar.ProgressBar(maxval=windows+1, \
 		widgets=['loading ', progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 	bar.start()
+	'''
 	for i in range(windows + 1):
 		start = int(shape * i)
 		end = int(shape * (i + 1))
@@ -122,19 +137,22 @@ def getFilePosition(file, sample_rate, mode=0):
 		padded[:end-start] = y[start:end]
 		padded = padded.reshape(1, shape)
 		D = np.concatenate((D,padded))
-		bar.update(i)
-	bar.finish()
-	
+		bar.update()
+	bar.close()
+	#bar.finish()
 	return X, D
 	
-def getFeatures(samples, window_size, hop_length):
+def getFeatures(manager, samples, window_size, hop_length):
 	#size of stft result is  (window size / 2 + 1) * (samples / hop length + 1)
 	shape = int((1 + window_size * 0.5))
 	shape *= int(samples[0].shape[0] / hop_length) + 1
 	D = np.array([]).reshape(0, shape)
+	'''
 	bar = progressbar.ProgressBar(maxval=samples.shape[0], \
     widgets=['extracting features ', progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 	bar.start()
+	'''
+	bar = manager.counter(total=samples.shape[0], desc="STFT");
 	for index,sample in enumerate(samples):
 		sample = sample.T
 		S = librosa.stft(sample, n_fft = window_size, hop_length = hop_length)
@@ -142,12 +160,11 @@ def getFeatures(samples, window_size, hop_length):
 		S = S.reshape(S.shape[0] * S.shape[1])
 		S = S.reshape(1, shape)
 		D = np.concatenate((D, S))
-		bar.update(index + 1)
-	bar.finish()
+		bar.update()
 	return D
 
 def getPCA(data, components):
-	print('Principal component analysis (this can take a while)')
+	print('Principal component analysis (this can take a while)...')
 	pca = PCA(n_components=components)
 	pca.fit(data)
 	Y = pca.transform(data)
@@ -155,7 +172,7 @@ def getPCA(data, components):
 	return Y
 
 def getTSNE(data, components, perplexity, learning_rate, iterations):
-	print('t-distributed stochastic neighbor embedding (this can take a while)')
+	print('t-distributed stochastic neighbor embedding (this can take a while)...')
 	tsne = TSNE(n_components = components,
 			 perplexity = perplexity,
 			 learning_rate = learning_rate,
