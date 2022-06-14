@@ -27,7 +27,7 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont fon
 void CBCSPage::setupGui()
 {
 	_arrangeFolder = _gui->addFolder("Analyze");
-	_arrangeFolder->addToggle("Analyze complete files", false)->setName("complete");
+	_arrangeFolder->addToggle("Analyze complete files", true)->setName("complete");
 	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
@@ -64,7 +64,7 @@ void CBCSPage::setupTsne()
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;
 	drParameters["--iterations"] = 1000;
-	drParameters["--cbcs_mode"] = 0;
+	drParameters["--cbcs_mode"] = 1;
 	_dr.setParameters(drParameters);
 }
 
