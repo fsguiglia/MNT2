@@ -7,22 +7,8 @@ import pca_nni
 
 def main():
 	args = process_arguments(sys.argv)
-	#input/output
 	script = int(args['script'])
-	file = args['file']
-	#audio
-	sample_rate = int(args['sample_rate'])
-	window_size = int(args['window_size'])
-	hop_length = int(args['hop_length'])
-	#t-sne
-	dimentions = int(args['perplexity'])
-	perplexity = int(args['perplexity'])
-	learning_rate = int(args['learning_rate'])
-	iterations = int(args['iterations'])
-	#cbcs
-	cbcs_mode = int(args['cbcs_mode'])
-	technique = int(args['technique'])
-
+	
 	if script == 0:
 		analysis_cbcs.analyze(args)
 	elif script == 1:
@@ -83,6 +69,11 @@ def process_arguments(args):
 						action='store',
 						default=512,
 						help='Hop length (default: 512)')
+						
+	parser.add_argument('-ul', '--unit_length',
+						action='store',
+						default = 500,
+						help='Unit length in ms (default: 500)')
 	#cbcs----------------------------------------------------
 	parser.add_argument('-cm', '--cbcs_mode',
 					 action='store',

@@ -30,6 +30,7 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addToggle("Analyze complete files", true)->setName("complete");
 	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
+	_arrangeFolder->addSlider("unit length", 100, 1000, _dr.getParameter("--unit_length"))->setName("unit_length");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
@@ -65,6 +66,7 @@ void CBCSPage::setupTsne()
 	drParameters["--learning_rate"] = 200;
 	drParameters["--iterations"] = 1000;
 	drParameters["--cbcs_mode"] = 1;
+	drParameters["--unit_length"] = 500;
 	_dr.setParameters(drParameters);
 }
 
@@ -112,7 +114,7 @@ void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
-	if (name == "perplexity" || name == "learning rate" || name == "iterations")
+	if (name == "--unit_length" || name == "--perplexity" || name == "--learning rate" || name == "--iterations")
 	{
 		_dr.setParameter(name, e.value);
 	}

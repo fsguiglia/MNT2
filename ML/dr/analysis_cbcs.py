@@ -25,6 +25,7 @@ def analyze(args):
 	iterations = int(args['iterations'])
 	mode = int(args['cbcs_mode'])
 	technique = int(args['technique'])
+	unit_length = float(args['unit_length']) / 1000 #seconds
 	
 	error = 'something went wrong, please check path and folder contents'
 	new_path = output_folder[:output_folder.rfind('.')] + '_o.tmp'
@@ -42,7 +43,7 @@ def analyze(args):
 
 		files = getListOfFiles(audio_files, ['.wav', '.WAV'])
 		
-		X = np.array([]).reshape(0, int(sample_rate * 0.5)) #analize half a second, this needs to be tested
+		X = np.array([]).reshape(0, int(sample_rate * unit_length)) #samples
 		
 		#load audio files and get features
 		manager = enlighten.get_manager()
@@ -50,9 +51,8 @@ def analyze(args):
 		print('loading ' + str(len(files)) + ' file(s)...')
 		
 		for index, file in enumerate(files):
-			#print('[' + str(index + 1) + ' / ' + str(len(files)) + ']: converting sample...')
 			try:
-				cur_file_position, cur_X = getFilePosition(manager, file, sample_rate, mode)
+				cur_file_position, cur_X = getFilePosition(manager, file, sample_rate, unit_length, mode)
 				for file in cur_file_position:
 					file_position.append(file)
 				X = np.concatenate((X, cur_X))
@@ -61,8 +61,8 @@ def analyze(args):
 			file_progress.update()
 		
 		print('done')
-		#save empty json and exit if less than 5 files are provided
-		if len(file_position) < 2:
+		#save empty json and exit if less than 5 units are found
+		if len(file_position) < 5:
 			error = 'not enough data to create map'
 			sys.exit()
 
@@ -108,38 +108,32 @@ def getListOfFiles(dirName, extensions):
 				allFiles.append(fullPath)
 	return allFiles
 
-def getFilePosition(manager, file, sample_rate, mode=0):
+def getFilePosition(manager, file, sample_rate, unit_length, mode=0):
 	y, sr = librosa.load(file, sample_rate)
 	y = librosa.to_mono(y)
-	shape = int(sample_rate * 0.5)
-	#maybe more windows?
-	windows = int(y.shape[0] / shape)
+	shape = int(sample_rate * unit_length) #unit length in samples
+	units = int(y.shape[0] / shape)
 	if mode == 0: 
-		windows = 0
-	X = list()
-	D = np.array([]).reshape(0, shape)
+		units = 0
+	X = list() #list of file names and unit position in ms
+	D = np.array([]).reshape(0, shape) #unit samples
 	
 	
-	bar = manager.counter(total=windows+1, leave=False)
-	'''
-	bar = progressbar.ProgressBar(maxval=windows+1, \
-		widgets=['loading ', progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-	bar.start()
-	'''
-	for i in range(windows + 1):
+	bar = manager.counter(total=units+1, leave=False)
+
+	for i in range(units + 1):
 		start = int(shape * i)
 		end = int(shape * (i + 1))
 		if end > y.shape[0]: 
 			end = y.shape[0]
-		X.append((file, i * 500))
-		#pad with zeros if file is shorter than 0.5 seconds, this needs to be tested
+		X.append((file, i * unit_length * 1000))
+		#pad with zeros if file is shorter than unit_length
 		padded = np.zeros(shape)
 		padded[:end-start] = y[start:end]
 		padded = padded.reshape(1, shape)
 		D = np.concatenate((D,padded))
 		bar.update()
 	bar.close()
-	#bar.finish()
 	return X, D
 	
 def getFeatures(manager, samples, window_size, hop_length):
@@ -147,11 +141,7 @@ def getFeatures(manager, samples, window_size, hop_length):
 	shape = int((1 + window_size * 0.5))
 	shape *= int(samples[0].shape[0] / hop_length) + 1
 	D = np.array([]).reshape(0, shape)
-	'''
-	bar = progressbar.ProgressBar(maxval=samples.shape[0], \
-    widgets=['extracting features ', progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-	bar.start()
-	'''
+	#stack fft results
 	bar = manager.counter(total=samples.shape[0], desc="STFT");
 	for index,sample in enumerate(samples):
 		sample = sample.T
