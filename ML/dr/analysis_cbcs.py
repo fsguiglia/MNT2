@@ -39,7 +39,7 @@ def analyze(args):
 		audio_files = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
 		if audio_files is None:
 			error = 'no files found'
-			exit()
+			save_empty_file(error, new_path)
 
 		files = getListOfFiles(audio_files, ['.wav', '.WAV'])
 		
@@ -64,7 +64,7 @@ def analyze(args):
 		#save empty json and exit if less than 5 units are found
 		if len(file_position) < 5:
 			error = 'not enough data to create map'
-			sys.exit()
+			save_empty_file(error, new_path)
 
 		print('getting features...')
 		D = getFeatures(manager, X, window_size, hop_length)
@@ -87,9 +87,8 @@ def analyze(args):
 		print(ex)
 		input("Press key to exit.")
 		'''
-		border_msg(error)
+		
 		save_empty_file(error, new_path)
-		time.sleep(3)
 		
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
@@ -197,11 +196,14 @@ def save(data, files, output_file):
 		json.dump(out, f, indent = 4)
 
 def save_empty_file(error, output_file):
+	border_msg(error)
+	time.sleep(3)
 	out = dict()
 	out["error"] = error
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
-		
+	exit()
+	
 def border_msg(msg):
 	row = len(msg)
 	h = ''.join(['-' *row])
