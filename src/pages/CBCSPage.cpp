@@ -324,6 +324,14 @@ void CBCSPage::loadData(ofJson & json)
 
 void CBCSPage::loadSingleFile(ofJson & json)
 {
+	vector<Point> points = _map.getPoints();
+	for (auto& point : points)
+	{
+		string file = point.getName();
+		int offset = json["files"][file];
+		int curPosition = offset + point.getValue("position");
+		point.setValue("single-file-position", curPosition);
+	}
 }
 
 ofJson CBCSPage::save()

@@ -48,6 +48,7 @@ void CBCS::update()
 				{
 					string curValue = ofToString(i) + ";" + _points[_selection[i]].getName();
 					curOutput[curValue] = _points[_selection[i]].getValue("position");
+					curOutput["single_file"] = _points[_selection[i]].getValue("single-file-positions");
 				}
 				_output = curOutput;
 			}
