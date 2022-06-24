@@ -74,9 +74,10 @@ void CBCSPage::setupTsne()
 
 void CBCSPage::setupExport()
 {
-	_export.setup("../../ML/dr/export.py", "export", "python"); //py
-	//_dr.setup("../ML/dr/export.exe", "export"); //exe
+	_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
+	//_dr.setup("../ML/dr/single_file.exe", "export"); //exe
 	_export.setParameter("--unit_length", _dr.getParameter("--unit_length"));
+	_export.setParameter("--script", 3);
 }
 
 void CBCSPage::update()
@@ -257,21 +258,24 @@ ofJson CBCSPage::getFileList()
 {
 	vector<Point> points = _map.getPoints();
 	ofJson jFiles;
-	for (auto point : points)
+	if (points.size() > 0)
 	{
-		bool pathExists = false;
-		string curPath = point.getName();
-		for (string path : jFiles["files"])
+		for (auto point : points)
 		{
-			if (path == curPath)
+			bool pathExists = false;
+			string curPath = point.getName();
+			for (string path : jFiles["files"])
 			{
-				pathExists = true;
-				break;
+				if (path == curPath)
+				{
+					pathExists = true;
+					break;
+				}
 			}
-		}
-		if (!pathExists)
-		{
-			jFiles["files"].push_back(curPath);
+			if (!pathExists)
+			{
+				jFiles["files"].push_back(curPath);
+			}
 		}
 	}
 	return jFiles;
@@ -312,6 +316,7 @@ void CBCSPage::loadData(ofJson & json)
 		curPoint.setPosition(point["x"], point["y"]);
 		curPoint.setName(point["name"].get<string>());
 		curPoint.setValue("position", point["pos"]);
+		curPoint.setValue("single-file-position", point["sf-pos"]);
 		_map.addPoint(curPoint);
 	}
 	_map.build();
@@ -332,6 +337,7 @@ ofJson CBCSPage::save()
 		curPoint["y"] = points[i].getPosition().y;
 		curPoint["name"] = points[i].getName();
 		curPoint["pos"] = points[i].getValue("position");
+		curPoint["sf-pos"] = points[i].getValue("single-file-position");
 		for (auto parameter : points[i].getValues())
 		jSave["points"].push_back(curPoint);
 	}

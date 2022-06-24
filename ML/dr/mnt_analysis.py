@@ -4,6 +4,7 @@ import sys
 import analysis_cbcs
 import analysis_nni
 import pca_nni
+import single_file
 
 def main():
 	args = process_arguments(sys.argv)
@@ -15,6 +16,8 @@ def main():
 		analysis_nni.analyze(args)
 	elif script == 2:
 		pca_nni.analyze(args)
+	elif script == 3:
+		single_file.export(args)
 		
 def process_arguments(args):
 	parser = argparse.ArgumentParser(description='MNT Analysis')
@@ -59,6 +62,11 @@ def process_arguments(args):
 						action='store',
 						default=22500,
 						help='Sample rate (default: 22500)')
+
+	parser.add_argument('-osr', '--output_sample_rate',
+						action='store',
+						default=22500,
+						help='Output sample rate (default: 44100)')
 						
 	parser.add_argument('-ws', '--window_size',
 						action='store',
