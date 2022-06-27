@@ -80,7 +80,7 @@ def analyze(args):
 		
 		Y = min_max_normalize(Y)
 		
-		save(Y, file_position, new_path)
+		save(Y, files, file_position, new_path)
 		manager.stop()
 	except Exception as ex:
 		'''
@@ -180,16 +180,19 @@ def min_max_normalize(a):
 	norm = (a - min_values) / (max_values - min_values)
 	return norm
 
-def save(data, files, output_file):
+def save(data, files, positions, output_file):
 	out = dict()
 	points = dict()
 	for i in range(len(files)):
 		curOut = dict()
-		curOut['name'] = files[i][0]
-		curOut['pos'] = files[i][1]
+		curOut['name'] = positions[i][0]
+		curOut['pos'] = positions[i][1]
 		curOut['x'] = float(data[i][0])
 		curOut['y'] = float(data[i][1])
-		curOut['sf-pos'] = -1
+		if len(files) == 1:
+			curOut['sf-pos'] = positions[i][1]
+		else:
+			curOut['sf-pos'] = -1
 		points[i] = curOut
 	
 	out['points'] = points

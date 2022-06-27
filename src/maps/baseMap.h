@@ -34,6 +34,7 @@ public:
 	void setLastSelected(int index, int time=0);
 	int getLastSelected();
 	void setDrawSelected(bool drawSelected);
+	int size();
 
 protected:
 	int addPoint(T point);
@@ -281,6 +282,12 @@ template<typename T>
 void BaseMap<T>::setDrawSelected(bool drawSelected)
 {
 	_drawSelected = drawSelected;
+}
+
+template<typename T>
+int BaseMap<T>::size()
+{
+	 return _points.size();
 }
 
 template<typename T>

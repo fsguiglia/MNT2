@@ -99,7 +99,7 @@ void CBCSPage::update()
 		{
 			loadSingleFile(_export.getData());
 		}
-		else _dr.check();
+		else _export.check();
 	}
 
 	MapPage::update();
@@ -324,13 +324,13 @@ void CBCSPage::loadData(ofJson & json)
 
 void CBCSPage::loadSingleFile(ofJson & json)
 {
-	vector<Point> points = _map.getPoints();
-	for (auto& point : points)
+	for (int i = 0; i < _map.size(); i++)
 	{
-		string file = point.getName();
-		int offset = json["files"][file];
-		int curPosition = offset + point.getValue("position");
-		point.setValue("single-file-position", curPosition);
+		Point curPoint = _map.getPoint(i);
+		int offset = json["files"][curPoint.getName()];
+		int curPosition = offset + curPoint.getValue("position");
+		cout << curPosition << endl;
+		_map.setPointParameter(i, "single-file-position", curPosition);
 	}
 }
 
@@ -346,7 +346,6 @@ ofJson CBCSPage::save()
 		curPoint["name"] = points[i].getName();
 		curPoint["pos"] = points[i].getValue("position");
 		curPoint["sf-pos"] = points[i].getValue("single-file-position");
-		for (auto parameter : points[i].getValues())
 		jSave["points"].push_back(curPoint);
 	}
 

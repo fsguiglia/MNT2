@@ -9,7 +9,7 @@ import time
 
 def export(args):
     error = 'something went wrong'
-    debug = True
+    debug = False
 
     try:
         input_file = args['file']
@@ -42,8 +42,8 @@ def concatenate(files, unit_length, samplerate):
     X = np.array([])
     s = np.zeros(int(unit_length / 1000 * samplerate))
     manager = enlighten.get_manager()
-    print("concatenating " + str(len(files)) + " files...")
     file_progress = manager.counter(total=len(files), desc='Files', unit='file', leave=True)
+    print("concatenating " + str(len(files)) + " files...")
     D = dict()
 
     for file in files:
@@ -53,6 +53,8 @@ def concatenate(files, unit_length, samplerate):
         X = np.append(X, cur_X)
         X = np.append(X, s)
         file_progress.update()
+    
+    manager.stop()
     return X, D 
 
 def saveFile(X, path, samplerate):
