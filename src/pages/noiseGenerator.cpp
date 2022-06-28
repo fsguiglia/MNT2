@@ -66,10 +66,11 @@ void NoiseGenerator::update()
 	if (_active)
 	{
 		generate();
+		_OSCOutMessages.clear();
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_OSCOutMessages["global/control/x"] = _cursor.x;
-			_OSCOutMessages["global/control/y"] = _cursor.y;
+			_OSCOutMessages.push_back(pair<string, float>("global/control/x", _cursor.x));
+			_OSCOutMessages.push_back(pair<string, float>("global/control/y", _cursor.y));
 		}
 		_xFrame += _xSpeed * 0.02;
 		_yFrame += _ySpeed * 0.02;

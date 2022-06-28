@@ -775,7 +775,8 @@ void ofApp::updateConnections()
 
 	for (auto& connection : _connections)
 	{
-		map<string, float> MIDIMessages, OSCMessages;
+		map<string, float> MIDIMessages;
+		map<string, vector<float>> OSCMessages;
 		vector <pair<string, vector<string>>> stringMessages;
 
 		//input
@@ -796,7 +797,7 @@ void ofApp::updateConnections()
 						{
 							for(auto &message : receiver.second)
 							{
-								OSCMessages[message.getAddress()] = message.getArgAsFloat(0);
+								OSCMessages[message.getAddress()].push_back(message.getArgAsFloat(0));
 							}
 						}
 					}
@@ -851,7 +852,10 @@ void ofApp::updateConnections()
 								MIDIMessages[newName] = message.second;
 							}
 						}
-						if(node->getOscOutput()) OSCMessages = node->getOSCOut();
+						if (node->getOscOutput()) {
+							vector<pair<string, float>>& curOutput = node->getOSCOut();
+							for (auto& message : curOutput) OSCMessages[message.first].push_back(message.second);
+						}
 						if (node->getStringOutput())
 						{
 							vector<string> vOutput = node->getStringOut();
@@ -887,10 +891,10 @@ void ofApp::updateConnections()
 					string name = split[1] + ":" + split[2];
 					ofxOscMessage m;
 					m.setAddress(element.first);
-					m.addFloatArg(element.second);
-					if (_oscSenders.find(name) != _oscSenders.end())
+					if (element.second.size() > 0)
 					{
-						_oscSenders[name].sendMessage(m);
+						for (auto& value : element.second) m.addFloatArg(value);
+						if (_oscSenders.find(name) != _oscSenders.end()) _oscSenders[name].sendMessage(m);
 					}
 				}
 				//midi to osc
@@ -977,7 +981,7 @@ void ofApp::updateConnections()
 						}
 						if (addressMatch)
 						{
-							node->OSCIn(curAddress, element.second);
+							node->OSCIn(curAddress, element.second[0]);
 						}
 					}
 				}

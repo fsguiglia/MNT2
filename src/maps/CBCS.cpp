@@ -43,13 +43,14 @@ void CBCS::update()
 			if (_cursor.x > 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 			{
 				_selection = getKnn(_cursor, _maxN);
-				map<string, float> curOutput;
+				_output.clear();
 				for (int i = 0; i < _selection.size(); i++)
 				{
-					string curValue = ofToString(i) + ";" + _points[_selection[i]].getName();
-					curOutput[curValue] = _points[_selection[i]].getValue("position");
+					pair<string, float> curOutput;
+					curOutput.first = ofToString(i) + ";" + _points[_selection[i]].getName();
+					curOutput.second = _points[_selection[i]].getValue("position");
+					_output.push_back(curOutput);
 				}
-				_output = curOutput;
 			}
 		}
 		_prevCursor = _cursor;
@@ -253,7 +254,7 @@ void CBCS::removeSelection()
 	}
 }
 
-map<string, float> CBCS::getOutput()
+vector<pair<string, float>> CBCS::getOutput()
 {
 	return _output;
 }

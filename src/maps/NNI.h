@@ -20,7 +20,7 @@ public:
 	ofVec2f getCursor();
 	vector<ofVec2f> getCursors();
 	void setDrawInterpolation(bool drawInterpolation);
-	map<string, float> getOutput();
+	vector<pair<string, float>> getOutput();
 private:
 	map<string, float> interpolate(ofVec2f pos, bool renderNewZone = false);
 	void update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites);

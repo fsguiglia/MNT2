@@ -329,7 +329,6 @@ void CBCSPage::loadSingleFile(ofJson & json)
 		Point curPoint = _map.getPoint(i);
 		int offset = json["files"][curPoint.getName()];
 		int curPosition = offset + curPoint.getValue("position");
-		cout << curPosition << endl;
 		_map.setPointParameter(i, "single-file-position", curPosition);
 	}
 }

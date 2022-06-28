@@ -71,7 +71,8 @@ void NNI::update()
 	}
 	if (_active)
 	{
-		_output = interpolate(_cursor, _drawInterpolation);
+		map<string, float> curOutput = interpolate(_cursor, _drawInterpolation);
+		_output.assign(curOutput.begin(), curOutput.end());
 	}
 }
 
@@ -155,7 +156,7 @@ void NNI::setDrawInterpolation(bool drawInterpolation)
 	_drawInterpolation = drawInterpolation;
 }
 
-map<string, float> NNI::getOutput()
+vector<pair<string, float>> NNI::getOutput()
 {
 	return _output;
 }

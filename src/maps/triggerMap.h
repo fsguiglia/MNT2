@@ -21,7 +21,7 @@ public:
 	void setCursor(ofVec2f cursor, int index);
 	vector<ofVec2f> getCursors();
 	vector<int> getTriggered();
-	map<string, float> getOutput();
+	vector<pair<string, float>> getOutput();
 private:
 	void updateFbo();
 	void updateTriggers();

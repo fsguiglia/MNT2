@@ -142,8 +142,9 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 		float value = e.value;
 		_map.setGlobalParameter(name, value);
 		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
-		map<string, float> message;
-		message[name] = value;
+		pair<string, float> message;
+		message.first = name;
+		message.second = value;
 		addMessages(message, _MIDIDumpMessages);
 		addMessages(message, _MIDIOutMessages);
 	}
@@ -213,9 +214,10 @@ void NNIPage::updateSelected(int selected, Point point)
 	map<string, float> parameters = point.getValues();
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second, false);
-	map<string, float> curMessage;
-	addMessages(parameters, _MIDIOutMessages);
-	addMessages(parameters, _MIDIDumpMessages);
+	vector<pair<string, float>> curMessage;
+	curMessage.assign(parameters.begin(), parameters.end());
+	addMessages(curMessage, _MIDIOutMessages);
+	addMessages(curMessage, _MIDIDumpMessages);
 }
 
 void NNIPage::mouseMoved(int x, int y)

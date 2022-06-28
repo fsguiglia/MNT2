@@ -98,7 +98,7 @@ vector<ofVec2f> RGBMap::getCursors()
 	return _cursors;
 }
 
-map<string, float> RGBMap::getOutput()
+vector<pair<string, float>> RGBMap::getOutput()
 {
 	return _output;
 }
@@ -164,8 +164,10 @@ void RGBMap::updateFbo()
 void RGBMap::updateOutput()
 {
 	_output.clear();
+
 	for (auto& point : _points)
 	{
+		pair<string, float> curOutput;
 		bool prevState = point.getState();
 		int radius = _radius * _width;
 		float maxWeight = NULL;
@@ -176,21 +178,37 @@ void RGBMap::updateOutput()
 			float curWeight = point.getAverageColor(cursor, radius);
 			if (maxWeight == NULL || curWeight > maxWeight) maxWeight = curWeight;
 		}
+		
 		if (point.getTrigger())
 		{
 			bool curState = point.getState();
+			
+
 			if (!prevState && curState)
 			{
-				for (auto value : point.getValues()) _output[value.first] = value.second;
+				for (auto value : point.getValues())
+				{
+					curOutput.first = value.first; 
+					curOutput.second = value.second;
+				}
 			}
 			else if (prevState && !curState)
 			{
-				for (auto value : point.getValues()) _output[value.first] = 0;
+				for (auto value : point.getValues())
+				{
+					curOutput.first = value.first;
+					curOutput.second = 0;
+				}
 			}
 		}
 		else
 		{
-			for (auto value : point.getValues()) _output[value.first] = value.second * maxWeight;
+			for (auto value : point.getValues())
+			{
+				curOutput.first = value.first;
+				curOutput.second = value.second;
+			}
 		}
+		_output.push_back(curOutput);
 	}
 }

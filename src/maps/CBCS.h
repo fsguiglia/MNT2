@@ -37,7 +37,7 @@ public:
 	vector<int> getKnn(ofVec2f position, int max_n);
 	void removeSelection();
 
-	map<string, float> getOutput();
+	vector<pair<string, float>> getOutput();
 
 private:	
 	vector<string> _features;

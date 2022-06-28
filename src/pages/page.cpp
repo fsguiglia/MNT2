@@ -130,16 +130,16 @@ void Page::MIDIIn(string port, int channel, int control, float value)
 	}
 }
 
-map<string, float> Page::getMidiOut(bool clear)
+vector<pair<string, float>> Page::getMidiOut(bool clear)
 {
-	map<string, float> out = _MIDIOutMessages;
+	vector<pair<string, float>> out = _MIDIOutMessages;
 	if (clear) clearMessages(_MIDIOutMessages);
 	return out;
 }
 
-map<string, float> Page::getMidiDump(bool clear)
+vector<pair<string, float>> Page::getMidiDump(bool clear)
 {
-	map<string, float> out = _MIDIDumpMessages;
+	vector<pair<string, float>> out = _MIDIDumpMessages;
 	if (clear) clearMessages(_MIDIDumpMessages);
 	return out;
 }
@@ -149,9 +149,9 @@ void Page::OSCIn(string address, float value)
 	moduleOSCIn(address, value);
 }
 
-map<string, float> Page::getOscOut(bool clear)
+vector<pair<string, float>> Page::getOscOut(bool clear)
 {
-	map<string, float> out = _OSCOutMessages;
+	vector<pair<string, float>> out = _OSCOutMessages;
 	if (clear) clearMessages(_OSCOutMessages);
 	return out;
 }
@@ -244,10 +244,16 @@ void Page::loadMidiMap(ofJson & json)
 	}
 }
 
-void Page::addMessages(map<string, float> messages, map<string, float>& queue)
+void Page::addMessages(vector<pair<string, float>> messages, vector<pair<string, float>>& queue)
 {
-	queue.insert(messages.begin(), messages.end());
-	while (queue.size() > _maxMessages) queue.erase(queue.begin());;
+	queue.insert(queue.end(), messages.begin(), messages.end());
+	while (queue.size() > _maxMessages) queue.erase(queue.begin());
+}
+
+void Page::addMessages(pair<string, float> message, vector<pair<string, float>>& queue)
+{
+	queue.push_back(message);
+	while (queue.size() > _maxMessages) queue.erase(queue.begin());
 }
 
 void Page::setStringMessages(vector<string> messages)
@@ -255,7 +261,7 @@ void Page::setStringMessages(vector<string> messages)
 	_stringMessages = messages;
 }
 
-void Page::clearMessages(map<string, float>& queue)
+void Page::clearMessages(vector<pair<string, float>>& queue)
 {
 	queue.clear();
 }

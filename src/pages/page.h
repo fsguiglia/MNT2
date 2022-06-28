@@ -45,11 +45,11 @@ public:
 
 	//io
 	void MIDIIn(string port, int channel, int control, float value);
-	map<string, float> getMidiOut(bool clear = false);
-	map<string, float> getMidiDump(bool clear = false);
+	vector<pair<string, float>> getMidiOut(bool clear = false);
+	vector<pair<string, float>> getMidiDump(bool clear = false);
 
 	void OSCIn(string address, float value);
-	map<string, float> getOscOut(bool clear = false);
+	vector<pair<string, float>> getOscOut(bool clear = false);
 	void setAddress(string address);
 	string getAddress();
 	vector<string> getStringOut(bool clear = false);
@@ -68,9 +68,10 @@ protected:
 	void saveMidiMap(ofJson& json);
 	void loadMidiMap(ofJson& json);
 	
-	void addMessages(map<string, float> messages, map<string, float>& queue);
+	void addMessages(vector<pair<string, float>> messages, vector<pair<string, float>>& queue);
+	void addMessages(pair<string, float> message, vector<pair<string, float>>& queue);
 	void setStringMessages(vector<string> messages);
-	void clearMessages(map<string, float>& queue);
+	void clearMessages(vector<pair<string, float>>& queue);
 
 	ofRectangle centerSquarePosition(int w, int h);
 
@@ -90,6 +91,6 @@ protected:
 	int _maxMessages;
 	bool _midiOutput, _oscOutput, _stringOutput;
 	string _address;
-	map<string, float> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
+	vector<pair<string,float>> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
 	vector<string> _stringMessages;
 };
