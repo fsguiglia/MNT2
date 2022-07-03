@@ -339,28 +339,7 @@ void ofApp::setupGui()
 void ofApp::moduleButtonEvent(ofxDatGuiButtonEvent e)
 {
 	string label = e.target->getLabel();
-	if (label == "Interpolate") _moduleNodes.push_back(make_unique<ModuleNode<NNIPage>>());
-	if (label == "Concatenate") _moduleNodes.push_back(make_unique<ModuleNode<CBCSPage>>());
-	if (label == "Trigger") _moduleNodes.push_back(make_unique<ModuleNode<TriggerPage>>());
-	if (label == "Draw") _moduleNodes.push_back(make_unique<ModuleNode<RGBPage>>());
-	if (label == "Gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
-	if (label == "Noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
-
-	label = ofToLower(label);
-	_moduleNodes[_moduleNodes.size() - 1]->setup(0.5, 0.5, 30, 1, 1, _verdana, _moduleColor);
-	_moduleNodes[_moduleNodes.size() - 1]->setName(label, true);
-	_moduleNodes[_moduleNodes.size() - 1]->setPosition(
-		(ofGetWidth() - _moduleNodes[_moduleNodes.size() - 1]->getWidth()) * 0.5 / (float)ofGetWidth(),
-		(ofGetHeight() - _moduleNodes[_moduleNodes.size() - 1]->getHeight()) * 0.5 / (float)ofGetHeight()
-	);
-	_moduleNodes[_moduleNodes.size() - 1]->setupPage(
-		_moduleNodes[_moduleNodes.size() - 1]->getName(),
-		_moduleSize,
-		_moduleSize,
-		_guiWidth,
-		_verdana,
-		_colorPallete
-	);
+	createModule(label, 0.5, 0.5);
 }
 
 void ofApp::buttonEvent(ofxDatGuiButtonEvent e)
@@ -378,6 +357,69 @@ void ofApp::changePage(int page)
 		for (auto& node : _moduleNodes) node->setVisible(false);
 		_moduleNodes[page]->setVisible(true);
 	}
+}
+
+int ofApp::createModule(string type, float x, float y)
+{
+	int index = setupModule(type, x, y);
+	setupModulePage(index);
+	return index;
+}
+
+int ofApp::createModule(string type, float x, float y, int id)
+{
+	int index = setupModule(type, x, y);
+
+	bool updateId = _moduleNodes[index]->getId() <= id;
+	_moduleNodes[index]->setId(id);
+	_moduleNodes[index]->setName(type, true);
+	//There are two ids one in node accesible trough set and get and a static one in ModuleNode...
+	if (updateId)
+	{
+		if (type == "interpolate") ModuleNode<NNIPage>::ID = id;
+		if (type == "concatenate") ModuleNode<CBCSPage>::ID = id;
+		if (type == "trigger") ModuleNode<TriggerPage>::ID = id;
+		if (type == "draw") ModuleNode<RGBPage>::ID = id;
+		if (type == "gesture") ModuleNode<GesturePage>::ID = id;
+		if (type == "noise") ModuleNode<NoiseGenerator>::ID = id;
+	}
+
+	setupModulePage(index);
+	return index;
+}
+
+int ofApp::setupModule(string type, float x, float y)
+{
+	type = ofToLower(type);
+	if (type == "interpolate") _moduleNodes.push_back(make_unique<ModuleNode<NNIPage>>());
+	if (type == "concatenate") _moduleNodes.push_back(make_unique<ModuleNode<CBCSPage>>());
+	if (type == "trigger") _moduleNodes.push_back(make_unique<ModuleNode<TriggerPage>>());
+	if (type == "draw") _moduleNodes.push_back(make_unique<ModuleNode<RGBPage>>());
+	if (type == "gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
+	if (type == "noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
+
+	int index = _moduleNodes.size() - 1;
+	_moduleNodes[index]->setup(x, y, _moduleNodeHeight, 1, 1, _verdana, _moduleColor);
+	_moduleNodes[index]->setName(type, true);
+	_moduleNodes[index]->setPosition(
+		(ofGetWidth() - _moduleNodes[index]->getWidth()) * 0.5 / (float)ofGetWidth(),
+		(ofGetHeight() - _moduleNodes[index]->getHeight()) * 0.5 / (float)ofGetHeight()
+	);
+	return index;
+}
+
+
+
+void ofApp::setupModulePage(int index)
+{
+	_moduleNodes[index]->setupPage(
+		_moduleNodes[index]->getName(),
+		_moduleSize,
+		_moduleSize,
+		_guiWidth,
+		_verdana,
+		_colorPallete
+	);
 }
 
 void ofApp::setupMIDI()
@@ -447,7 +489,7 @@ string ofApp::createMIDIInput(string port, float x, float y)
 	_MIDIInputs[name].addListener(this);
 
 	Node node;
-	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
+	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
 	node.setName(name);
 	node.setAsInput(true);
 	_inputNodes.push_back(node);
@@ -1077,7 +1119,6 @@ void ofApp::load()
 					if (isNumber)
 					{
 						createOscInput(split[1], element["x"], element["y"]);
-						//names[curPort] = curPort;
 					}
 				}
 				else
@@ -1093,7 +1134,6 @@ void ofApp::load()
 					if (portAvailable)
 					{
 						string name = createMIDIInput(split[1], element["x"], element["y"]);
-						//names[name] = name;
 					}
 				}
 			}
@@ -1113,7 +1153,6 @@ void ofApp::load()
 					if (isNumber)
 					{
 						createOscOutput(split[1], split[2], element["x"], element["y"]);
-						//names[curPort] = curPort;
 					}
 				}
 				else
@@ -1129,7 +1168,6 @@ void ofApp::load()
 					if (portAvailable)
 					{
 						string name = createMIDIOutput(split[1], element["x"], element["y"]);
-						//names[name] = name;
 					}
 				}
 			}
@@ -1137,51 +1175,16 @@ void ofApp::load()
 			ofJson jModules = jLoad["Modules"];
 			for (auto& element : jModules)
 			{
-				if (element["type"].get<string>() == "interpolate") _moduleNodes.push_back(make_unique<ModuleNode<NNIPage>>());
-				if (element["type"].get<string>() == "concatenate") _moduleNodes.push_back(make_unique<ModuleNode<CBCSPage>>());
-				if (element["type"].get<string>() == "trigger") _moduleNodes.push_back(make_unique<ModuleNode<TriggerPage>>());
-				if (element["type"].get<string>() == "draw") _moduleNodes.push_back(make_unique<ModuleNode<RGBPage>>());
-				if (element["type"].get<string>() == "gesture") _moduleNodes.push_back(make_unique<ModuleNode<GesturePage>>());
-				if (element["type"].get<string>() == "noise") _moduleNodes.push_back(make_unique<ModuleNode<NoiseGenerator>>());
-				
-				_moduleNodes[_moduleNodes.size() - 1]->setup(
+				int index = createModule(
+					element["type"],
 					element["x"],
 					element["y"],
-					30,
-					element["inputs"],
-					element["outputs"],
-					_verdana,
-					_moduleColor);
-
-				int targetId = element["id"];
-				bool updateId = _moduleNodes[_moduleNodes.size() - 1]->getId() <= targetId;
-				_moduleNodes[_moduleNodes.size() - 1]->setId(targetId);
-				_moduleNodes[_moduleNodes.size() - 1]->setName(element["type"].get<string>(), true);
-				//There are two ids one in node accesible trough set and get and a static one in ModuleNode...
-				if (updateId)
-				{
-					if (element["type"].get<string>() == "interpolate") ModuleNode<NNIPage>::ID = targetId;
-					if (element["type"].get<string>() == "concatenate") ModuleNode<CBCSPage>::ID = targetId;
-					if (element["type"].get<string>() == "trigger") ModuleNode<TriggerPage>::ID = targetId;
-					if (element["type"].get<string>() == "draw") ModuleNode<RGBPage>::ID = targetId;
-					if (element["type"].get<string>() == "gesture") ModuleNode<GesturePage>::ID = targetId;
-					if (element["type"].get<string>() == "noise") ModuleNode<NoiseGenerator>::ID = targetId;
-				}
-
-				_moduleNodes[_moduleNodes.size() - 1]->setupPage(
-					_moduleNodes[_moduleNodes.size() - 1]->getName(),
-					_moduleSize,
-					_moduleSize,
-					_guiWidth,
-					_verdana,
-					_colorPallete
-				);
-				ofJson data = element["data"];
-				_moduleNodes[_moduleNodes.size() - 1]->load(data);
+					element["id"]);
 				
-				//string oldName = element["type"].get<string>() + "/" + ofToString(element["id"]);
-				//string newName = _moduleNodes[_moduleNodes.size() - 1]->getName();
-				//names[oldName] = newName;
+				ofJson data = element["data"];
+				_moduleNodes[index]->load(data);
+				//call draw so position is updated, maybe node should have an update method
+				_moduleNodes[index]->draw();
 			}
 			//CONNECTIONS
 			ofJson jConnections = jLoad["Connections"];
@@ -1189,8 +1192,6 @@ void ofApp::load()
 			{
 
 				Connection connection;
-				//connection.fromId = names[element["fromId"].get<string>()];
-				//connection.toId = names[element["toId"].get<string>()];
 				connection.fromId = element["fromId"].get<string>();
 				connection.toId = element["toId"].get<string>();
 				connection.fromOutput = element["fromOutput"];
@@ -1390,18 +1391,25 @@ void ofApp::mouseDragged(int x, int y, int button){
 		ofVec2f curPos;
 		curPos.x = (x - _selectionOffset.x) / (float)ofGetWidth();
 		curPos.y = float(y - _selectionOffset.y) / (float)ofGetHeight();
+		bool valid;
+		//node width is unknown, use height instead
+		valid = x - _selectionOffset.x < ofGetWidth() - _moduleNodeHeight && y - _selectionOffset.y < ofGetHeight() - _moduleNodeHeight;
+		valid = valid && curPos.x > 0 && curPos.y > 0;
 
-		for (auto& node : _moduleNodes)
+		if (valid)
 		{
-			if (node->getName() == _selected) node->setPosition(curPos.x, curPos.y);
-		}
-		for (auto& node : _inputNodes)
-		{
-			if (node.getName() == _selected) node.setPosition(curPos.x, curPos.y);
-		}
-		for (auto& node : _outputNodes)
-		{
-			if (node.getName() == _selected) node.setPosition(curPos.x, curPos.y);
+			for (auto& node : _moduleNodes)
+			{
+				if (node->getName() == _selected) node->setPosition(curPos.x, curPos.y);
+			}
+			for (auto& node : _inputNodes)
+			{
+				if (node.getName() == _selected) node.setPosition(curPos.x, curPos.y);
+			}
+			for (auto& node : _outputNodes)
+			{
+				if (node.getName() == _selected) node.setPosition(curPos.x, curPos.y);
+			}
 		}
 	}
 		break;

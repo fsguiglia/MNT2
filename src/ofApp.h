@@ -36,6 +36,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		//--------------------------------------------------------------
 		void changePage(int page);
 		//--------------------------------------------------------------
+		int createModule(string type, float x, float y);
+		int createModule(string type, float x, float y, int id);
+		int setupModule(string type, float x, float y);
+		void setupModulePage(int index);
+		//--------------------------------------------------------------
 		void setupMIDI();
 		string removePortNumber(string name);
 		void MIDIInToggle(ofxDatGuiToggleEvent e);
@@ -90,6 +95,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		//GUI
 		const size_t _maxPages = 1;
 		const int _moduleSize = 1024;
+		int _moduleNodeHeight = 30;
 		int _guiWidth = 300;
 		int _lastWidth, _lastHeight;
 		int _pageMarginLeft, _pageMarginRight;
