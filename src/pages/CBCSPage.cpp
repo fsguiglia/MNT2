@@ -4,7 +4,7 @@ CBCSPage::CBCSPage()
 {
 	setUseGlobalParameters(false);
 	setMidiOutput(false);
-	setOscOutput(false);
+	setOscOutput(true);
 	setStringOutput(true);
 	setAddress("/cbcs");
 }
@@ -102,7 +102,33 @@ void CBCSPage::update()
 		else _export.check();
 	}
 
-	MapPage::update();
+	updateOutput();
+}
+
+void CBCSPage::updateOutput()
+{
+	_map.update();
+	if (_map.getActive())
+	{
+		if (_map.getOutput() != _previousOutput)
+		{
+			vector<string> stringOutput;
+			vector<pair<string, float>> oscOutput;
+			vector<pair<string, float>> curOutput = _map.getOutput();
+
+			for (auto& element : curOutput)
+			{
+				if (element.first == "single-file-position") oscOutput.push_back(element);
+				else stringOutput.push_back(element.first + ";" + ofToString(element.second));
+			}
+			if (_oscOutput) addMessages(oscOutput, _OSCOutMessages);
+			if (_stringOutput) setStringMessages(stringOutput);
+		}
+		_previousOutput = _map.getOutput();
+	}
+	_gui->setVisible(_visible);
+	_gui->setEnabled(_visible);
+	_gui->update();
 }
 
 void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)

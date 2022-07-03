@@ -14,7 +14,8 @@ public:
 	void setupExport();
 
 	void update();
-	
+	void updateOutput();
+
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);

@@ -91,6 +91,7 @@ protected:
 	int _maxMessages;
 	bool _midiOutput, _oscOutput, _stringOutput;
 	string _address;
-	vector<pair<string,float>> _previousOutput, _OSCOutMessages, _MIDIOutMessages, _MIDIDumpMessages;
+	vector<pair<string,float>> _previousOutput, _OSCOutMessages, _MIDIDumpMessages;
+	vector<pair<string, float>> _MIDIOutMessages;
 	vector<string> _stringMessages;
 };
