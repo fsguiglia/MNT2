@@ -33,7 +33,6 @@ protected:
 	bool _mouseControl, _useGlobalParameters;
 	int _lastSelectedPoint;
 	float _minClickDistance;
-	ofFbo test;
 };
 
 template<typename T>

@@ -115,10 +115,10 @@ void CBCSPage::updateOutput()
 			vector<string> stringOutput;
 			vector<pair<string, float>> oscOutput;
 			vector<pair<string, float>> curOutput = _map.getOutput();
-
+			string address = _address + "/single-file-position";
 			for (auto& element : curOutput)
 			{
-				if (element.first == "single-file-position") oscOutput.push_back(element);
+				if (element.first == "single-file-position") oscOutput.push_back(make_pair(address, element.second));
 				else stringOutput.push_back(element.first + ";" + ofToString(element.second));
 			}
 			if (_oscOutput) addMessages(oscOutput, _OSCOutMessages);

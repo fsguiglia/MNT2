@@ -128,10 +128,7 @@ void ofApp::drawEditMode()
 	ofPushStyle();
 	ofSetColor(0);
 	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-	for (auto& node : _moduleNodes)
-	{
-		if (node->getVisible()) node->drawPage();
-	};
+	for (auto& node : _moduleNodes) if (node->getVisible()) node->drawPage();
 	//draw prev next areas
 	if (_pageMarginLeft > 80)
 	{
@@ -447,7 +444,7 @@ string ofApp::createMIDIInput(string port, float x, float y)
 	_MIDIInputs[name].addListener(this);
 
 	Node node;
-	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
+	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
 	node.setName(name);
 	node.setAsInput(true);
 	_inputNodes.push_back(node);
