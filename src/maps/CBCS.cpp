@@ -46,10 +46,13 @@ void CBCS::update()
 				_output.clear();
 				for (int i = 0; i < _selection.size(); i++)
 				{
-					pair<string, float> curOutput;
-					curOutput.first = ofToString(i) + ";" + _points[_selection[i]].getName();
-					curOutput.second = _points[_selection[i]].getValue("position");
-					_output.push_back(curOutput);
+					pair<string, float> multipleFiles, singleFile;
+					multipleFiles.first = ofToString(i) + ";" + _points[_selection[i]].getName();
+					multipleFiles.second = _points[_selection[i]].getValue("position");
+					singleFile.first = "single-file-position";
+					singleFile.second = _points[_selection[i]].getValue("single-file-position");
+					_output.push_back(multipleFiles);
+					_output.push_back(singleFile);
 				}
 			}
 		}
