@@ -41,7 +41,7 @@ inline MapPage<T>::MapPage()
 {
 	_lastSelectedPoint = -1;
 	_minClickDistance = 0.1;
-	_mouseControl = false;
+	_mouseControl = true;
 	_controlLearn = false;
 	_parameterLearn = false;
 	_inside = false;
@@ -67,7 +67,7 @@ inline void MapPage<T>::setupGui(string name)
 	_gui->addToggle("MIDI learn")->setName("controlLearn");
 	_gui->addButton("clear MIDI")->setName("clearMIDI");
 	_controlFolder = _gui->addFolder("Control");
-	_controlFolder->addToggle("Mouse Control");
+	_controlFolder->addToggle("Mouse Control", _mouseControl);
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
 	_controlFolder->collapse();
