@@ -49,7 +49,7 @@ def analyze(args):
 		manager = enlighten.get_manager()
 		file_progress = manager.counter(total=len(files), desc='Files', unit='file', leave=True)
 		print('loading ' + str(len(files)) + ' file(s)...')
-		
+		print(unit_length)
 		for index, file in enumerate(files):
 			try:
 				cur_file_position, cur_X = getFilePosition(manager, file, sample_rate, unit_length, mode)
@@ -77,9 +77,8 @@ def analyze(args):
 		elif technique == 0:
 			pca = getPCA(D, 0.8)
 			Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
-		
+			
 		Y = min_max_normalize(Y)
-		
 		save(Y, files, file_position, new_path)
 		manager.stop()
 	except Exception as ex:
@@ -183,7 +182,7 @@ def min_max_normalize(a):
 def save(data, files, positions, output_file):
 	out = dict()
 	points = dict()
-	for i in range(len(files)):
+	for i in range(len(positions)):
 		curOut = dict()
 		curOut['name'] = positions[i][0]
 		curOut['pos'] = positions[i][1]

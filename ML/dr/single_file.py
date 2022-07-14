@@ -59,6 +59,8 @@ def concatenate(files, unit_length, samplerate):
 
 def saveFile(X, path, samplerate):
     output = easygui.filesavebox(msg="Save file", title="MNT2", default=path)
+    if(output[:3] != ".wav"):
+        output = output + ".wav"
     sf.write(output, X, samplerate, format='wav')
 
 def saveData(D, output_file):
@@ -71,7 +73,6 @@ def save_empty_file(error, output_file):
     border_msg(error)
     time.sleep(3)
     out = dict()
-    out["error"] = error
     with open(output_file, 'w+') as f:
         json.dump(out, f, indent = 4)
         exit()
