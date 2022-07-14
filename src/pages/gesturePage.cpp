@@ -113,10 +113,11 @@ void GesturePage::update()
 	else if (_recording) record();
 	if (_cursor != _prevCursor)
 	{
+		_OSCOutMessages.clear();
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_OSCOutMessages["global/control/x"] = _cursor.x;
-			_OSCOutMessages["global/control/y"] = _cursor.y;
+			_OSCOutMessages.push_back(pair<string,float>("global/control/x", _cursor.x));
+			_OSCOutMessages.push_back(pair<string,float>("global/control/y", _cursor.y));
 		}
 	}
 	_prevCursor = _cursor;

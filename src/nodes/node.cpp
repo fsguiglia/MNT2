@@ -87,6 +87,11 @@ void Node::draw()
 		_outPositions[i].y = r.y;
 		ofDrawRectangle(_outPositions[i]);
 	}
+	if (_inputs > 0)
+	{
+		ofSetColor(150);
+		ofDrawCircle(r.x, r.y + r.height * 0.5, r.height * 0.1);
+	}
 	ofPopStyle();
 }
 
@@ -171,7 +176,10 @@ int Node::inside(int x, int y, bool select)
 	ofRectangle translated = _rect;
 	translated.x *= ofGetWidth();
 	translated.y *= ofGetHeight();
-	if (translated.inside(x, y)) in = 0;
+	ofRectangle input = translated;
+	input.x -= input.height * 0.1;
+	input.width += input.height * 0.1;
+	if (input.inside(x, y)) in = 0;
 	else
 	{
 		for (int i = 0; i < _outPositions.size(); i++)

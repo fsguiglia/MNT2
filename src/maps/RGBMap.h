@@ -19,7 +19,7 @@ public:
 	void setCursors(vector<ofVec2f> cursors);
 	void setCursor(ofVec2f cursor, int index);
 	vector<ofVec2f> getCursors();
-	map<string, float> getOutput();
+	vector<pair<string, float>> getOutput();
 private:
 	void updateFbo();
 	void updateOutput();

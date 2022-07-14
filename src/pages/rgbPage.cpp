@@ -117,8 +117,9 @@ void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 		int control = ofToInt(ofSplitString(name, "/")[1]);
 		float value = e.value;
 		if (lastSelected != -1) _map.setPointParameter(lastSelected, name, value);
-		map<string, float> message;
-		message[name] = value;
+		pair<string, float> message;
+		message.first = name;
+		message.second = value;
 		addMessages(message, _MIDIOutMessages);
 		addMessages(message, _MIDIDumpMessages);
 	}

@@ -4,9 +4,9 @@ CBCSPage::CBCSPage()
 {
 	setUseGlobalParameters(false);
 	setMidiOutput(false);
-	setOscOutput(false);
+	setOscOutput(true);
 	setStringOutput(true);
-	setAddress("/cbcs");
+	setAddress("/concatenate");
 }
 
 void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
@@ -18,9 +18,12 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont fon
 	_map.setRandomize(0.);
 	_map.setDrawSelected(true);
 	_map.setCursor(ofVec2f(-1, -1));
-
+	
+	setAddress("/" + name);
+	
 	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
 	setupTsne();
+	setupExport();
 	setupGui();
 }
 
@@ -30,7 +33,7 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addToggle("Analyze complete files", true)->setName("complete");
 	_arrangeFolder->addButton("PCA")->setName("pca");
 	_arrangeFolder->addButton("t-SNE")->setName("tsne");
-	_arrangeFolder->addSlider("unit length", 100, 1000, _dr.getParameter("--unit_length"))->setName("unit_length");
+	_arrangeFolder->addSlider("unit length", 100, 1000, _dr.getParameter("--unit_length"))->setName("--unit_length");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
@@ -40,7 +43,8 @@ void CBCSPage::setupGui()
 	_gui->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
 	_gui->getSlider("units")->setPrecision(0);
 	_gui->addTextInput("address", getAddress());
-	_gui->addButton("Export file list")->setName("Export");
+	_gui->addButton("Export single file")->setName("Export_file");
+	_gui->addButton("Export file list")->setName("Export_list");
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
 	_gui->onToggleEvent(this, &CBCSPage::toggleEvent);
 	_gui->onSliderEvent(this, &CBCSPage::sliderEvent);
@@ -70,6 +74,14 @@ void CBCSPage::setupTsne()
 	_dr.setParameters(drParameters);
 }
 
+void CBCSPage::setupExport()
+{
+	_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
+	//_dr.setup("../ML/dr/single_file.exe", "export"); //exe
+	_export.setParameter("--unit_length", _dr.getParameter("--unit_length"));
+	_export.setParameter("--script", 3);
+}
+
 void CBCSPage::update()
 {
 	if (_dr.getRunning())
@@ -78,11 +90,47 @@ void CBCSPage::update()
 		{
 			_map.clearPoints();
 			loadData(_dr.getData());
+			_export.setParameter("--unit_length", _dr.getParameter("--unit_length"));
 		}
 		else _dr.check();
 	}
 
-	MapPage::update();
+	if (_export.getRunning())
+	{
+		if (_export.getCompleted())
+		{
+			loadSingleFile(_export.getData());
+		}
+		else _export.check();
+	}
+
+	updateOutput();
+}
+
+void CBCSPage::updateOutput()
+{
+	_map.update();
+	if (_map.getActive())
+	{
+		if (_map.getOutput() != _previousOutput)
+		{
+			vector<string> stringOutput;
+			vector<pair<string, float>> oscOutput;
+			vector<pair<string, float>> curOutput = _map.getOutput();
+			string address = _address + "/single-file-position";
+			for (auto& element : curOutput)
+			{
+				if (element.first == "single-file-position") oscOutput.push_back(make_pair(address, element.second));
+				else stringOutput.push_back(element.first + ";" + ofToString(element.second));
+			}
+			if (_oscOutput) addMessages(oscOutput, _OSCOutMessages);
+			if (_stringOutput) setStringMessages(stringOutput);
+		}
+		_previousOutput = _map.getOutput();
+	}
+	_gui->setVisible(_visible);
+	_gui->setEnabled(_visible);
+	_gui->update();
 }
 
 void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
@@ -90,20 +138,27 @@ void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 	if (e.target->getName() == "tsne")
 	{
 		_dr.setParameter("--technique", 0);
-		if (!_dr.getRunning()) _dr.start();
+		if (!_dr.getRunning() && !_export.getRunning()) _dr.start();
 	}
 	else if (e.target->getName() == "pca")
 	{
 		_dr.setParameter("--technique", 1);
-		if (!_dr.getRunning()) _dr.start();
+		if (!_dr.getRunning() && !_export.getRunning()) _dr.start();
 	}
 	else if (e.target->getName() == "Normalize")
 	{
 		_map.normalize();
 	}
-	else if (e.target->getName() == "Export")
+	else if (e.target->getName() == "Export_list")
 	{
 		exportFileList();
+	}
+	else if (e.target->getName() == "Export_file")
+	{
+		if (!_dr.getRunning() && !_export.getRunning())
+		{
+			if(_map.getPoints().size() > 0)	_export.start(getFileList());
+		}
 	}
 	else if (e.target->getName() == "clearMIDI")
 	{
@@ -227,14 +282,12 @@ void CBCSPage::moduleOSCIn(string address, float value)
 	MapPage::moduleOSCIn(address, value);
 }
 
-void CBCSPage::exportFileList()
+ofJson CBCSPage::getFileList()
 {
-	//exports list of filenames to load in synth
-	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.cbcs", "Export list of files");
-	if (saveFile.bSuccess)
+	vector<Point> points = _map.getPoints();
+	ofJson jFiles;
+	if (points.size() > 0)
 	{
-		ofJson jFiles;
-		vector<Point> points = _map.getPoints();
 		for (auto point : points)
 		{
 			bool pathExists = false;
@@ -252,11 +305,27 @@ void CBCSPage::exportFileList()
 				jFiles["files"].push_back(curPath);
 			}
 		}
+	}
+	return jFiles;
+}
+
+void CBCSPage::exportFileList()
+{
+	//exports list of filenames to load in synth
+	ofFileDialogResult saveFile = ofSystemSaveDialog("untitled.cbcs", "Export list of files");
+	if (saveFile.bSuccess)
+	{
+		ofJson jFiles = getFileList();
 		string path = saveFile.getPath();
 		path = ofSplitString(path, ".")[0];
 		path += ".cbcs";
 		ofSavePrettyJson(path, jFiles);
 	}
+}
+
+void CBCSPage::exportSingleFile()
+{
+	_export.start();
 }
 
 void CBCSPage::load(ofJson & json)
@@ -275,9 +344,21 @@ void CBCSPage::loadData(ofJson & json)
 		curPoint.setPosition(point["x"], point["y"]);
 		curPoint.setName(point["name"].get<string>());
 		curPoint.setValue("position", point["pos"]);
+		curPoint.setValue("single-file-position", point["sf-pos"]);
 		_map.addPoint(curPoint);
 	}
 	_map.build();
+}
+
+void CBCSPage::loadSingleFile(ofJson & json)
+{
+	for (int i = 0; i < _map.size(); i++)
+	{
+		Point curPoint = _map.getPoint(i);
+		int offset = json["files"][curPoint.getName()];
+		int curPosition = offset + curPoint.getValue("position");
+		_map.setPointParameter(i, "single-file-position", curPosition);
+	}
 }
 
 ofJson CBCSPage::save()
@@ -291,7 +372,7 @@ ofJson CBCSPage::save()
 		curPoint["y"] = points[i].getPosition().y;
 		curPoint["name"] = points[i].getName();
 		curPoint["pos"] = points[i].getValue("position");
-		for (auto parameter : points[i].getValues())
+		curPoint["sf-pos"] = points[i].getValue("single-file-position");
 		jSave["points"].push_back(curPoint);
 	}
 

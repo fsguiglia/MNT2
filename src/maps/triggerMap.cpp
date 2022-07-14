@@ -107,7 +107,7 @@ vector<int> TriggerMap::getTriggered()
 	return _triggered;
 }
 
-map<string, float> TriggerMap::getOutput()
+vector<pair<string, float>> TriggerMap::getOutput()
 {
 	return _output;
 }
@@ -184,15 +184,24 @@ void TriggerMap::updateTriggers()
 	_output.clear();
 	for (int i = 0; i < _triggered.size(); i++)
 	{
+		pair<string, float> curOutput;
 		if (_triggered[i] != 0)
 		{
 			if (_triggered[i] == 1)
 			{
-				for (auto value : _points[i].getValues()) _output[value.first] = value.second;
+				for (auto value : _points[i].getValues())
+				{
+					curOutput.first = value.first;
+					curOutput.second = value.second;
+				}
 			}
 			if (_triggered[i] == -1 && !_points[i].getSwitch())
 			{
-				for (auto value : _points[i].getValues()) _output[value.first] = 0;
+				for (auto value : _points[i].getValues())
+				{
+					curOutput.first = value.first;
+					curOutput.second = 0;
+				}
 			}
 		}
 	}

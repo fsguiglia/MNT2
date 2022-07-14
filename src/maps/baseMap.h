@@ -8,6 +8,7 @@ public:
 	virtual void setup(int width, int height) = 0;
 	virtual void update() = 0;
 	virtual void draw(int x, int y, int w, int h, ofTrueTypeFont& font) = 0;
+	virtual vector<pair<string, float>> getOutput() = 0;
 
 	void setColorPallete(vector<ofColor> colorPallete);
 	void removePoint(int index);
@@ -34,13 +35,15 @@ public:
 	void setLastSelected(int index, int time=0);
 	int getLastSelected();
 	void setDrawSelected(bool drawSelected);
+	int size();
 
 protected:
 	int addPoint(T point);
 	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity=100);
 
 	typename vector<T> _points;
-	map<string, float> _parameters, _output;
+	map<string, float> _parameters;
+	vector<pair<string, float>> _output;
 	bool _positionChanged, _drawSelected, _active;
 	float _randomSpeed;
 	int _width, _height, _lastSelectedMs , _lastSelected;
@@ -281,6 +284,12 @@ template<typename T>
 void BaseMap<T>::setDrawSelected(bool drawSelected)
 {
 	_drawSelected = drawSelected;
+}
+
+template<typename T>
+int BaseMap<T>::size()
+{
+	 return _points.size();
 }
 
 template<typename T>

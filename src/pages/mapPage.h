@@ -33,7 +33,6 @@ protected:
 	bool _mouseControl, _useGlobalParameters;
 	int _lastSelectedPoint;
 	float _minClickDistance;
-	ofFbo test;
 };
 
 template<typename T>
@@ -179,8 +178,9 @@ inline void MapPage<T>::moduleMIDIIn(string port, int channel, int control, floa
 				_map.setPointParameter(_map.getLastSelected(), parameterName, value);
 				_gui->getSlider(parameterName)->setValue(value, false);
 				
-				map<string, float> curMessage;
-				curMessage[parameterName] = value;
+				pair<string, float> curMessage;
+				curMessage.first = parameterName;
+				curMessage.second = value;
 				addMessages(curMessage, _MIDIOutMessages);
 			}
 		}

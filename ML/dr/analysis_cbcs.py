@@ -39,7 +39,7 @@ def analyze(args):
 		audio_files = (easygui.diropenbox(msg='Audio file folder', title='MNT2', default = init_path))
 		if audio_files is None:
 			error = 'no files found'
-			exit()
+			save_empty_file(error, new_path)
 
 		files = getListOfFiles(audio_files, ['.wav', '.WAV'])
 		
@@ -49,7 +49,7 @@ def analyze(args):
 		manager = enlighten.get_manager()
 		file_progress = manager.counter(total=len(files), desc='Files', unit='file', leave=True)
 		print('loading ' + str(len(files)) + ' file(s)...')
-		
+		print(unit_length)
 		for index, file in enumerate(files):
 			try:
 				cur_file_position, cur_X = getFilePosition(manager, file, sample_rate, unit_length, mode)
@@ -64,7 +64,7 @@ def analyze(args):
 		#save empty json and exit if less than 5 units are found
 		if len(file_position) < 5:
 			error = 'not enough data to create map'
-			sys.exit()
+			save_empty_file(error, new_path)
 
 		print('getting features...')
 		D = getFeatures(manager, X, window_size, hop_length)
@@ -77,19 +77,17 @@ def analyze(args):
 		elif technique == 0:
 			pca = getPCA(D, 0.8)
 			Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
-		
+			
 		Y = min_max_normalize(Y)
-		
-		save(Y, file_position, new_path)
+		save(Y, files, file_position, new_path)
 		manager.stop()
 	except Exception as ex:
 		'''
 		print(ex)
 		input("Press key to exit.")
 		'''
-		border_msg(error)
+		
 		save_empty_file(error, new_path)
-		time.sleep(3)
 		
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
@@ -181,15 +179,19 @@ def min_max_normalize(a):
 	norm = (a - min_values) / (max_values - min_values)
 	return norm
 
-def save(data, files, output_file):
+def save(data, files, positions, output_file):
 	out = dict()
 	points = dict()
-	for i in range(len(files)):
+	for i in range(len(positions)):
 		curOut = dict()
-		curOut['name'] = files[i][0]
-		curOut['pos'] = files[i][1]
+		curOut['name'] = positions[i][0]
+		curOut['pos'] = positions[i][1]
 		curOut['x'] = float(data[i][0])
 		curOut['y'] = float(data[i][1])
+		if len(files) == 1:
+			curOut['sf-pos'] = positions[i][1]
+		else:
+			curOut['sf-pos'] = -1
 		points[i] = curOut
 	
 	out['points'] = points
@@ -197,11 +199,14 @@ def save(data, files, output_file):
 		json.dump(out, f, indent = 4)
 
 def save_empty_file(error, output_file):
+	border_msg(error)
+	time.sleep(3)
 	out = dict()
 	out["error"] = error
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
-		
+	exit()
+	
 def border_msg(msg):
 	row = len(msg)
 	h = ''.join(['-' *row])

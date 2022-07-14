@@ -27,9 +27,9 @@ public:
 
 	virtual void MIDIIn(string port, int control, int channel, float value) = 0;
 	virtual void OSCIn(string address, float value) = 0;
-	virtual map<string, float> getOSCOut() = 0;
-	virtual map<string, float> getMidiOut() = 0;
-	virtual map<string, float> getMidiDump() = 0;
+	virtual vector<pair<string, float>> getOSCOut() = 0;
+	virtual vector<pair<string, float>> getMidiOut() = 0;
+	virtual vector<pair<string, float>> getMidiDump() = 0;
 	virtual string getAddress() = 0;
 	virtual vector<string> getStringOut() = 0;
 	virtual void clearMessages() = 0;

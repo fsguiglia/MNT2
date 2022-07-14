@@ -11,8 +11,10 @@ public:
 	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 50);
 	void setupGui();
 	void setupTsne();
+	void setupExport();
 
 	void update();
+	void updateOutput();
 
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
@@ -27,10 +29,14 @@ public:
 
 	void moduleOSCIn(string address, float value);
 
+	ofJson getFileList();
 	void exportFileList();
+	void exportSingleFile();
 	void load(ofJson& json);
 	void loadData(ofJson& json);
+	void loadSingleFile(ofJson& json);
+
 	ofJson save();
 private:
-	PythonML _dr;
+	PythonML _dr, _export;
 };
