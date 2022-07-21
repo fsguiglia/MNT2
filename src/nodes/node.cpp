@@ -78,7 +78,7 @@ void Node::draw()
 	ofDrawRectangle(r);
 	ofSetColor(255);
 	// a ojo...
-	_font.drawString(_name, r.x + r.width * 0.08, r.y + (r.height + _font.getLineHeight() * 0.75) * 0.5);
+	_font.drawString("/"+_name, r.x + r.width * 0.08, r.y + (r.height + _font.getLineHeight() * 0.75) * 0.5);
 	for (int i = 0; i < _outputs; i++)
 	{
 		if (i == _selectedOut) ofSetColor(180);

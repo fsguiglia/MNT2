@@ -996,9 +996,9 @@ void ofApp::updateConnections()
 					}
 					for (auto element : OSCMessages)
 					{
-						vector<string> vAddress = ofSplitString(element.first, "/");
-						bool addressMatch = false;
-						string curAddress = element.first;
+						string curAddress = element.first.substr(1, string::npos);
+						vector<string> vAddress = ofSplitString(curAddress, "/");
+						bool addressMatch = false;	
 						if (vAddress.size() > 0)
 						{
 							if (vAddress[0] == "global") {
