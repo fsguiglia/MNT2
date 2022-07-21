@@ -207,11 +207,11 @@ void NoiseGenerator::mouseScrolled(int scroll)
 {
 }
 
-void NoiseGenerator::moduleMIDIIn(string port, int control, int channel, float value)
+void NoiseGenerator::moduleMIDIIn(string port, int channel, int control, float value)
 {
 }
 
-void NoiseGenerator::moduleMIDIMap(string port, int control, int channel, float value)
+void NoiseGenerator::moduleMIDIMap(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);

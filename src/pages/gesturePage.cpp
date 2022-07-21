@@ -448,11 +448,11 @@ void GesturePage::mouseScrolled(int scroll)
 {
 }
 
-void GesturePage::moduleMIDIIn(string port, int control, int channel, float value)
+void GesturePage::moduleMIDIIn(string port, int channel, int control, float value)
 {
 }
 
-void GesturePage::moduleMIDIMap(string port, int control, int channel, float value)
+void GesturePage::moduleMIDIMap(string port, int channel, int control, float value)
 {
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);

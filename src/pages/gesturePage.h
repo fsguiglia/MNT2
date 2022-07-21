@@ -42,8 +42,8 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
 
-	void moduleMIDIIn(string port, int control, int channel, float value);
-	void moduleMIDIMap(string port, int control, int channel, float value);
+	void moduleMIDIIn(string port, int channel, int control, float value);
+	void moduleMIDIMap(string port, int channel, int control, float value);
 	void moduleOSCIn(string address, float value);
 
 	void load(ofJson& json);
