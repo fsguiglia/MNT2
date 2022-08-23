@@ -53,22 +53,22 @@ void TriggerMap::draw(int x, int y, int w, int h, ofTrueTypeFont & font)
 	ofPopStyle();
 }
 
-int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColor color)
+int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColor color, bool isSwitch)
 {
 	Trigger trigger;
 	trigger.setPosition(position);
 	trigger.setRadius(radius);
 	trigger.setThreshold(threshold);
 	trigger.setColor(color);
-	trigger.setSwitch(false);
+	trigger.setSwitch(isSwitch);
 	BaseMap::addPoint(trigger);
 	return _points.size() - 1;
 }
 
-int TriggerMap::addPoint(ofVec2f position, float radius, float threshold)
+int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, bool isSwitch)
 {
 	int colorIndex = _points.size() % _colorPallete.size();
-	int size = addPoint(position, radius, threshold, _colorPallete[colorIndex]);
+	int size = addPoint(position, radius, threshold, _colorPallete[colorIndex], isSwitch);
 	return size;
 }
 
@@ -182,25 +182,29 @@ void TriggerMap::updateTriggers()
 	}
 
 	_output.clear();
+	_output.size();
 	for (int i = 0; i < _triggered.size(); i++)
 	{
-		pair<string, float> curOutput;
 		if (_triggered[i] != 0)
 		{
 			if (_triggered[i] == 1)
 			{
 				for (auto value : _points[i].getValues())
 				{
+					pair<string, float> curOutput;
 					curOutput.first = value.first;
 					curOutput.second = value.second;
+					_output.push_back(curOutput);
 				}
 			}
-			if (_triggered[i] == -1 && !_points[i].getSwitch())
+			else if (_triggered[i] == -1 && !_points[i].getSwitch())
 			{
 				for (auto value : _points[i].getValues())
 				{
+					pair<string, float> curOutput;
 					curOutput.first = value.first;
 					curOutput.second = 0;
+					_output.push_back(curOutput);
 				}
 			}
 		}

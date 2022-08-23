@@ -871,7 +871,7 @@ void ofApp::updateConnections()
 					{
 						if (node->getMidiOutput())
 						{
-							for (auto message : node->getMidiDump())
+							for (auto& message : node->getMidiDump())
 							{
 								//add node name as port name
 								string newName = node->getName() + "/" + message.first;
@@ -884,7 +884,7 @@ void ofApp::updateConnections()
 						//midi
 						if (node->getMidiOutput())
 						{
-							for (auto message : node->getMidiOut())
+							for (auto& message : node->getMidiOut())
 							{
 								//add node name as port name
 								string newName = node->getName() + "/" + message.first;

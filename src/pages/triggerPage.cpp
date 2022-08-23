@@ -221,7 +221,7 @@ void TriggerPage::mousePressed(int x, int y, int button, bool doubleClick)
 	if (_inside && !insideGui)
 	{
 		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (doubleClick) _map.addPoint(pos, _radius, _threshold);
+		if (doubleClick) _map.addPoint(pos, _radius, _threshold, true);
 		if (button < 2)
 		{
 			int lastSelected = _map.getLastSelected();
@@ -297,8 +297,7 @@ void TriggerPage::load(ofJson& json)
 		float radius = curPoint["radius"];
 		float threshold = curPoint["threshold"];
 		bool isSwitch = curPoint["switch"];
-		int index = _map.addPoint(position, radius, threshold);
-		_map.setSwitch(index, isSwitch);
+		int index = _map.addPoint(position, radius, threshold, isSwitch);
 		if (curPoint.find("parameters") != curPoint.end())
 		{
 			auto obj = curPoint["parameters"].get<ofJson::object_t>();
