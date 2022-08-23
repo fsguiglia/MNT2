@@ -182,7 +182,6 @@ void TriggerMap::updateTriggers()
 	}
 
 	_output.clear();
-	_output.size();
 	for (int i = 0; i < _triggered.size(); i++)
 	{
 		if (_triggered[i] != 0)

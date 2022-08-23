@@ -12,7 +12,6 @@ RGBPoint::RGBPoint(int width, int height, int maxPixels)
 	setPosition(0,0);
 	_width = width;
 	_height = height;
-	//_img.allocate(_width, _height, ofImageType::OF_IMAGE_COLOR_ALPHA);
 	_isTrigger = false;
 	_state = false;
 	_maxPixels = maxPixels;
@@ -20,7 +19,6 @@ RGBPoint::RGBPoint(int width, int height, int maxPixels)
 
 void RGBPoint::setImage(ofImage img)
 {
-	//img.setImageType(ofImageType::OF_IMAGE_GRAYSCALE);
 	_img = img;
 	_pixels = _img.getPixels();
 	_width = _img.getWidth();

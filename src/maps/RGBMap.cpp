@@ -167,7 +167,6 @@ void RGBMap::updateOutput()
 
 	for (auto& point : _points)
 	{
-		pair<string, float> curOutput;
 		bool prevState = point.getState();
 		int radius = _radius * _width;
 		float maxWeight = NULL;
@@ -183,21 +182,24 @@ void RGBMap::updateOutput()
 		{
 			bool curState = point.getState();
 			
-
 			if (!prevState && curState)
 			{
 				for (auto value : point.getValues())
 				{
+					pair<string, float> curOutput;
 					curOutput.first = value.first; 
-					curOutput.second = value.second;
+					curOutput.second = value.second * maxWeight;
+					_output.push_back(curOutput);
 				}
 			}
 			else if (prevState && !curState)
 			{
 				for (auto value : point.getValues())
 				{
+					pair<string, float> curOutput;
 					curOutput.first = value.first;
 					curOutput.second = 0;
+					_output.push_back(curOutput);
 				}
 			}
 		}
@@ -205,10 +207,11 @@ void RGBMap::updateOutput()
 		{
 			for (auto value : point.getValues())
 			{
+				pair<string, float> curOutput;
 				curOutput.first = value.first;
-				curOutput.second = value.second;
+				curOutput.second = value.second * maxWeight;
+				_output.push_back(curOutput);
 			}
 		}
-		_output.push_back(curOutput);
 	}
 }
