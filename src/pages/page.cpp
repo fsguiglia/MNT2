@@ -81,8 +81,9 @@ void Page::MIDIIn(string port, int channel, int control, float value)
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
 	string controlName = sChannel + "/" + sControl;
-	string controlLabel = "ch" + sChannel + "/cc" + sControl;
-
+	//string controlLabel = "ch" + sChannel + "/cc" + sControl;
+	string controlLabel = controlName;
+	
 	bool valid = true;
 	valid = valid && channel >= 0 && channel < 16;
 	valid = valid && control >= 0 && control < 128;
@@ -105,17 +106,17 @@ void Page::MIDIIn(string port, int channel, int control, float value)
 					_midiMap[_lastControl] = controlName;
 					if (vLastControl[0] == "toggle")
 					{
-						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						string newName = vLastControl[1] + " (" + controlLabel + ")";
 						_gui->getToggle(vLastControl[1])->setLabel(newName);
 					}
 					else if (vLastControl[0] == "slider")
 					{
-						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						string newName = vLastControl[1] + " (" + controlLabel + ")";
 						_gui->getSlider(vLastControl[1])->setLabel(newName);
 					}
 					else if (vLastControl[0] == "button")
 					{
-						string newName = vLastControl[1] + "(" + controlLabel + ")";
+						string newName = vLastControl[1] + " (" + controlLabel + ")";
 						_gui->getButton(vLastControl[1])->setLabel(newName);
 					}
 				}

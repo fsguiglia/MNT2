@@ -457,7 +457,6 @@ void GesturePage::moduleMIDIMap(string port, int channel, int control, float val
 	string sControl = ofToString(control);
 	string sChannel = ofToString(channel);
 	string controlName = sChannel + "/" + sControl;
-	string controlLabel = "ch" + sChannel + "/cc" + sControl;
 
 	bool valid = true;
 	valid = valid && channel >= 0 && channel < 16;
