@@ -338,13 +338,23 @@ void CBCSPage::load(ofJson & json)
 
 void CBCSPage::loadData(ofJson & json)
 {
+	vector<string> features;
+	ofJson featureList = json["features"];
+	for (auto& feature : featureList) features.push_back(feature);
+	_map.setFeatures(features);
 	for (ofJson point : json["points"])
 	{
 		Point curPoint;
-		curPoint.setPosition(point["x"], point["y"]);
+		//info
 		curPoint.setName(point["name"].get<string>());
-		curPoint.setValue("position", point["pos"]);
-		curPoint.setValue("single-file-position", point["sf-pos"]);
+		curPoint.setValue("position", point["position"]);
+		curPoint.setValue("single-file-position", point["single-file-position"]);
+		//features
+		for (auto& feature : _map.getFeatures()) curPoint.setValue(feature, point[feature]);
+		//use first feature pair as default position
+		float x = curPoint.getValue(_map.getFeatures()[0]);
+		float y = curPoint.getValue(_map.getFeatures()[1]);
+		curPoint.setPosition(x, y);
 		_map.addPoint(curPoint);
 	}
 	_map.build();

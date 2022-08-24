@@ -52,6 +52,7 @@ void PythonML::start()
 {
 	string command = _prefix + " " + _scriptPath;
 	command += " -f " + _inputFilePath;
+	cout << command << endl;
 	for (auto parameter : _parameters) command = command + " " + parameter.first + " " + ofToString(parameter.second);
 	system(command.c_str());
 	_running = true;
@@ -81,8 +82,8 @@ ofJson PythonML::getData()
 
 void PythonML::end()
 {
-	ofFile::removeFile(_inputFilePath);
-	ofFile::removeFile(_outputFilePath);
+	//ofFile::removeFile(_inputFilePath);
+	//ofFile::removeFile(_outputFilePath);
 	_running = false;
 	_completed = false;
 }

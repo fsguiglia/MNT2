@@ -24,7 +24,6 @@ def analyze(args):
 	learning_rate = int(args['learning_rate'])
 	iterations = int(args['iterations'])
 	mode = int(args['cbcs_mode'])
-	technique = int(args['technique'])
 	unit_length = float(args['unit_length']) / 1000 #seconds
 	
 	error = 'something went wrong, please check path and folder contents'
@@ -49,7 +48,6 @@ def analyze(args):
 		manager = enlighten.get_manager()
 		file_progress = manager.counter(total=len(files), desc='Files', unit='file', leave=True)
 		print('loading ' + str(len(files)) + ' file(s)...')
-		print(unit_length)
 		for index, file in enumerate(files):
 			try:
 				cur_file_position, cur_X = getFilePosition(manager, file, sample_rate, unit_length, mode)
@@ -67,27 +65,29 @@ def analyze(args):
 			save_empty_file(error, new_path)
 
 		print('getting features...')
-		D = getFeatures(manager, X, window_size, hop_length)
+		D, F = getFeatures(manager, X, window_size, hop_length)
 		print('done')
-		Y = np.zeros((len(file_position),2))
+		TSNE = np.zeros((len(file_position),2))
 		
-		#pca or pca+tsne (0.8 variance needs to be tested)
-		if technique == 1:
-			Y = getPCA(D, 2)
-		elif technique == 0:
-			pca = getPCA(D, 0.8)
-			Y = getTSNE(pca, 2, perplexity, learning_rate, iterations) 
-			
-		Y = min_max_normalize(Y)
-		save(Y, files, file_position, new_path)
+		#0.8 variance needs to be tested
+		PCA = getPCA(D, 0.8)
+		if PCA.shape[1] < 2: 
+			PCA = getPCA(D, 2)
+		TSNE = getTSNE(PCA, 2, perplexity, learning_rate, iterations)
+		TSNE = min_max_normalize(TSNE)
+		#keep first two components of PCA and normalize
+		PCA = PCA.T
+		PCA = PCA[:2]
+		PCA = PCA.T
+		PCA = min_max_normalize(PCA)
+		#normalize features
+		F = min_max_normalize(F)
+		#save
+		save(F, PCA, TSNE, files, file_position, new_path)
 		manager.stop()
 	except Exception as ex:
-		'''
-		print(ex)
-		input("Press key to exit.")
-		'''
-		
-		save_empty_file(error, new_path)
+		raise
+		#save_empty_file(error, new_path)
 		
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
@@ -133,23 +133,36 @@ def getFilePosition(manager, file, sample_rate, unit_length, mode=0):
 		bar.update()
 	bar.close()
 	return X, D
-	
+
 def getFeatures(manager, samples, window_size, hop_length):
 	#size of stft result is  (window size / 2 + 1) * (samples / hop length + 1)
 	shape = int((1 + window_size * 0.5))
 	shape *= int(samples[0].shape[0] / hop_length) + 1
 	D = np.array([]).reshape(0, shape)
+	#rms, centroid, bandwidth, flatness, rolloff
+	F = np.array([]).reshape(0, 5)
 	#stack fft results
 	bar = manager.counter(total=samples.shape[0], desc="STFT");
 	for index,sample in enumerate(samples):
 		sample = sample.T
 		S = librosa.stft(sample, n_fft = window_size, hop_length = hop_length)
+		#featuress
+		mp, phase = librosa.magphase(S)
+		rms =librosa.feature.rms(S=mp)[0][0]
+		sc = librosa.feature.spectral_centroid(S=mp)[0][0]
+		bw = librosa.feature.spectral_bandwidth(S=mp)[0][0]
+		sf = librosa.feature.spectral_flatness(S=mp)[0][0]
+		sr = librosa.feature.spectral_rolloff(S=mp)[0][0]
+		f =  np.array([rms, sc, bw, sf, sr]) 
+		f = f.reshape(1,5)
+		F = np.concatenate((F,f))
+		#stft
 		S = np.abs(S)
 		S = S.reshape(S.shape[0] * S.shape[1])
 		S = S.reshape(1, shape)
 		D = np.concatenate((D, S))
 		bar.update()
-	return D
+	return D, F
 
 def getPCA(data, components):
 	print('Principal component analysis (this can take a while)...')
@@ -179,22 +192,32 @@ def min_max_normalize(a):
 	norm = (a - min_values) / (max_values - min_values)
 	return norm
 
-def save(data, files, positions, output_file):
+def save(F, PCA, TSNE, files, positions, output_file):
 	out = dict()
 	points = dict()
 	for i in range(len(positions)):
 		curOut = dict()
 		curOut['name'] = positions[i][0]
-		curOut['pos'] = positions[i][1]
-		curOut['x'] = float(data[i][0])
-		curOut['y'] = float(data[i][1])
+		curOut['position'] = positions[i][1]
+		curOut['TSNE-x'] = float(TSNE[i][0])
+		curOut['TSNE-y'] = float(TSNE[i][1])
+		curOut['PCA-x'] = float(PCA[i][0])
+		curOut['PCA-y'] = float(PCA[i][1])
+		curOut['rms'] = F[i][0]
+		curOut['centroid'] = F[i][1]
+		curOut['bandwidth'] = F[i][2]
+		curOut['flatness'] = F[i][3]
+		curOut['rolloff'] = F[i][4]
+
 		if len(files) == 1:
-			curOut['sf-pos'] = positions[i][1]
+			curOut['single-file-position'] = positions[i][1]
 		else:
-			curOut['sf-pos'] = -1
+			curOut['single-file-position'] = -1
 		points[i] = curOut
 	
+	out['features'] = ['PCA-x', 'PCA-y', 'TSNE-x', 'TSNE-y', 'rms', 'centroid', 'bandwidth', 'flatness', 'rolloff']
 	out['points'] = points
+
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
 
