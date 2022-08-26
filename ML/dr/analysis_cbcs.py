@@ -199,15 +199,17 @@ def save(F, PCA, TSNE, files, positions, output_file):
 		curOut = dict()
 		curOut['name'] = positions[i][0]
 		curOut['position'] = positions[i][1]
+		curOut['x'] = float(TSNE[i][0])
+		curOut['y'] = float(TSNE[i][1])
 		curOut['TSNE-x'] = float(TSNE[i][0])
 		curOut['TSNE-y'] = float(TSNE[i][1])
 		curOut['PCA-x'] = float(PCA[i][0])
 		curOut['PCA-y'] = float(PCA[i][1])
-		curOut['rms'] = F[i][0]
-		curOut['centroid'] = F[i][1]
-		curOut['bandwidth'] = F[i][2]
-		curOut['flatness'] = F[i][3]
-		curOut['rolloff'] = F[i][4]
+		curOut['rms'] = float(F[i][0])
+		curOut['centroid'] = float(F[i][1])
+		curOut['bandwidth'] = float(F[i][2])
+		curOut['flatness'] = float(F[i][3])
+		curOut['rolloff'] = float(F[i][4])
 
 		if len(files) == 1:
 			curOut['single-file-position'] = positions[i][1]

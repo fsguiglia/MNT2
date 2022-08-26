@@ -35,7 +35,6 @@ public:
 	void load(ofJson& json);
 	void loadData(ofJson& json);
 	void loadSingleFile(ofJson& json);
-
 	ofJson save();
 private:
 	PythonML _dr, _export;

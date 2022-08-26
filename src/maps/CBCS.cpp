@@ -113,7 +113,7 @@ void CBCS::updateDrawFbo()
 	ofVec2f scaledCursor = _cursor * ofVec2f(_width, _height);
 	//scaledCursor.x += x;
 	//scaledCursor.y += y;
-	ofDrawEllipse(scaledCursor, _radius * _width * 2, _radius * _height * 2);
+	if(_active) ofDrawEllipse(scaledCursor, _radius * _width * 2, _radius * _height * 2);
 
 	for (int i = 0; i < _selection.size(); i++)
 	{
