@@ -31,6 +31,7 @@ public:
 	int getMaxSamples();
 	void setRadius(float radius);
 	float getRadius();
+	pair<string, string> getSelectedFeatures();
 
 	void normalize();
 	void build();

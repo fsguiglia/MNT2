@@ -199,8 +199,6 @@ def save(F, PCA, TSNE, files, positions, output_file):
 		curOut = dict()
 		curOut['name'] = positions[i][0]
 		curOut['position'] = positions[i][1]
-		curOut['x'] = float(TSNE[i][0])
-		curOut['y'] = float(TSNE[i][1])
 		curOut['TSNE-x'] = float(TSNE[i][0])
 		curOut['TSNE-y'] = float(TSNE[i][1])
 		curOut['PCA-x'] = float(PCA[i][0])
@@ -218,6 +216,7 @@ def save(F, PCA, TSNE, files, positions, output_file):
 		points[i] = curOut
 	
 	out['features'] = ['PCA-x', 'PCA-y', 'TSNE-x', 'TSNE-y', 'rms', 'centroid', 'bandwidth', 'flatness', 'rolloff']
+	out['selected'] = ['TSNE-x', 'TSNE-y']
 	out['points'] = points
 
 	with open(output_file, 'w+') as f:

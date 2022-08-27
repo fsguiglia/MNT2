@@ -52,7 +52,6 @@ void PythonML::start()
 {
 	string command = _prefix + " " + _scriptPath;
 	command += " -f " + _inputFilePath;
-	cout << command << endl;
 	for (auto parameter : _parameters) command = command + " " + parameter.first + " " + ofToString(parameter.second);
 	system(command.c_str());
 	_running = true;

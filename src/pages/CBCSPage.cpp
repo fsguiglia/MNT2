@@ -29,20 +29,21 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont fon
 
 void CBCSPage::setupGui()
 {
-	_arrangeFolder = _gui->addFolder("Analyze");
+	_gui->addButton("Analyze")->setName("analyze");
+	_arrangeFolder = _gui->addFolder("Analysis settings");
 	_arrangeFolder->addToggle("Analyze complete files", true)->setName("complete");
-	_arrangeFolder->addButton("PCA")->setName("pca");
-	_arrangeFolder->addButton("t-SNE")->setName("tsne");
 	_arrangeFolder->addSlider("unit length", 100, 1000, _dr.getParameter("--unit_length"))->setName("--unit_length");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addButton("Normalize");
 	_arrangeFolder->collapse();
+	_gui->addBreak();
 	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
 	_gui->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
 	_gui->getSlider("units")->setPrecision(0);
 	_gui->addTextInput("address", getAddress());
+	_gui->addBreak();
 	_gui->addButton("Export single file")->setName("Export_file");
 	_gui->addButton("Export file list")->setName("Export_list");
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
@@ -57,7 +58,8 @@ void CBCSPage::setupGui()
 	_gui->setMaxHeight(ofGetHeight());
 	_gui->setEnabled(false);
 	_gui->setVisible(false);
-	_gui->update();
+
+	_sortGui->onDropdownEvent(this, &CBCSPage::dropDownEvent);
 }
 
 void CBCSPage::setupTsne()
@@ -131,20 +133,15 @@ void CBCSPage::updateOutput()
 	_gui->setVisible(_visible);
 	_gui->setEnabled(_visible);
 	_gui->update();
+
+	_sortGui->setVisible(_visible && _showSortGui);
+	_sortGui->setEnabled(_visible && _showSortGui);
+	_sortGui->update();
 }
 
 void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
-	if (e.target->getName() == "tsne")
-	{
-		_dr.setParameter("--technique", 0);
-		if (!_dr.getRunning() && !_export.getRunning()) _dr.start();
-	}
-	else if (e.target->getName() == "pca")
-	{
-		_dr.setParameter("--technique", 1);
-		if (!_dr.getRunning() && !_export.getRunning()) _dr.start();
-	}
+	if (e.target->getName() == "analyze")	if (!_dr.getRunning() && !_export.getRunning()) _dr.start();
 	else if (e.target->getName() == "Normalize")
 	{
 		_map.normalize();
@@ -220,6 +217,22 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 void CBCSPage::textInputEvent(ofxDatGuiTextInputEvent e)
 {
 	_address = e.text;
+}
+
+void CBCSPage::dropDownEvent(ofxDatGuiDropdownEvent e)
+{
+	pair<string, string> curFeatures = _map.getSelectedFeatures();
+	if (e.target->getName() == "sort-x")
+	{
+		e.target->setLabel("x:" + e.target->getSelected()->getLabel());
+		curFeatures.first = e.target->getSelected()->getLabel();
+	}
+	else if (e.target->getName() == "sort-y")
+	{
+		e.target->setLabel("y:" + e.target->getSelected()->getLabel());
+		curFeatures.second = e.target->getSelected()->getLabel();
+	}
+	_map.selectFeatures(curFeatures.first, curFeatures.second);
 }
 
 void CBCSPage::mouseMoved(int x, int y)
@@ -338,10 +351,14 @@ void CBCSPage::load(ofJson & json)
 
 void CBCSPage::loadData(ofJson & json)
 {
+	bool hasFeatures = _map.getFeatures().size() > 0;
 	vector<string> features;
 	ofJson featureList = json["features"];
+	ofJson selected = json["selected"];
+
 	for (auto& feature : featureList) features.push_back(feature);
 	_map.setFeatures(features);
+
 	for (ofJson point : json["points"])
 	{
 		Point curPoint;
@@ -349,12 +366,23 @@ void CBCSPage::loadData(ofJson & json)
 		curPoint.setName(point["name"].get<string>());
 		curPoint.setValue("position", point["position"]);
 		curPoint.setValue("single-file-position", point["single-file-position"]);
-		//features
 		for (auto& feature : _map.getFeatures()) curPoint.setValue(feature, point[feature]);
-		curPoint.setPosition(point["x"], point["y"]);
 		_map.addPoint(curPoint);
 	}
-	_map.build();
+
+	_map.selectFeatures(selected[0], selected[1]);
+	
+	if (hasFeatures) {
+		_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
+		_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
+	}
+	_sortGui->addDropdown("x", _map.getFeatures())->setName("sort-x");
+	_sortGui->addDropdown("y", _map.getFeatures())->setName("sort-y");
+	_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+	_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
+	_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
+	_sortGui->update();
+	_showSortGui = true;
 }
 
 void CBCSPage::loadSingleFile(ofJson & json)
@@ -375,6 +403,8 @@ ofJson CBCSPage::save()
 	vector<string> features = _map.getFeatures();
 
 	for (auto& feature : features) jSave["features"].push_back(feature);
+	jSave["selected"].push_back(_map.getSelectedFeatures().first);
+	jSave["selected"].push_back(_map.getSelectedFeatures().second);
 	for (int i = 0; i < points.size(); i++)
 	{
 		ofJson curPoint;

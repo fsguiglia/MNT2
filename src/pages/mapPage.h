@@ -28,9 +28,10 @@ public:
 
 protected:
 	T _map;
+	ofxDatGui* _sortGui;
 	ofxDatGuiFolder* _controlFolder;
 	ofxDatGuiFolder* _arrangeFolder;
-	bool _mouseControl, _useGlobalParameters;
+	bool _mouseControl, _useGlobalParameters, _showSortGui;
 	int _lastSelectedPoint;
 	float _minClickDistance;
 };
@@ -45,6 +46,7 @@ inline MapPage<T>::MapPage()
 	_parameterLearn = false;
 	_inside = false;
 	_visible = false;
+	_showSortGui = false;
 }
 
 template<typename T>
@@ -71,6 +73,16 @@ inline void MapPage<T>::setupGui(string name)
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
 	_controlFolder->collapse();
 	_gui->addBreak();
+
+	_sortGui = new ofxDatGui(ofxDatGuiAnchor::TOP_LEFT);
+	_sortGui->addHeader("Select features")->setName("Header");
+	_sortGui->addFooter();
+	_sortGui->getFooter()->setLabelWhenExpanded("CLOSE");
+	_sortGui->getFooter()->setLabelWhenCollapsed("SORT");
+	_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+	_sortGui->setOpacity(0.2);
+	_sortGui->setAutoDraw(false);
+	_sortGui->collapse();
 }
 
 template<typename T>
@@ -101,6 +113,10 @@ inline void MapPage<T>::update()
 	_gui->setVisible(_visible);
 	_gui->setEnabled(_visible);
 	_gui->update();
+	
+	_sortGui->setVisible(_showSortGui && _visible);
+	_sortGui->setEnabled(_showSortGui && _visible);
+	_sortGui->update();
 }
 
 template<typename T>
@@ -111,6 +127,12 @@ inline void MapPage<T>::draw()
 	ofSetColor(50);
 	ofDrawRectangle(_position.x + _position.getWidth(), 0, _guiWidth, _position.getHeight());
 	_gui->draw();
+	if (_showSortGui)
+	{
+		if (_sortGui->getExpanded()) _sortGui->setOpacity(1);
+		else _sortGui->setOpacity(0.2);
+		_sortGui->draw();
+	}
 	ofPopStyle();
 }
 

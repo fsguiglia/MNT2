@@ -20,6 +20,7 @@ public:
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
 	void textInputEvent(ofxDatGuiTextInputEvent e);
+	void dropDownEvent(ofxDatGuiDropdownEvent e);
 
 	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);

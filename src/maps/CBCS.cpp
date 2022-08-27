@@ -143,6 +143,16 @@ void CBCS::selectFeatures(string xFeature, string yFeature)
 {
 	_selectedFeatures.first = xFeature;
 	_selectedFeatures.second = yFeature;
+	_positions.clear();
+	for (auto& point : _points)
+	{
+		ofVec2f curPos;
+		curPos.x = point.getValue(xFeature);
+		curPos.y = point.getValue(yFeature);
+		_positions.push_back(curPos);
+		point.setPosition(curPos);
+	}
+	build();
 }
 
 void CBCS::setFeatures(vector<string> features)
@@ -197,8 +207,15 @@ float CBCS::getRadius()
 	return _radius;
 }
 
+pair<string, string> CBCS::getSelectedFeatures()
+{
+	return _selectedFeatures;
+}
+
 void CBCS::normalize()
 {
+	_positions.clear();
+	for (auto& point : _points) _positions.push_back(point.getPosition());
 	float minX = _positions[0].x;
 	float maxX = _positions[0].x;
 	float minY = _positions[0].y;
