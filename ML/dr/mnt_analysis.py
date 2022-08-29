@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-import analysis_cbcs
+import analysis_audio
 import analysis_nni
 import pca_nni
 import single_file
@@ -11,7 +11,7 @@ def main():
 	script = int(args['script'])
 	
 	if script == 0:
-		analysis_cbcs.analyze(args)
+		analysis_audio.analyze(args)
 	elif script == 1:
 		analysis_nni.analyze(args)
 	elif script == 2:

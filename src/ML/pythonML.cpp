@@ -81,8 +81,8 @@ ofJson PythonML::getData()
 
 void PythonML::end()
 {
-	//ofFile::removeFile(_inputFilePath);
-	//ofFile::removeFile(_outputFilePath);
+	ofFile::removeFile(_inputFilePath);
+	ofFile::removeFile(_outputFilePath);
 	_running = false;
 	_completed = false;
 }

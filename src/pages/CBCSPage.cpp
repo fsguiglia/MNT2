@@ -351,38 +351,41 @@ void CBCSPage::load(ofJson & json)
 
 void CBCSPage::loadData(ofJson & json)
 {
-	bool hasFeatures = _map.getFeatures().size() > 0;
-	vector<string> features;
-	ofJson featureList = json["features"];
-	ofJson selected = json["selected"];
-
-	for (auto& feature : featureList) features.push_back(feature);
-	_map.setFeatures(features);
-
-	for (ofJson point : json["points"])
+	if (json.find("error") == json.end())
 	{
-		Point curPoint;
-		//info
-		curPoint.setName(point["name"].get<string>());
-		curPoint.setValue("position", point["position"]);
-		curPoint.setValue("single-file-position", point["single-file-position"]);
-		for (auto& feature : _map.getFeatures()) curPoint.setValue(feature, point[feature]);
-		_map.addPoint(curPoint);
-	}
+		bool hasFeatures = _map.getFeatures().size() > 0;
+		vector<string> features;
+		ofJson featureList = json["features"];
+		ofJson selected = json["selected"];
 
-	_map.selectFeatures(selected[0], selected[1]);
-	
-	if (hasFeatures) {
-		_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
-		_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
+		for (auto& feature : featureList) features.push_back(feature);
+		_map.setFeatures(features);
+
+		for (ofJson point : json["points"])
+		{
+			Point curPoint;
+			//info
+			curPoint.setName(point["name"].get<string>());
+			curPoint.setValue("position", point["position"]);
+			curPoint.setValue("single-file-position", point["single-file-position"]);
+			for (auto& feature : _map.getFeatures()) curPoint.setValue(feature, point[feature]);
+			_map.addPoint(curPoint);
+		}
+
+		_map.selectFeatures(selected[0], selected[1]);
+
+		if (hasFeatures) {
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
+		}
+		_sortGui->addDropdown("x", _map.getFeatures())->setName("sort-x");
+		_sortGui->addDropdown("y", _map.getFeatures())->setName("sort-y");
+		_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+		_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
+		_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
+		_sortGui->update();
+		_showSortGui = true;
 	}
-	_sortGui->addDropdown("x", _map.getFeatures())->setName("sort-x");
-	_sortGui->addDropdown("y", _map.getFeatures())->setName("sort-y");
-	_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
-	_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
-	_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
-	_sortGui->update();
-	_showSortGui = true;
 }
 
 void CBCSPage::loadSingleFile(ofJson & json)

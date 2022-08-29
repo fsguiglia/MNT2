@@ -86,8 +86,8 @@ def analyze(args):
 		save(F, PCA, TSNE, files, file_position, new_path)
 		manager.stop()
 	except Exception as ex:
-		raise
-		#save_empty_file(error, new_path)
+		#raise
+		save_empty_file(error, new_path)
 		
 def getListOfFiles(dirName, extensions):
 	listOfFile = os.listdir(dirName)
