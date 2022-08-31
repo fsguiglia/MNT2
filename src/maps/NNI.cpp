@@ -129,6 +129,30 @@ int NNI::addPoint(ofVec2f pos)
 	return _points.size();
 }
 
+void NNI::generatePoints()
+{
+	vector<Point> newPoints;
+	for (int i = 0; i < _points.size() - 1; i++)
+	{
+		for (int j = i; j < _points.size(); j++)
+		{
+			if (i != j)
+			{
+				Point point;
+				ofVec2f curPosition = _points[i].getPosition() + _points[j].getPosition();
+				curPosition /= 2;
+				point.setPosition(curPosition);
+				point.setValues(interpolate(curPosition));
+				newPoints.push_back(point);
+			}
+		}
+	}
+	for (auto& point : newPoints)
+	{
+		BaseMap::addPoint(point);
+	}
+}
+
 void NNI::setCursor(ofVec2f cursor)
 {
 	_cursor = cursor;

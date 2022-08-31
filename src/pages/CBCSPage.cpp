@@ -22,23 +22,19 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont fon
 	setAddress("/" + name);
 	
 	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
-	setupTsne();
+	setupAnalysis();
 	setupExport();
 	setupGui();
 }
 
 void CBCSPage::setupGui()
 {
-	_gui->addButton("Analyze")->setName("analyze");
-	_arrangeFolder = _gui->addFolder("Analysis settings");
 	_arrangeFolder->addToggle("Analyze complete files", true)->setName("complete");
 	_arrangeFolder->addSlider("unit length", 100, 1000, _dr.getParameter("--unit_length"))->setName("--unit_length");
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
-	_arrangeFolder->addButton("Normalize");
-	_arrangeFolder->collapse();
-	_gui->addBreak();
+	
 	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
 	_gui->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
 	_gui->getSlider("units")->setPrecision(0);
@@ -62,17 +58,17 @@ void CBCSPage::setupGui()
 	_sortGui->onDropdownEvent(this, &CBCSPage::dropDownEvent);
 }
 
-void CBCSPage::setupTsne()
+void CBCSPage::setupAnalysis()
 {
 	_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //py
 	//_dr.setup("../ML/dr/mnt_analysis.exe", "cbcs"); //exe
 	map<string, float> drParameters;
-	drParameters["--script"] = 0;
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;
 	drParameters["--iterations"] = 1000;
 	drParameters["--cbcs_mode"] = 1;
 	drParameters["--unit_length"] = 500;
+	drParameters["--script"] = 0;
 	_dr.setParameters(drParameters);
 }
 
@@ -81,7 +77,7 @@ void CBCSPage::setupExport()
 	_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
 	//_dr.setup("../ML/dr/single_file.exe", "export"); //exe
 	_export.setParameter("--unit_length", _dr.getParameter("--unit_length"));
-	_export.setParameter("--script", 3);
+	_export.setParameter("--script", 2);
 }
 
 void CBCSPage::update()

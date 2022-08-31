@@ -10,7 +10,7 @@ public:
 	CBCSPage();
 	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 50);
 	void setupGui();
-	void setupTsne();
+	void setupAnalysis();
 	void setupExport();
 
 	void update();

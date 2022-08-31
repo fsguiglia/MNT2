@@ -19,8 +19,6 @@ public:
 	void addPoint(Point point);
 	void clearPoints();
 	void selectFeatures(string xFeature, string yFeature);
-	void setFeatures(vector<string> features);
-	vector<string> getFeatures();
 
 	void setCursor(ofVec2f cursor);
 	void setCursor(ofVec2f cursor, int index);
@@ -31,7 +29,6 @@ public:
 	int getMaxSamples();
 	void setRadius(float radius);
 	float getRadius();
-	pair<string, string> getSelectedFeatures();
 
 	void normalize();
 	void build();
@@ -41,9 +38,6 @@ public:
 	vector<pair<string, float>> getOutput();
 
 private:	
-	vector<string> _features;
-	pair<string, string> _selectedFeatures;
-	
 	vector<ofVec2f> _positions;
 	vector<int> _selection;
 	ofx::KDTree<ofVec2f> _hash;

@@ -73,6 +73,11 @@ inline void MapPage<T>::setupGui(string name)
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
 	_controlFolder->collapse();
 	_gui->addBreak();
+	_gui->addButton("Analyze")->setName("analyze");
+	_gui->addButton("Normalize")->setName("normalize");
+	_arrangeFolder = _gui->addFolder("Analysis settings");
+	_arrangeFolder->collapse();
+	_gui->addBreak();
 
 	_sortGui = new ofxDatGui(ofxDatGuiAnchor::TOP_LEFT);
 	_sortGui->addHeader("Select features")->setName("Header");

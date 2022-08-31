@@ -9,8 +9,7 @@ public:
 	NNIPage();
 	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 50);
 	void setupGui();
-	void setupTsne();
-	void setupPca();
+	void setupAnalysis();
 
 	void update();
 
@@ -30,6 +29,5 @@ public:
 	ofJson save();
 
 private:
-		PythonML _pca;
-		PythonML _audioDr;
+		PythonML _dr;
 };

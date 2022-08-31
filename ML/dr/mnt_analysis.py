@@ -2,7 +2,7 @@ import argparse
 import sys
 
 import analysis_audio
-import analysis_nni
+import analysis_midi
 import pca_nni
 import single_file
 
@@ -13,10 +13,8 @@ def main():
 	if script == 0:
 		analysis_audio.analyze(args)
 	elif script == 1:
-		analysis_nni.analyze(args)
+		analysis_midi.analyze(args)
 	elif script == 2:
-		pca_nni.analyze(args)
-	elif script == 3:
 		single_file.export(args)
 		
 def process_arguments(args):
@@ -32,11 +30,6 @@ def process_arguments(args):
 						action='store',
 						help='path to the input/output file or directory')
 
-	#dimensionality reduction technique----------------------
-	parser.add_argument('-t', '--technique',
-					 action='store',
-					 default=1,
-					 help='Dimensionality reduction technique (0: tsne, 1: pca)')
 	#tsne----------------------------------------------------
 	parser.add_argument('-d', '--dimentions',
 						action='store',
@@ -65,7 +58,7 @@ def process_arguments(args):
 
 	parser.add_argument('-osr', '--output_sample_rate',
 						action='store',
-						default=22500,
+						default=44100,
 						help='Output sample rate (default: 44100)')
 						
 	parser.add_argument('-ws', '--window_size',

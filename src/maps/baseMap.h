@@ -37,6 +37,10 @@ public:
 	void setDrawSelected(bool drawSelected);
 	int size();
 
+	void selectFeatures(string xFeature, string yFeature);
+	void setFeatures(vector<string> features);
+	vector<string> getFeatures();
+	pair<string, string> getSelectedFeatures();
 protected:
 	int addPoint(T point);
 	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity=100);
@@ -48,6 +52,9 @@ protected:
 	float _randomSpeed;
 	int _width, _height, _lastSelectedMs , _lastSelected;
 	vector<ofColor> _colorPallete;
+
+	vector<string> _features;
+	pair<string, string> _selectedFeatures;
 };
 
 template<typename T>
@@ -290,6 +297,42 @@ template<typename T>
 int BaseMap<T>::size()
 {
 	 return _points.size();
+}
+
+template<typename T>
+inline void BaseMap<T>::selectFeatures(string xFeature, string yFeature)
+{
+	bool valid = std::find(_features.begin(), features.end(), xFeature) != _features.end();
+	valid = valid && std::find(_features.begin(), features.end(), yFeature) != _features.end();
+	if (valid)
+	{
+		_selectedFeatures.first = xFeature;
+		_selectedFeatures.second = yFeature;
+		for (auto& point : _points)
+		{
+			ofVec2f position;
+			position.x = point.getValue(_selectedFeatures.first);
+			position.x = point.getValue(_selectedFeature.second);
+		}
+	}
+}
+
+template<typename T>
+inline void BaseMap<T>::setFeatures(vector<string> features)
+{
+	_features = features;
+}
+
+template<typename T>
+inline vector<string> BaseMap<T>::getFeatures()
+{
+	return _features;
+}
+
+template<typename T>
+inline pair<string, string> BaseMap<T>::getSelectedFeatures()
+{
+	return _selectedFeatures;
 }
 
 template<typename T>

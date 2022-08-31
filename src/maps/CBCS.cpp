@@ -155,16 +155,6 @@ void CBCS::selectFeatures(string xFeature, string yFeature)
 	build();
 }
 
-void CBCS::setFeatures(vector<string> features)
-{
-	_features = features;
-}
-
-vector<string> CBCS::getFeatures()
-{
-	return _features;
-}
-
 void CBCS::setCursor(ofVec2f cursor)
 {
 	_cursor = cursor;
@@ -205,11 +195,6 @@ void CBCS::setRadius(float radius)
 float CBCS::getRadius()
 {
 	return _radius;
-}
-
-pair<string, string> CBCS::getSelectedFeatures()
-{
-	return _selectedFeatures;
 }
 
 void CBCS::normalize()

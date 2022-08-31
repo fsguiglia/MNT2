@@ -18,23 +18,19 @@ void NNIPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font
 	_map.setDrawSelected(true);
 	
 	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
-	setupPca();
-	setupTsne();
+	setupAnalysis();
 	setupGui();
 }
 
 void NNIPage::setupGui()
 {
-	_arrangeFolder = _gui->addFolder("arrange");
-	_arrangeFolder->addButton("PCA")->setName("pca");
-	_arrangeFolder->addButton("PCA (Audio)")->setName("pca_audio");
-	_arrangeFolder->addButton("t-SNE (Audio)")->setName("tsne_audio");
-	_arrangeFolder->addSlider("perplexity", 5, 50, _audioDr.getParameter("--perplexity"))->setName("--perplexity");
-	_arrangeFolder->addSlider("learning rate", 10, 1000, _audioDr.getParameter("--learning_rate"))->setName("--learning_rate");
-	_arrangeFolder->addSlider("iterations", 250, 2500, _audioDr.getParameter("--iterations"))->setName("--iterations");
+	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
+	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
+	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addBreak();
-	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->collapse();
+	_gui->addToggle("randomize");
+	_gui->addButton("generate");
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
@@ -55,39 +51,24 @@ void NNIPage::setupGui()
 	_gui->update();
 }
 
-void NNIPage::setupTsne()
+void NNIPage::setupAnalysis()
 {
-	_audioDr.setup("../../ML/dr/mnt_analysis.py", "nni_audio", "python"); //py
+	_dr.setup("../../ML/dr/mnt_analysis.py", "nni", "python"); //py
 	//_audioDr.setup("../ML/dr/mnt_analysis.exe", "nni_audio"); //exe
-	map<string, float> audioDrParameters;
-	audioDrParameters["--script"] = 1;
-	audioDrParameters["--perplexity"] = 5;
-	audioDrParameters["--learning_rate"] = 15;
-	audioDrParameters["--iterations"] = 1000;
-	_audioDr.setParameters(audioDrParameters);
-}
-
-void NNIPage::setupPca()
-{
-	_pca.setup("../../ML/dr/mnt_analysis.py", "pca_nni", "python"); //py
-	//_pca.setup("../ML/dr/mnt_analysis.exe", "pca_nni"); //exe
-	map<string, float> audioDrParameters;
-	audioDrParameters["--script"] = 2;
-	_pca.setParameters(audioDrParameters);
+	map<string, float> drParameters;
+	drParameters["--perplexity"] = 5;
+	drParameters["--learning_rate"] = 15;
+	drParameters["--iterations"] = 1000;
+	drParameters["--script"] = 1;
+	_dr.setParameters(drParameters);
 }
 
 void NNIPage::update()
 {
-	if (_audioDr.getRunning())
+	if (_dr.getRunning())
 	{
-		if (_audioDr.getCompleted()) load(_audioDr.getData());
-		else _audioDr.check();
-	}
-	
-	if (_pca.getRunning())
-	{
-		if (_pca.getCompleted()) load(_pca.getData());
-		else _pca.check();
+		if (_dr.getCompleted()) load(_dr.getData());
+		else _dr.check();
 	}
 
 	MapPage::update();
@@ -95,23 +76,22 @@ void NNIPage::update()
 
 void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
-	if (e.target->getName() == "pca")
+	if (e.target->getName() == "analyze")
 	{
-		if (!_pca.getRunning()) _pca.start(save());
-	}
-	else if (e.target->getName() == "tsne_audio")
-	{
-		_audioDr.setParameter("--technique", 0);
-		if (!_audioDr.getRunning()) _audioDr.start(save());
-	}
-	else if (e.target->getName() == "pca_audio")
-	{
-		_audioDr.setParameter("--technique", 1);
-		if (!_audioDr.getRunning()) _audioDr.start(save());
+		if (_map.getPoints().size() < 6) _map.generatePoints();
+		if (_dr.getParameter("--perplexity") >= _map.getPoints().size())
+		{
+			_dr.setParameter("--perplexity", _map.getPoints().size() - 1);
+		}
+		if (!_dr.getRunning()) _dr.start(save());
 	}
 	else if (e.target->getName() == "clearMIDI")
 	{
 		clearMidiMap();
+	}
+	else if (e.target->getName() == "generate")
+	{
+		_map.generatePoints();
 	}
 }
 
@@ -121,7 +101,7 @@ void NNIPage::sliderEvent(ofxDatGuiSliderEvent e)
 
 	if (name == "perplexity" || name == "learning rate" || name == "iterations")
 	{
-		_audioDr.setParameter(name, e.value);
+		_dr.setParameter(name, e.value);
 	}
 	else if (name == "x" || name == "y")
 	{

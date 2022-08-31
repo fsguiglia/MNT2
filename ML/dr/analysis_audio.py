@@ -10,8 +10,6 @@ import enlighten
 
 import os
 import easygui
-import argparse
-import sys
 import json
 import time
 

@@ -1323,6 +1323,11 @@ void ofApp::keyPressed(int key){
 }
 
 void ofApp::keyReleased(int key){
+	if (_intro)
+	{
+		_intro = false;
+		_introSequence.clear();
+	}
 	switch (key)
 	{
 	case('L'):
