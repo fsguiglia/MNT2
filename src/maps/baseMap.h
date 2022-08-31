@@ -201,7 +201,7 @@ void BaseMap<T>::addGlobalParameter(string parameter, float value)
 		_parameters[parameter] = value;
 		for (auto& point : _points)
 		{
-			if (!point.hasValue(parameter)) point.setValue(parameter, value);
+			if (!point.hasParameter(parameter)) point.setParameter(parameter, value);
 		}
 	}
 }
@@ -216,7 +216,7 @@ template<typename T>
 void BaseMap<T>::removeGlobalParameter(string parameter)
 {
 	if (_parameters.find(parameter) != _parameters.end()) _parameters.erase(parameter);
-	for (auto& point : _points) point.deleteValue(parameter);
+	for (auto& point : _points) point.deleteParameter(parameter);
 }
 
 template<typename T>
@@ -228,20 +228,20 @@ inline void BaseMap<T>::clearGlobalParameters()
 template<typename T>
 void BaseMap<T>::addPointParameter(int index, string parameter, float value)
 {
-	if (!_points[index].hasValue(parameter)) _points[index].setValue(parameter, value);
+	if (!_points[index].hasParameter(parameter)) _points[index].setParameter(parameter, value);
 }
 
 
 template<typename T>
 void BaseMap<T>::setPointParameter(int index, string parameter, float value)
 {
-	if (_points[index].hasValue(parameter)) _points[index].setValue(parameter, value);
+	if (_points[index].hasParameter(parameter)) _points[index].setParameter(parameter, value);
 }
 
 template<typename T>
 void BaseMap<T>::removePointParameter(int index, string parameter)
 {
-	_points[index].deleteValue(parameter);
+	_points[index].deleteParameter(parameter);
 }
 
 template<typename T>
@@ -311,8 +311,8 @@ inline void BaseMap<T>::selectFeatures(string xFeature, string yFeature)
 		for (auto& point : _points)
 		{
 			ofVec2f position;
-			position.x = point.getValue(_selectedFeatures.first);
-			position.x = point.getValue(_selectedFeature.second);
+			position.x = point.getFeature(_selectedFeatures.first);
+			position.x = point.getFeature(_selectedFeature.second);
 		}
 	}
 }

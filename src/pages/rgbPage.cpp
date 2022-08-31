@@ -194,7 +194,7 @@ void RGBPage::textInputEvent(ofxDatGuiTextInputEvent e)
 void RGBPage::updateSelected(int selected, RGBPoint point)
 {
 	_gui->clearRemovableSliders();
-	for (auto value : point.getValues())
+	for (auto value : point.getParameters())
 	{
 		vector<string> split = ofSplitString(value.first, "/");
 		string sliderLabel = "ch" + split[0] + "/cc" + split[1];
@@ -382,7 +382,7 @@ ofJson RGBPage::save()
 		curPoint["height"] = points[i].getHeight();
 		curPoint["trigger"] = points[i].getTrigger();
 		curPoint["image_path"] = points[i].getImagePath();
-		for (auto parameter : points[i].getValues())
+		for (auto parameter : points[i].getParameters())
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}

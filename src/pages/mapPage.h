@@ -185,7 +185,7 @@ inline void MapPage<T>::moduleMIDIIn(string port, int channel, int control, floa
 		if (lastSelected != -1)
 		{
 			if (_useGlobalParameters) curParameters = _map.getParameters();
-			else curParameters = _map.getPoint(lastSelected).getValues();
+			else curParameters = _map.getPoint(lastSelected).getParameters();
 			if (curParameters.find(parameterName) == curParameters.end())
 			{
 				if (_useGlobalParameters) _map.addGlobalParameter(parameterName, value);

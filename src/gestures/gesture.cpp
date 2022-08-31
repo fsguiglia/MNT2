@@ -8,9 +8,9 @@ Gesture::Gesture()
 
 void Gesture::addPoint(float time, Point point)
 {
-	point.setValue("t", time);
-	if(size() > 0) point.setValue("dt", time - _lastInputMs);
-	else point.setValue("dt", 0);
+	point.setParameter("t", time);
+	if(size() > 0) point.setParameter("dt", time - _lastInputMs);
+	else point.setParameter("dt", 0);
 	addPoint(point);
 	_lastInputMs = time;
 }
@@ -61,7 +61,7 @@ void Gesture::sort()
 		for (int i = 0; i < _points.size(); i++)
 		{
 			pair<int, int> curValue;
-			curValue.first = _points[i].getValue("t");
+			curValue.first = _points[i].getParameter("t");
 			curValue.second = i;
 			timeStamps.push_back(curValue);
 		}
@@ -70,8 +70,8 @@ void Gesture::sort()
 		vector<Point> sorted;
 		for (auto time : timeStamps) sorted.push_back(_points[time.second]);
 		int firstValue = timeStamps[0].first;
-		for (auto& point : _points)	point.setValue("t", point.getValue("t") - firstValue);
-		_lengthMs = _points[_points.size() - 1].getValue("t");
+		for (auto& point : _points)	point.setParameter("t", point.getParameter("t") - firstValue);
+		_lengthMs = _points[_points.size() - 1].getParameter("t");
 	}
 }
 
@@ -81,14 +81,14 @@ void Gesture::normalizeTimes()
 	float max = NULL;
 	for (auto point : _points)
 	{
-		float curTime = point.getValue("t");
+		float curTime = point.getParameter("t");
 		if (min == NULL || curTime < min) min = curTime;
 		if (max == NULL || curTime > max) max = curTime;
 	}
 	for (auto& point : _points)
 	{
-		float normalized = (point.getValue("t") - min) / (max - min);
-		point.setValue("t", normalized);
+		float normalized = (point.getParameter("t") - min) / (max - min);
+		point.setParameter("t", normalized);
 	}
 }
 
@@ -98,8 +98,8 @@ ofJson Gesture::save()
 	for (auto point : _points)
 	{
 		ofJson jPoint, parameters;
-		jPoint["time"] = point.getValue("t");
-		jPoint["dtime"] = point.getValue("dt");
+		jPoint["time"] = point.getParameter("t");
+		jPoint["dtime"] = point.getParameter("dt");
 		jPoint["x"] = point.getPosition().x;
 		jPoint["y"] = point.getPosition().y;
 		/*
@@ -121,8 +121,8 @@ void Gesture::load(ofJson loadFile, bool sortPoints, bool normalizeTimeStamps)
 	{
 		Point point;
 		point.setPosition(curPoint["x"], curPoint["y"]);
-		point.setValue("t", curPoint["time"]);
-		point.setValue("dt", curPoint["dtime"]);
+		point.setParameter("t", curPoint["time"]);
+		point.setParameter("dt", curPoint["dtime"]);
 		/*
 		//in case we want to load some other parameter
 		auto obj = curPoint["parameters"].get<ofJson::object_t>();

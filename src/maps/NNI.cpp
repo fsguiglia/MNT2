@@ -124,7 +124,7 @@ int NNI::addPoint(ofVec2f pos)
 {
 	Point point;
 	point.setPosition(pos);
-	point.setValues(_parameters);
+	point.setParameters(_parameters);
 	BaseMap::addPoint(point);
 	return _points.size();
 }
@@ -142,7 +142,7 @@ void NNI::generatePoints()
 				ofVec2f curPosition = _points[i].getPosition() + _points[j].getPosition();
 				curPosition /= 2;
 				point.setPosition(curPosition);
-				point.setValues(interpolate(curPosition));
+				point.setParameters(interpolate(curPosition));
 				newPoints.push_back(point);
 			}
 		}
@@ -255,7 +255,7 @@ map<string, float> NNI::interpolate(ofVec2f pos, bool renderNewZone)
 		float value = 0;
 		for (int i = 0; i < _points.size(); i++)
 		{
-			if(_points[i].hasValue(parameter.first)) value += _points[i].getValue(parameter.first) * weights[i];
+			if(_points[i].hasParameter(parameter.first)) value += _points[i].getParameter(parameter.first) * weights[i];
 		}
 		values[parameter.first] = value;
 	}

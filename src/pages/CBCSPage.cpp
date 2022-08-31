@@ -362,9 +362,9 @@ void CBCSPage::loadData(ofJson & json)
 			Point curPoint;
 			//info
 			curPoint.setName(point["name"].get<string>());
-			curPoint.setValue("position", point["position"]);
-			curPoint.setValue("single-file-position", point["single-file-position"]);
-			for (auto& feature : _map.getFeatures()) curPoint.setValue(feature, point[feature]);
+			curPoint.setFeature("position", point["position"]);
+			curPoint.setFeature("single-file-position", point["single-file-position"]);
+			for (auto& feature : _map.getFeatures()) curPoint.setFeature(feature, point[feature]);
 			_map.addPoint(curPoint);
 		}
 
@@ -390,7 +390,7 @@ void CBCSPage::loadSingleFile(ofJson & json)
 	{
 		Point curPoint = _map.getPoint(i);
 		int offset = json["files"][curPoint.getName()];
-		int curPosition = offset + curPoint.getValue("position");
+		int curPosition = offset + curPoint.getFeature("position");
 		_map.setPointParameter(i, "single-file-position", curPosition);
 	}
 }
@@ -410,9 +410,9 @@ ofJson CBCSPage::save()
 		curPoint["x"] = points[i].getPosition().x;
 		curPoint["y"] = points[i].getPosition().y;
 		curPoint["name"] = points[i].getName();
-		curPoint["position"] = points[i].getValue("position");
-		curPoint["single-file-position"] = points[i].getValue("single-file-position");
-		for (auto& feature : features) curPoint[feature] = points[i].getValue(feature);
+		curPoint["position"] = points[i].getFeature("position");
+		curPoint["single-file-position"] = points[i].getFeature("single-file-position");
+		for (auto& feature : features) curPoint[feature] = points[i].getFeature(feature);
 		jSave["points"].push_back(curPoint);
 	}
 

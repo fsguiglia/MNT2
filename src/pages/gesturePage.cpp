@@ -244,7 +244,7 @@ void GesturePage::play()
 		Point curPoint = _playGesture.getPoint(_playGestureIndex);
 		bool playNext = false;
 		if (_playGestureIndex == 0) playNext = true;
-		else if (ofGetElapsedTimeMillis() - _lastPointTime >= curPoint.getValue("dt")) playNext = true;
+		else if (ofGetElapsedTimeMillis() - _lastPointTime >= curPoint.getParameter("dt")) playNext = true;
 		if (playNext)
 		{
 			_cursor = curPoint.getPosition();

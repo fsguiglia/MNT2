@@ -188,7 +188,7 @@ void TriggerMap::updateTriggers()
 		{
 			if (_triggered[i] == 1)
 			{
-				for (auto value : _points[i].getValues())
+				for (auto value : _points[i].getParameters())
 				{
 					pair<string, float> curOutput;
 					curOutput.first = value.first;
@@ -198,7 +198,7 @@ void TriggerMap::updateTriggers()
 			}
 			else if (_triggered[i] == -1 && !_points[i].getSwitch())
 			{
-				for (auto value : _points[i].getValues())
+				for (auto value : _points[i].getParameters())
 				{
 					pair<string, float> curOutput;
 					curOutput.first = value.first;

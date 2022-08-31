@@ -184,7 +184,7 @@ void RGBMap::updateOutput()
 			
 			if (!prevState && curState)
 			{
-				for (auto value : point.getValues())
+				for (auto value : point.getParameters())
 				{
 					pair<string, float> curOutput;
 					curOutput.first = value.first; 
@@ -194,7 +194,7 @@ void RGBMap::updateOutput()
 			}
 			else if (prevState && !curState)
 			{
-				for (auto value : point.getValues())
+				for (auto value : point.getParameters())
 				{
 					pair<string, float> curOutput;
 					curOutput.first = value.first;
@@ -205,7 +205,7 @@ void RGBMap::updateOutput()
 		}
 		else
 		{
-			for (auto value : point.getValues())
+			for (auto value : point.getParameters())
 			{
 				pair<string, float> curOutput;
 				curOutput.first = value.first;

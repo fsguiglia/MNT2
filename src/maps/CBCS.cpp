@@ -48,9 +48,9 @@ void CBCS::update()
 				{
 					pair<string, float> multipleFiles, singleFile;
 					multipleFiles.first = ofToString(i) + ";" + _points[_selection[i]].getName();
-					multipleFiles.second = _points[_selection[i]].getValue("position");
+					multipleFiles.second = _points[_selection[i]].getFeature("position");
 					singleFile.first = "single-file-position";
-					singleFile.second = _points[_selection[i]].getValue("single-file-position");
+					singleFile.second = _points[_selection[i]].getFeature("single-file-position");
 					_output.push_back(multipleFiles);
 					_output.push_back(singleFile);
 				}
@@ -147,8 +147,8 @@ void CBCS::selectFeatures(string xFeature, string yFeature)
 	for (auto& point : _points)
 	{
 		ofVec2f curPos;
-		curPos.x = point.getValue(xFeature);
-		curPos.y = point.getValue(yFeature);
+		curPos.x = point.getFeature(xFeature);
+		curPos.y = point.getFeature(yFeature);
 		_positions.push_back(curPos);
 		point.setPosition(curPos);
 	}

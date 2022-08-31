@@ -174,7 +174,7 @@ void TriggerPage::textInputEvent(ofxDatGuiTextInputEvent e)
 void TriggerPage::updateSelected(int selected, Trigger trigger)
 {
 	_gui->clearRemovableSliders();
-	for (auto value : trigger.getValues())
+	for (auto value : trigger.getParameters())
 	{
 		vector<string> split = ofSplitString(value.first, "/");
 		string sliderLabel = "ch" + split[0] + "/cc" + split[1];
@@ -331,7 +331,7 @@ ofJson TriggerPage::save()
 		curPoint["radius"] = points[i].getRadius();
 		curPoint["threshold"] = points[i].getThreshold();
 		curPoint["switch"] = points[i].getSwitch();
-		for (auto parameter : points[i].getValues())
+		for (auto parameter : points[i].getParameters())
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}

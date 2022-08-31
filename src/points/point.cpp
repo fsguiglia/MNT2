@@ -21,19 +21,34 @@ void Point::setPosition(float x, float y)
 	setPosition(ofVec2f(x, y));
 }
 
-void Point::setValue(string key, float value)
+void Point::setParameter(string key, float value)
 {
 	_parameters[key] = value;
 }
 
-void Point::deleteValue(string key)
+void Point::setFeature(string key, float value)
+{
+	_features[key] = value;
+}
+
+void Point::deleteParameter(string key)
 {
 	if(_parameters.find(key) != _parameters.end()) _parameters.erase(key);
 }
 
-void Point::setValues(map<string, float> parameters)
+void Point::deleteFeature(string key)
+{
+	if (_features.find(key) != _features.end()) _features.erase(key);
+}
+
+void Point::setParameters(map<string, float> parameters)
 {
 	_parameters = parameters;
+}
+
+void Point::setFeatures(map<string, float> features)
+{
+	_features = features;
 }
 
 void Point::setName(string name)
@@ -51,23 +66,42 @@ ofVec2f Point::getPosition()
 	return _position;
 }
 
-bool Point::hasValue(string key)
+bool Point::hasFeature(string key)
+{
+	bool value = false;
+	if (_features.find(key) != _features.end()) value = true;
+	return value;
+}
+
+bool Point::hasParameter(string key)
 {
 	bool value = false;
 	if(_parameters.find(key) != _parameters.end()) value = true;
 	return value;
 }
 
-float Point::getValue(string key)
+float Point::getParameter(string key)
 {
 	float value = -1.0;
 	if (_parameters.find(key) != _parameters.end()) value = _parameters[key];
 	return value;
 }
 
-map<string, float> Point::getValues()
+float Point::getFeature(string key)
+{
+	float value = -1.0;
+	if (_features.find(key) != _features.end()) value = _features[key];
+	return value;
+}
+
+map<string, float> Point::getParameters()
 {
 	return _parameters;
+}
+
+map<string, float> Point::getFeatures()
+{
+	return _features;
 }
 
 vector<pair<float, int>> Point::getClosest(vector<ofVec2f>& positions, int n)

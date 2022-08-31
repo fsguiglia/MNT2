@@ -191,7 +191,7 @@ void NNIPage::textInputEvent(ofxDatGuiTextInputEvent e)
 
 void NNIPage::updateSelected(int selected, Point point)
 {
-	map<string, float> parameters = point.getValues();
+	map<string, float> parameters = point.getParameters();
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	for (auto parameter : parameters) _gui->getSlider(parameter.first)->setValue(parameter.second, false);
 	vector<pair<string, float>> curMessage;
@@ -344,7 +344,7 @@ ofJson NNIPage::save()
 		curPoint["id"] = i;
 		curPoint["pos"]["x"] = points[i].getPosition().x;
 		curPoint["pos"]["y"] = points[i].getPosition().y;
-		for (auto parameter : points[i].getValues())
+		for (auto parameter : points[i].getParameters())
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}
