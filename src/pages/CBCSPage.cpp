@@ -370,7 +370,8 @@ void CBCSPage::loadData(ofJson & json)
 
 		_map.selectFeatures(selected[0], selected[1]);
 
-		if (hasFeatures) {
+		if (hasFeatures) 
+		{
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
 		}

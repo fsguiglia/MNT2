@@ -129,6 +129,11 @@ int NNI::addPoint(ofVec2f pos)
 	return _points.size();
 }
 
+void NNI::addPoint(Point point)
+{
+	BaseMap::addPoint(point);
+}
+
 void NNI::generatePoints()
 {
 	vector<Point> newPoints;

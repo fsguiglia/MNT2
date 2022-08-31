@@ -302,8 +302,8 @@ int BaseMap<T>::size()
 template<typename T>
 inline void BaseMap<T>::selectFeatures(string xFeature, string yFeature)
 {
-	bool valid = std::find(_features.begin(), features.end(), xFeature) != _features.end();
-	valid = valid && std::find(_features.begin(), features.end(), yFeature) != _features.end();
+	bool valid = std::find(_features.begin(), _features.end(), xFeature) != _features.end();
+	valid = valid && std::find(_features.begin(), _features.end(), yFeature) != _features.end();
 	if (valid)
 	{
 		_selectedFeatures.first = xFeature;
@@ -312,7 +312,8 @@ inline void BaseMap<T>::selectFeatures(string xFeature, string yFeature)
 		{
 			ofVec2f position;
 			position.x = point.getFeature(_selectedFeatures.first);
-			position.x = point.getFeature(_selectedFeature.second);
+			position.x = point.getFeature(_selectedFeatures.second);
+			point.setPosition(position);
 		}
 	}
 }

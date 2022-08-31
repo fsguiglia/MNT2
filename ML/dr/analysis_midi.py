@@ -73,7 +73,7 @@ def get_data(D):
 	pos = np.array([]).reshape(0, 2)
 
 	for point in D['points']:
-			curPos = np.array([float(point['pos']['x']), float(point['pos']['x'])])
+			curPos = np.array([float(point['pos']['x']), float(point['pos']['y'])])
 			curPos = curPos.reshape(1, 2)
 			pos = np.concatenate((pos, curPos))
 			F = []
@@ -98,25 +98,34 @@ def min_max_normalize(a):
 def save(X, cc, pos, PCA, TSNE, output_file):
 	out = dict()
 	out['parameters'] = cc
+	out['features'] = cc + ['pos-x', 'pos-y', 'pca-x', 'pca-y', 'tsne-x', 'tsne-y']
 	points = []
 	for i in range(X.shape[0]):
 		curOut = dict()
 		parameters = dict()
+		features = dict()
+		curPos = dict()
 		for j, parameter in enumerate(cc):
 			parameters[parameter] = float(X[i][j])
-		dr = dict()
-		dr['pos_x'] = float(pos[i][0])
-		dr['pos_y'] = float(pos[i][1])
-		dr['pca_x'] = float(PCA[i][0])
-		dr['pca_y'] = float(PCA[i][1])
-		dr['tnse_x'] = float(TSNE[i][0])
-		dr['tnse_y'] = float(TSNE[i][1])
+			features[parameter] = float(X[i][j])
+		features['pos-x'] = float(pos[i][0])
+		features['pos-y'] = float(pos[i][1])
+		features['pca-x'] = float(PCA[i][0])
+		features['pca-y'] = float(PCA[i][1])
+		features['tsne-x'] = float(TSNE[i][0])
+		features['tsne-y'] = float(TSNE[i][1])
+		
+		curPos['x'] = float(pos[i][0])
+		curPos['y'] = float(pos[i][1])
 		
 		curOut['id'] = i
 		curOut['parameters'] = parameters
-		curOut['dr'] = dr
+		curOut['features'] = features
+		curOut['pos'] = curPos
+		
 		points.append(curOut)
 	out['points'] = points
+	out['selected'] = ['TSNE-x', 'TSNE-y']
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
 

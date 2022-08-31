@@ -79,7 +79,7 @@ inline void MapPage<T>::setupGui(string name)
 	_arrangeFolder->collapse();
 	_gui->addBreak();
 
-	_sortGui = new ofxDatGui(ofxDatGuiAnchor::TOP_LEFT);
+	_sortGui = new ScrollGui();
 	_sortGui->addHeader("Select features")->setName("Header");
 	_sortGui->addFooter();
 	_sortGui->getFooter()->setLabelWhenExpanded("CLOSE");
@@ -88,6 +88,7 @@ inline void MapPage<T>::setupGui(string name)
 	_sortGui->setOpacity(0.2);
 	_sortGui->setAutoDraw(false);
 	_sortGui->collapse();
+	_sortGui->setPosition(_position.x, 0);
 }
 
 template<typename T>
@@ -290,8 +291,11 @@ inline void MapPage<T>::moduleOSCIn(string address, float value)
 template<typename T>
 inline void MapPage<T>::load(ofJson jLoad)
 {
-	_map.setActive(jLoad["active"]);
-	_gui->getToggle("active")->setChecked(jLoad["active"]);
+	if (jLoad.find("active") != jLoad.end())
+	{
+		_map.setActive(jLoad["active"]);
+		_gui->getToggle("active")->setChecked(jLoad["active"]);
+	}
 }
 
 template<typename T>

@@ -294,42 +294,81 @@ void NNIPage::mouseScrolled(int scroll)
 
 void NNIPage::load(ofJson& json)
 {
-	//clear current NNI
-	_map.clearPoints();
-	_map.clearGlobalParameters();
-	_gui->clearRemovableSliders();
-
-	//load parameters to NNI and GUI
-	for (auto parameter : json["parameters"])
+	if (json.find("error") == json.end())
 	{
-		_map.addGlobalParameter(parameter, 0);
-		//GUI
-		 string sliderLabel = "ch" + ofSplitString(parameter, "/")[0] + "/cc" + ofSplitString(parameter, "/")[1];
-		_gui->addSlider(sliderLabel, 0., 1.);
-		_gui->getSlider(sliderLabel)->setName(parameter);
-		_gui->setRemovableSlider(parameter);
-		_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
-		_gui->setWidth(_guiWidth, 0.3);
-		_gui->setOpacity(0.5);
-	}
+		//clear current NNI
+		_map.clearPoints();
+		_map.clearGlobalParameters();
+		_gui->clearRemovableSliders();
 
-	for (ofJson site : json["points"])
-	{
-		for (auto parameter : _map.getParameters())
+		bool prevFeatures = _map.getFeatures().size() > 0;
+		bool curFeatures = json.find("features") != json.end();
+		vector<string> features;
+
+		//load parameters to NNI and GUI
+		for (auto parameter : json["parameters"])
 		{
-			_map.setGlobalParameter(parameter.first, site["parameters"][parameter.first]);
+			_map.addGlobalParameter(parameter, 0);
+			//GUI
+			string sliderLabel = "ch" + ofSplitString(parameter, "/")[0] + "/cc" + ofSplitString(parameter, "/")[1];
+			_gui->addSlider(sliderLabel, 0., 1.);
+			_gui->getSlider(sliderLabel)->setName(parameter);
+			_gui->setRemovableSlider(parameter);
+			_gui->getSlider(parameter)->setTheme(new ofxDatGuiThemeWireframe());
+			_gui->setWidth(_guiWidth, 0.3);
+			_gui->setOpacity(0.5);
 		}
-		_map.addPoint(ofVec2f(site["pos"]["x"], site["pos"]["y"]));
-	}
-	
-	if (_map.getPoints().size() != 0)
-	{
-		_map.setLastSelected(0, ofGetElapsedTimeMillis());
-		updateSelected(0, _map.getPoint(_map.getPoints().size() - 1));
-	}
 
-	loadMidiMap(json);
-	MapPage::load(json);
+		if (curFeatures)
+		{
+			for (auto& feature : json["features"]) features.push_back(feature);
+			_map.setFeatures(features);
+		}
+
+		for (ofJson point : json["points"])
+		{
+			Point curPoint;
+			for (auto& parameter : _map.getParameters())
+			{
+				curPoint.setParameter(parameter.first, point["parameters"][parameter.first]);
+			}
+			if (curFeatures)
+			{
+				for (auto& feature : _map.getFeatures())
+				{
+					cout << feature << endl;
+					curPoint.setFeature(feature, point["features"][feature]);
+				}
+			}
+			curPoint.setPosition(point["pos"]["x"], point["pos"]["y"]);
+			_map.addPoint(curPoint);
+		}
+		
+		if (prevFeatures) 
+		{
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
+		}
+		if (curFeatures)
+		{
+			_map.selectFeatures(json["selected"][0], json["selected"][1]);
+			_sortGui->addDropdown("x", _map.getFeatures())->setName("sort-x");
+			_sortGui->addDropdown("y", _map.getFeatures())->setName("sort-y");
+			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+			_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
+			_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
+			_sortGui->update();
+			_showSortGui = true;
+		}
+		if (_map.getPoints().size() != 0)
+		{
+			_map.setLastSelected(0, ofGetElapsedTimeMillis());
+			updateSelected(0, _map.getPoint(_map.getPoints().size() - 1));
+		}
+
+		loadMidiMap(json);
+		MapPage::load(json);
+	}
 }
 
 ofJson NNIPage::save()
