@@ -32,8 +32,10 @@ protected:
 	ofxDatGuiFolder* _controlFolder;
 	ofxDatGuiFolder* _arrangeFolder;
 	bool _mouseControl, _useGlobalParameters, _showSortGui;
+	pair<bool, bool> _selSortParameter;
 	int _lastSelectedPoint;
 	float _minClickDistance;
+	string _selSortParameterLabel;
 };
 
 template<typename T>
@@ -47,6 +49,8 @@ inline MapPage<T>::MapPage()
 	_inside = false;
 	_visible = false;
 	_showSortGui = false;
+	_selSortParameter = { false, false };
+	_selSortParameterLabel = "select cc";
 }
 
 template<typename T>
@@ -74,20 +78,16 @@ inline void MapPage<T>::setupGui(string name)
 	_controlFolder->collapse();
 	_gui->addBreak();
 	_gui->addButton("Analyze")->setName("analyze");
-	_gui->addButton("Normalize")->setName("normalize");
 	_arrangeFolder = _gui->addFolder("Analysis settings");
+	_arrangeFolder->addToggle("Select features")->setName("showSortGui");
 	_arrangeFolder->collapse();
 	_gui->addBreak();
 
 	_sortGui = new ScrollGui();
 	_sortGui->addHeader("Select features")->setName("Header");
-	_sortGui->addFooter();
-	_sortGui->getFooter()->setLabelWhenExpanded("CLOSE");
-	_sortGui->getFooter()->setLabelWhenCollapsed("SORT");
+	_sortGui->addButton("close gui")->setName("closeSortGui");
 	_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
-	_sortGui->setOpacity(0.2);
 	_sortGui->setAutoDraw(false);
-	_sortGui->collapse();
 	_sortGui->setPosition(_position.x, 0);
 }
 
@@ -135,8 +135,8 @@ inline void MapPage<T>::draw()
 	_gui->draw();
 	if (_showSortGui)
 	{
-		if (_sortGui->getExpanded()) _sortGui->setOpacity(1);
-		else _sortGui->setOpacity(0.2);
+		ofSetColor(255, 100);
+		ofDrawRectangle(_position.x, _position.y, _position.getWidth(), _position.getHeight());
 		_sortGui->draw();
 	}
 	ofPopStyle();

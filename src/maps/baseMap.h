@@ -41,6 +41,7 @@ public:
 	void setFeatures(vector<string> features);
 	vector<string> getFeatures();
 	pair<string, string> getSelectedFeatures();
+	void sortByParameter(int axis, string parameter);
 protected:
 	int addPoint(T point);
 	void drawSelected(int x, int y, int w, int h, ofTrueTypeFont& font, int opacity=100);
@@ -312,7 +313,7 @@ inline void BaseMap<T>::selectFeatures(string xFeature, string yFeature)
 		{
 			ofVec2f position;
 			position.x = point.getFeature(_selectedFeatures.first);
-			position.x = point.getFeature(_selectedFeatures.second);
+			position.y = point.getFeature(_selectedFeatures.second);
 			point.setPosition(position);
 		}
 	}
@@ -334,6 +335,20 @@ template<typename T>
 inline pair<string, string> BaseMap<T>::getSelectedFeatures()
 {
 	return _selectedFeatures;
+}
+
+template<typename T>
+inline void BaseMap<T>::sortByParameter(int axis, string parameter)
+{
+	for (auto& point : _points)
+	{
+		ofVec2f curPos = point.getPosition();
+		float curValue = 0;
+		if (point.hasParameter(parameter)) curValue = point.getParameter(parameter);
+		if (axis == 0) curPos.x = curValue;
+		else curPos.y = curValue;
+		point.setPosition(curPos);
+	}
 }
 
 template<typename T>

@@ -24,7 +24,8 @@ public:
 	void mousePressed(int x, int y, int button, bool doubleClick = false);
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
-	
+	void dropDownEvent(ofxDatGuiDropdownEvent e);
+
 	void load(ofJson& json);
 	ofJson save();
 

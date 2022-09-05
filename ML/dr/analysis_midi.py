@@ -98,7 +98,7 @@ def min_max_normalize(a):
 def save(X, cc, pos, PCA, TSNE, output_file):
 	out = dict()
 	out['parameters'] = cc
-	out['features'] = cc + ['pos-x', 'pos-y', 'pca-x', 'pca-y', 'tsne-x', 'tsne-y']
+	out['features'] = ['pos-x', 'pos-y', 'pca-x', 'pca-y', 'tsne-x', 'tsne-y']
 	points = []
 	for i in range(X.shape[0]):
 		curOut = dict()
@@ -107,7 +107,7 @@ def save(X, cc, pos, PCA, TSNE, output_file):
 		curPos = dict()
 		for j, parameter in enumerate(cc):
 			parameters[parameter] = float(X[i][j])
-			features[parameter] = float(X[i][j])
+			#features[parameter] = float(X[i][j])
 		features['pos-x'] = float(pos[i][0])
 		features['pos-y'] = float(pos[i][1])
 		features['pca-x'] = float(PCA[i][0])
@@ -125,7 +125,7 @@ def save(X, cc, pos, PCA, TSNE, output_file):
 		
 		points.append(curOut)
 	out['points'] = points
-	out['selected'] = ['TSNE-x', 'TSNE-y']
+	out['selected'] = ['tsne-x', 'tsne-y']
 	with open(output_file, 'w+') as f:
 		json.dump(out, f, indent = 4)
 

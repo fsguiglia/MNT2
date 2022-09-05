@@ -49,6 +49,9 @@ void NNIPage::setupGui()
 	_gui->setEnabled(false);
 	_gui->setVisible(false);
 	_gui->update();
+
+	_sortGui->onButtonEvent(this, &NNIPage::buttonEvent);
+	_sortGui->onDropdownEvent(this, &NNIPage::dropDownEvent);
 }
 
 void NNIPage::setupAnalysis()
@@ -92,6 +95,11 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 	else if (e.target->getName() == "generate")
 	{
 		_map.generatePoints();
+	}
+	else if (e.target->getName() == "closeSortGui")
+	{
+		_showSortGui = false;
+		_gui->getToggle("showSortGui")->setChecked(false);
 	}
 }
 
@@ -167,6 +175,7 @@ void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
 	}
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
+	if (e.target->getName() == "showSortGui") _showSortGui = e.checked;
 }
 
 void NNIPage::textInputEvent(ofxDatGuiTextInputEvent e)
@@ -202,48 +211,57 @@ void NNIPage::updateSelected(int selected, Point point)
 
 void NNIPage::mouseMoved(int x, int y)
 {
-	if (_visible)
+	if (!_showSortGui)
 	{
-		_inside = _position.inside(x, y);
-		if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position));
+		if (_visible)
+		{
+			_inside = _position.inside(x, y);
+			if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position));
+		}
 	}
 }
 
 void NNIPage::mouseDragged(int x, int y, int button)
 {
-	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
-	bool insideGui = guiPosition.inside(x, y);
-	_inside = _position.inside(x, y);
-	if (button < 2 && _inside && !insideGui) {
-		ofVec2f normPosition = normalize(ofVec2f(x, y), _position);
-		if(_lastSelectedPoint >= 0)	_map.movePoint(_lastSelectedPoint, normPosition);
+	if (!_showSortGui)
+	{
+		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
+		bool insideGui = guiPosition.inside(x, y);
+		_inside = _position.inside(x, y);
+		if (button < 2 && _inside && !insideGui) {
+			ofVec2f normPosition = normalize(ofVec2f(x, y), _position);
+			if (_lastSelectedPoint >= 0)	_map.movePoint(_lastSelectedPoint, normPosition);
+		}
 	}
 }
 
 void NNIPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
-	_inside = _position.inside(x, y);
-	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
-	bool insideGui = guiPosition.inside(x, y);
-	if (_inside && !insideGui)
+	if (!_showSortGui)
 	{
-		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (doubleClick) _map.addPoint(pos);
-		if (button < 2)
+		_inside = _position.inside(x, y);
+		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
+		bool insideGui = guiPosition.inside(x, y);
+		if (_inside && !insideGui)
 		{
-			int lastSelected = _map.getLastSelected();
-			array<float,2> selection = _map.getClosest(pos, false);
-			if (selection[1] < _minClickDistance)
+			ofVec2f pos = normalize(ofVec2f(x, y), _position);
+			if (doubleClick) _map.addPoint(pos);
+			if (button < 2)
 			{
-				_lastSelectedPoint = int(selection[0]);
-				_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
-				if (int(selection[0]) != lastSelected && _map.getPoints().size() > 0)
+				int lastSelected = _map.getLastSelected();
+				array<float, 2> selection = _map.getClosest(pos, false);
+				if (selection[1] < _minClickDistance)
 				{
-					Point point = _map.getPoint(int(selection[0]));
-					updateSelected(int(selection[0]), point);
+					_lastSelectedPoint = int(selection[0]);
+					_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
+					if (int(selection[0]) != lastSelected && _map.getPoints().size() > 0)
+					{
+						Point point = _map.getPoint(int(selection[0]));
+						updateSelected(int(selection[0]), point);
+					}
 				}
+				else _lastSelectedPoint = -1;
 			}
-			else _lastSelectedPoint = -1;
 		}
 	}
 }
@@ -254,7 +272,7 @@ void NNIPage::mouseReleased(int x, int y, int button)
 	_inside = _position.inside(x, y);
 	if (button == 2)
 	{
-		if (_inside)
+		if (_inside && !_showSortGui)
 		{
 			_map.removePoint(normalized);
 			if (_map.getPoints().size() > 0)
@@ -270,7 +288,6 @@ void NNIPage::mouseReleased(int x, int y, int button)
 		}
 		else
 		{
-			//_map.getClosest(normalized, true);
 			_gui->update();
 			_gui->updatePositions();
 			string removableSlider = _gui->inside(x, y);
@@ -282,8 +299,34 @@ void NNIPage::mouseReleased(int x, int y, int button)
 				_gui->update();
 			}
 		}
+		_lastSelectedPoint = -1;
 	}
-	_lastSelectedPoint = -1;
+	else if(button == 1)
+	{
+		if (_selSortParameter.first || _selSortParameter.second)
+		{
+			_gui->update();
+			_gui->updatePositions();
+			string removableSlider = _gui->inside(x, y);
+			if (removableSlider != "")
+			{
+				pair<string, string> curFeatures = _map.getSelectedFeatures();
+				if (std::find(_map.getFeatures().begin(), _map.getFeatures().end(), removableSlider) != _map.getFeatures().end())
+				{
+					if (_selSortParameter.first) 
+					{
+						_sortGui->getDropdown("sort-x")->setLabel("x:" + removableSlider);
+						_map.sortByParameter(0, removableSlider);
+					}
+					else if (_selSortParameter.second)
+					{
+						_sortGui->getDropdown("sort-y")->setLabel("y:" + removableSlider);
+						_map.sortByParameter(1, removableSlider);
+					}
+				}
+			}
+		}
+	}	
 }
 
 void NNIPage::mouseScrolled(int scroll)
@@ -291,12 +334,38 @@ void NNIPage::mouseScrolled(int scroll)
 	_gui->scroll(scroll);
 }
 
+void NNIPage::dropDownEvent(ofxDatGuiDropdownEvent e)
+{
+	string selected = e.target->getSelected()->getLabel();
+	if (selected == _selSortParameterLabel)
+	{
+		if (e.target->getName() == "sort-x") _selSortParameter.first = !_selSortParameter.first;
+		else if (e.target->getName() == "sort-y") _selSortParameter.second = !_selSortParameter.second;
+	}
+	else
+	{
+		pair<string, string> curFeatures = _map.getSelectedFeatures();
+		if (e.target->getName() == "sort-x")
+		{
+			curFeatures.first = selected;
+			selected = "x:" + selected;
+ 		}
+		else if (e.target->getName() == "sort-y")
+		{
+			curFeatures.second = selected;
+			selected = "y:" + selected;
+		}
+		_selSortParameter = { false, false };
+		e.target->setLabel(selected);
+		_map.selectFeatures(curFeatures.first, curFeatures.second);
+	}
+}
 
 void NNIPage::load(ofJson& json)
 {
 	if (json.find("error") == json.end())
 	{
-		//clear current NNI
+		//clear current map
 		_map.clearPoints();
 		_map.clearGlobalParameters();
 		_gui->clearRemovableSliders();
@@ -304,7 +373,6 @@ void NNIPage::load(ofJson& json)
 		bool prevFeatures = _map.getFeatures().size() > 0;
 		bool curFeatures = json.find("features") != json.end();
 		vector<string> features;
-
 		//load parameters to NNI and GUI
 		for (auto parameter : json["parameters"])
 		{
@@ -318,13 +386,13 @@ void NNIPage::load(ofJson& json)
 			_gui->setWidth(_guiWidth, 0.3);
 			_gui->setOpacity(0.5);
 		}
-
+		//features
 		if (curFeatures)
 		{
 			for (auto& feature : json["features"]) features.push_back(feature);
 			_map.setFeatures(features);
 		}
-
+		//load points
 		for (ofJson point : json["points"])
 		{
 			Point curPoint;
@@ -336,30 +404,37 @@ void NNIPage::load(ofJson& json)
 			{
 				for (auto& feature : _map.getFeatures())
 				{
-					cout << feature << endl;
 					curPoint.setFeature(feature, point["features"][feature]);
 				}
 			}
+
 			curPoint.setPosition(point["pos"]["x"], point["pos"]["y"]);
 			_map.addPoint(curPoint);
 		}
-		
+		//clear feature selection gui
 		if (prevFeatures) 
 		{
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
 		}
+		//add parameters to gui
 		if (curFeatures)
 		{
 			_map.selectFeatures(json["selected"][0], json["selected"][1]);
-			_sortGui->addDropdown("x", _map.getFeatures())->setName("sort-x");
-			_sortGui->addDropdown("y", _map.getFeatures())->setName("sort-y");
+			vector<string> guiFeatures;
+			for(auto& feature : _map.getFeatures())
+			{
+				if(ofSplitString(feature, "/").size() != 2) guiFeatures.push_back(feature);
+			}
+			guiFeatures.push_back(_selSortParameterLabel);
+			_sortGui->addDropdown("x", guiFeatures)->setName("sort-x");
+			_sortGui->addDropdown("y", guiFeatures)->setName("sort-y");
 			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
 			_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
 			_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
 			_sortGui->update();
-			_showSortGui = true;
 		}
+		//init
 		if (_map.getPoints().size() != 0)
 		{
 			_map.setLastSelected(0, ofGetElapsedTimeMillis());
@@ -374,8 +449,9 @@ void NNIPage::load(ofJson& json)
 ofJson NNIPage::save()
 {
 	ofJson jSave = MapPage::save();
-	map<string, float> nniParameters = _map.getParameters();
-	for (auto element : nniParameters) jSave["parameters"].push_back(element.first);
+	for (auto& element : _map.getParameters()) jSave["parameters"].push_back(element.first);
+	for (auto &element : _map.getFeatures()) jSave["features"].push_back(element);
+	jSave["selected"] = { _map.getSelectedFeatures().first, _map.getSelectedFeatures().second };
 	vector<Point> points = _map.getPoints();
 	for (int i = 0; i < points.size(); i++)
 	{
@@ -383,9 +459,13 @@ ofJson NNIPage::save()
 		curPoint["id"] = i;
 		curPoint["pos"]["x"] = points[i].getPosition().x;
 		curPoint["pos"]["y"] = points[i].getPosition().y;
-		for (auto parameter : points[i].getParameters())
+		for (auto& parameter : points[i].getParameters())
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
+		}
+		for (auto& feature : points[i].getFeatures())
+		{
+			curPoint["features"][feature.first] = feature.second;
 		}
 		jSave["points"].push_back(curPoint);
 	}
