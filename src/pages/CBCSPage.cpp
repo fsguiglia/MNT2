@@ -208,6 +208,7 @@ void CBCSPage::toggleEvent(ofxDatGuiToggleEvent e)
 		if (e.checked) _dr.setParameter("--cbcs_mode", 1);
 		else _dr.setParameter("--cbcs_mode", 0);
 	}
+	if (e.target->getName() == "showSortGui") _showSortGui = e.checked;
 }
 
 void CBCSPage::textInputEvent(ofxDatGuiTextInputEvent e)
@@ -233,10 +234,13 @@ void CBCSPage::dropDownEvent(ofxDatGuiDropdownEvent e)
 
 void CBCSPage::mouseMoved(int x, int y)
 {
-	if (_visible)
+	if (!_showSortGui)
 	{
-		_inside = _position.inside(x, y);
-		if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position));
+		if (_visible)
+		{
+			_inside = _position.inside(x, y);
+			if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position));
+		}
 	}
 }
 
@@ -259,12 +263,15 @@ void CBCSPage::mousePressed(int x, int y, int button, bool doubleClick)
 
 void CBCSPage::mouseReleased(int x, int y, int button)
 {
-	_inside = _position.inside(x, y);
-	if (_inside)
+	if (!_showSortGui)
 	{
-		if (button == 2)
+		_inside = _position.inside(x, y);
+		if (_inside)
 		{
-			_map.removeSelection();
+			if (button == 2)
+			{
+				_map.removeSelection();
+			}
 		}
 	}
 }
@@ -381,7 +388,6 @@ void CBCSPage::loadData(ofJson & json)
 		_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
 		_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
 		_sortGui->update();
-		_showSortGui = true;
 	}
 }
 
