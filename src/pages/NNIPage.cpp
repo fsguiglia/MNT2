@@ -301,7 +301,7 @@ void NNIPage::mouseReleased(int x, int y, int button)
 		}
 		_lastSelectedPoint = -1;
 	}
-	else if(button == 1)
+	else if(button == 0)
 	{
 		if (_selSortParameter.first || _selSortParameter.second)
 		{
@@ -311,7 +311,8 @@ void NNIPage::mouseReleased(int x, int y, int button)
 			if (removableSlider != "")
 			{
 				pair<string, string> curFeatures = _map.getSelectedFeatures();
-				if (std::find(_map.getFeatures().begin(), _map.getFeatures().end(), removableSlider) != _map.getFeatures().end())
+				map<string, float> parameters = _map.getParameters();
+				if (parameters.find(removableSlider) != parameters.end())
 				{
 					if (_selSortParameter.first) 
 					{
@@ -325,6 +326,7 @@ void NNIPage::mouseReleased(int x, int y, int button)
 					}
 				}
 			}
+			_selSortParameter = { false, false };
 		}
 	}	
 }
@@ -417,6 +419,7 @@ void NNIPage::load(ofJson& json)
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
 		}
+		_sortGui->removeComponent(_sortGui->getButton("closeSortGui"));
 		//add parameters to gui
 		if (curFeatures)
 		{
@@ -432,6 +435,8 @@ void NNIPage::load(ofJson& json)
 			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
 			_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
 			_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
+			_sortGui->addButton("close")->setName("closeSortGui");
+			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
 			_sortGui->update();
 		}
 		//init

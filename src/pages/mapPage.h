@@ -85,7 +85,7 @@ inline void MapPage<T>::setupGui(string name)
 
 	_sortGui = new ScrollGui();
 	_sortGui->addHeader("Select features")->setName("Header");
-	_sortGui->addButton("close gui")->setName("closeSortGui");
+	_sortGui->addButton("close")->setName("closeSortGui");
 	_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
 	_sortGui->setAutoDraw(false);
 	_sortGui->setPosition(_position.x, 0);
