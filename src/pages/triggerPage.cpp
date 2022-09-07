@@ -21,12 +21,17 @@ void TriggerPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont 
 	_map.setCursors(initialCursors);
 
 	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
+	setupAnalysis();
 	setupGui();
 }
 
 void TriggerPage::setupGui()
 {
+	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
+	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
+	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_gui->addToggle("randomize");
+	_gui->addButton("generate");
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
@@ -49,19 +54,68 @@ void TriggerPage::setupGui()
 	_gui->setVisible(false);
 	_gui->setEnabled(false);
 	_gui->update();
+
+	_sortGui->onButtonEvent(this, &TriggerPage::buttonEvent);
+	_sortGui->onDropdownEvent(this, &TriggerPage::dropDownEvent);
+}
+
+void TriggerPage::setupAnalysis()
+{
+	_dr.setup("../../ML/dr/mnt_analysis.py", "trg", "python"); //py
+	//_audioDr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
+	map<string, float> drParameters;
+	drParameters["--perplexity"] = 5;
+	drParameters["--learning_rate"] = 15;
+	drParameters["--iterations"] = 1000;
+	drParameters["--script"] = 1;
+	_dr.setParameters(drParameters);
+}
+
+void TriggerPage::update()
+{
+	if (_dr.getRunning())
+	{
+		if (_dr.getCompleted()) load(_dr.getData());
+		else _dr.check();
+	}
+
+	MapPage::update();
 }
 
 void TriggerPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
+	if (e.target->getName() == "analyze")
+	{
+		if (_map.getPoints().size() < 6) _map.generatePoints();
+		if (_dr.getParameter("--perplexity") >= _map.getPoints().size())
+		{
+			_dr.setParameter("--perplexity", _map.getPoints().size() - 1);
+		}
+		if (!_dr.getRunning()) _dr.start(save());
+	}
 	if (e.target->getName() == "clearMIDI")
 	{
 		clearMidiMap();
+	}
+	else if (e.target->getName() == "generate")
+	{
+		_map.generatePoints();
+	}
+	else if (e.target->getName() == "closeSortGui")
+	{
+		_showSortGui = false;
+		_gui->getToggle("showSortGui")->setChecked(false);
 	}
 }
 
 void TriggerPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
+
+	if (name == "perplexity" || name == "learning rate" || name == "iterations")
+	{
+		_dr.setParameter(name, e.value);
+	}
 	if (name == "x" || name == "y")
 	{
 		_lastControl = "slider/" + name;
@@ -149,6 +203,7 @@ void TriggerPage::toggleEvent(ofxDatGuiToggleEvent e)
 			_map.setSwitch(_map.getLastSelected(), e.checked);
 		}
 	}
+	if (e.target->getName() == "showSortGui") _showSortGui = e.checked;
 }
 
 void TriggerPage::textInputEvent(ofxDatGuiTextInputEvent e)
@@ -169,6 +224,33 @@ void TriggerPage::textInputEvent(ofxDatGuiTextInputEvent e)
 	}
 	e.target->setText("");
 	_parameterLearn = prevLearn;
+}
+
+void TriggerPage::dropDownEvent(ofxDatGuiDropdownEvent e)
+{
+	string selected = e.target->getSelected()->getLabel();
+	if (selected == _selSortParameterLabel)
+	{
+		if (e.target->getName() == "sort-x") _selSortParameter.first = !_selSortParameter.first;
+		else if (e.target->getName() == "sort-y") _selSortParameter.second = !_selSortParameter.second;
+	}
+	else
+	{
+		pair<string, string> curFeatures = _map.getSelectedFeatures();
+		if (e.target->getName() == "sort-x")
+		{
+			curFeatures.first = selected;
+			selected = "x:" + selected;
+		}
+		else if (e.target->getName() == "sort-y")
+		{
+			curFeatures.second = selected;
+			selected = "y:" + selected;
+		}
+		_selSortParameter = { false, false };
+		e.target->setLabel(selected);
+		_map.selectFeatures(curFeatures.first, curFeatures.second);
+	}
 }
 
 void TriggerPage::updateSelected(int selected, Trigger trigger)
@@ -195,48 +277,57 @@ void TriggerPage::updateSelected(int selected, Trigger trigger)
 
 void TriggerPage::mouseMoved(int x, int y)
 {
-	if (_visible)
+	if (!_showSortGui)
 	{
-		_inside = _position.inside(x, y);
-		if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position), 0);
+		if (_visible)
+		{
+			_inside = _position.inside(x, y);
+			if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position), 0);
+		}
 	}
 }
 
 void TriggerPage::mouseDragged(int x, int y, int button)
 {
-	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
-	bool insideGui = guiPosition.inside(x, y);
-	_inside = _position.inside(x, y);
-	if (button < 2 && _inside && !insideGui) {
-		ofVec2f normPosition = normalize(ofVec2f(x, y), _position);
-		if (_lastSelectedPoint >= 0) _map.movePoint(_lastSelectedPoint, normPosition);
+	if (!_showSortGui)
+	{
+		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
+		bool insideGui = guiPosition.inside(x, y);
+		_inside = _position.inside(x, y);
+		if (button < 2 && _inside && !insideGui) {
+			ofVec2f normPosition = normalize(ofVec2f(x, y), _position);
+			if (_lastSelectedPoint >= 0) _map.movePoint(_lastSelectedPoint, normPosition);
+		}
 	}
 }
 
 void TriggerPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
-	_inside = _position.inside(x, y);
-	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
-	bool insideGui = guiPosition.inside(x, y);
-	if (_inside && !insideGui)
+	if (!_showSortGui)
 	{
-		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (doubleClick) _map.addPoint(pos, _radius, _threshold, true);
-		if (button < 2)
+		_inside = _position.inside(x, y);
+		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
+		bool insideGui = guiPosition.inside(x, y);
+		if (_inside && !insideGui)
 		{
-			int lastSelected = _map.getLastSelected();
-			array<float, 2> selection = _map.getClosest(pos, false);
-			if (selection[1] < _minClickDistance)
+			ofVec2f pos = normalize(ofVec2f(x, y), _position);
+			if (doubleClick) _map.addPoint(pos, _radius, _threshold, true);
+			if (button < 2)
 			{
-				_lastSelectedPoint = int(selection[0]);
-				_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
-				if (int(selection[0]) != lastSelected)
+				int lastSelected = _map.getLastSelected();
+				array<float, 2> selection = _map.getClosest(pos, false);
+				if (selection[1] < _minClickDistance)
 				{
-					Trigger point = _map.getPoint(int(selection[0]));
-					updateSelected(int(selection[0]), point);
+					_lastSelectedPoint = int(selection[0]);
+					_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
+					if (int(selection[0]) != lastSelected)
+					{
+						Trigger point = _map.getPoint(int(selection[0]));
+						updateSelected(int(selection[0]), point);
+					}
 				}
+				else _lastSelectedPoint = -1;
 			}
-			else _lastSelectedPoint = -1;
 		}
 	}
 }
@@ -247,7 +338,7 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 	_inside = _position.inside(x, y);
 	if (button == 2)
 	{
-		if (_inside)
+		if (_inside && !_showSortGui)
 		{
 			_map.removePoint(normalized);
 			if (_map.getPoints().size() > 0)
@@ -276,8 +367,36 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 				_gui->update();
 			}
 		}
+		_lastSelectedPoint = -1;
 	}
-	_lastSelectedPoint = -1;
+	else if (button == 0)
+	{
+		if (_selSortParameter.first || _selSortParameter.second)
+		{
+			_gui->update();
+			_gui->updatePositions();
+			string removableSlider = _gui->inside(x, y);
+			if (removableSlider != "")
+			{
+				pair<string, string> curFeatures = _map.getSelectedFeatures();
+				map<string, float> parameters = _map.getParameters();
+				if (parameters.find(removableSlider) != parameters.end())
+				{
+					if (_selSortParameter.first)
+					{
+						_sortGui->getDropdown("sort-x")->setLabel("x:" + removableSlider);
+						_map.sortByParameter(0, removableSlider);
+					}
+					else if (_selSortParameter.second)
+					{
+						_sortGui->getDropdown("sort-y")->setLabel("y:" + removableSlider);
+						_map.sortByParameter(1, removableSlider);
+					}
+				}
+			}
+			_selSortParameter = { false, false };
+		}
+	}
 }
 
 void TriggerPage::mouseScrolled(int scroll)
@@ -287,40 +406,86 @@ void TriggerPage::mouseScrolled(int scroll)
 
 void TriggerPage::load(ofJson& json)
 {
-	//clear current map
-	_map.clearPoints();
-	_gui->clearRemovableSliders();
-	//load parameters to map and GUI
-	for (ofJson curPoint : json["points"])
+	if (json.find("error") == json.end())
 	{
-		ofVec2f position = ofVec2f(curPoint["pos"]["x"], curPoint["pos"]["y"]);
-		float radius = curPoint["radius"];
-		float threshold = curPoint["threshold"];
-		bool isSwitch = curPoint["switch"];
-		int index = _map.addPoint(position, radius, threshold, isSwitch);
-		if (curPoint.find("parameters") != curPoint.end())
+		//clear current map
+		_map.clearPoints();
+		_gui->clearRemovableSliders();
+
+		bool prevFeatures = _map.getFeatures().size() > 0;
+		bool curFeatures = json.find("features") != json.end();
+		vector<string> features;
+		//features
+		if (curFeatures)
 		{
-			auto obj = curPoint["parameters"].get<ofJson::object_t>();
-			for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
+			for (auto& feature : json["features"]) features.push_back(feature);
+			_map.setFeatures(features);
 		}
-	}
+		//load points
+		for (ofJson point : json["points"])
+		{
+			Trigger curPoint;
+			curPoint.setPosition(point["pos"]["x"], point["pos"]["y"]);
+			curPoint.setRadius(point["radius"]);
+			curPoint.setThreshold(point["threshold"]);
+			curPoint.setSwitch(point["switch"]);
+			if (point.find("parameters") != point.end())
+			{
+				auto obj = point["parameters"].get<ofJson::object_t>();
+				for (auto parameter : obj) curPoint.setParameter(parameter.first, parameter.second);
+			}
+			if (curFeatures)
+			{
+				for (auto& feature : _map.getFeatures()) curPoint.setFeature(feature, point["features"][feature]);
+			}
+			_map.addPoint(curPoint);
+		}
+		//clear feature selection gui
+		if (prevFeatures)
+		{
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
+		}
+		_sortGui->removeComponent(_sortGui->getButton("closeSortGui"));
+		//add parameters to gui
+		if (curFeatures)
+		{
+			_map.selectFeatures(json["selected"][0], json["selected"][1]);
+			vector<string> guiFeatures;
+			for (auto& feature : _map.getFeatures())
+			{
+				if (ofSplitString(feature, "/").size() != 2) guiFeatures.push_back(feature);
+			}
+			guiFeatures.push_back(_selSortParameterLabel);
+			_sortGui->addDropdown("x", guiFeatures)->setName("sort-x");
+			_sortGui->addDropdown("y", guiFeatures)->setName("sort-y");
+			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+			_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
+			_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
+			_sortGui->addButton("close")->setName("closeSortGui");
+			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+			_sortGui->update();
+		}
+		//init
+		if (_map.getPoints().size() != 0)
+		{
+			_map.setLastSelected(0, ofGetElapsedTimeMillis());
+			Trigger point = _map.getPoint(0);
+			updateSelected(0, point);
+		}
 
-	if (_map.getPoints().size() != 0)
-	{
-		_map.setLastSelected(0, ofGetElapsedTimeMillis());
-		Trigger point = _map.getPoint(0);
-		updateSelected(0, point);
+		loadMidiMap(json);
+		MapPage::load(json);
 	}
-
-	loadMidiMap(json);
-	MapPage::load(json);
 }
 
 ofJson TriggerPage::save()
 {
 	ofJson jSave = MapPage::save();
 	map<string, float> parameters = _map.getParameters();
-	for (auto element : parameters) jSave["parameters"].push_back(element.first);
+	
+	for (auto &element : _map.getFeatures()) jSave["features"].push_back(element);
+	jSave["selected"] = { _map.getSelectedFeatures().first, _map.getSelectedFeatures().second };
 	vector<Trigger> points = _map.getPoints();
 	for (int i = 0; i < points.size(); i++)
 	{
@@ -331,13 +496,19 @@ ofJson TriggerPage::save()
 		curPoint["radius"] = points[i].getRadius();
 		curPoint["threshold"] = points[i].getThreshold();
 		curPoint["switch"] = points[i].getSwitch();
-		for (auto parameter : points[i].getParameters())
+		map<string, float> curParameters = points[i].getParameters();
+		for (auto parameter : curParameters)
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}
+		for (auto& feature : points[i].getFeatures())
+		{
+			curPoint["features"][feature.first] = feature.second;
+		}
 		jSave["points"].push_back(curPoint);
+		parameters.insert(curParameters.begin(), curParameters.end());
 	}
-	
+	for (auto element : parameters) jSave["parameters"].push_back(element.first);
 	saveMidiMap(jSave);
 	return jSave;
 }

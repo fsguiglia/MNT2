@@ -53,23 +53,58 @@ void TriggerMap::draw(int x, int y, int w, int h, ofTrueTypeFont & font)
 	ofPopStyle();
 }
 
-int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, ofColor color, bool isSwitch)
+int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, bool isSwitch)
 {
 	Trigger trigger;
 	trigger.setPosition(position);
 	trigger.setRadius(radius);
 	trigger.setThreshold(threshold);
-	trigger.setColor(color);
 	trigger.setSwitch(isSwitch);
-	BaseMap::addPoint(trigger);
-	return _points.size() - 1;
+	int size = addPoint(trigger);
+	return size;
 }
 
-int TriggerMap::addPoint(ofVec2f position, float radius, float threshold, bool isSwitch)
+int TriggerMap::addPoint(Trigger point)
 {
 	int colorIndex = _points.size() % _colorPallete.size();
-	int size = addPoint(position, radius, threshold, _colorPallete[colorIndex], isSwitch);
+	point.setColor(_colorPallete[colorIndex]);
+	int size = BaseMap::addPoint(point);
 	return size;
+}
+
+void TriggerMap::generatePoints()
+{
+	vector<Trigger> newPoints;
+	for (int i = 0; i < _points.size() - 1; i++)
+	{
+		for (int j = i; j < _points.size(); j++)
+		{
+			if (i != j)
+			{
+				Trigger point;
+				ofVec2f curPosition = _points[i].getPosition() + _points[j].getPosition();
+				curPosition /= 2;
+				point.setPosition(curPosition);
+				map<string, float> D, d;
+				D = _points[i].getParameters();
+				for (auto& parameter : D)
+				{
+					if (_points[j].hasParameter(parameter.first))
+					{
+						parameter.second += _points[j].getParameter(parameter.first);
+						parameter.second /= 2;
+					}
+				}
+				D.insert(d.begin(), d.end());
+				point.setParameters(D);
+				newPoints.push_back(point);
+			}
+		}
+	}
+	for (auto& point : newPoints)
+	{
+		addPoint(point);
+	}
 }
 
 void TriggerMap::setRadius(int index, float radius)

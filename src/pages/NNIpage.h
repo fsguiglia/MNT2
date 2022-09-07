@@ -17,6 +17,8 @@ public:
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
 	void textInputEvent(ofxDatGuiTextInputEvent e);
+	void dropDownEvent(ofxDatGuiDropdownEvent e);
+
 	void updateSelected(int selected, Point point);
 
 	void mouseMoved(int x, int y);
@@ -24,7 +26,6 @@ public:
 	void mousePressed(int x, int y, int button, bool doubleClick = false);
 	void mouseReleased(int x, int y, int button);
 	void mouseScrolled(int scroll);
-	void dropDownEvent(ofxDatGuiDropdownEvent e);
 
 	void load(ofJson& json);
 	ofJson save();

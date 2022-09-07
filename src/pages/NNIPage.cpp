@@ -27,8 +27,6 @@ void NNIPage::setupGui()
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
-	_arrangeFolder->addBreak();
-	_arrangeFolder->collapse();
 	_gui->addToggle("randomize");
 	_gui->addButton("generate");
 	_gui->addBreak();
@@ -198,6 +196,33 @@ void NNIPage::textInputEvent(ofxDatGuiTextInputEvent e)
 	_parameterLearn = prevLearn;
 }
 
+void NNIPage::dropDownEvent(ofxDatGuiDropdownEvent e)
+{
+	string selected = e.target->getSelected()->getLabel();
+	if (selected == _selSortParameterLabel)
+	{
+		if (e.target->getName() == "sort-x") _selSortParameter.first = !_selSortParameter.first;
+		else if (e.target->getName() == "sort-y") _selSortParameter.second = !_selSortParameter.second;
+	}
+	else
+	{
+		pair<string, string> curFeatures = _map.getSelectedFeatures();
+		if (e.target->getName() == "sort-x")
+		{
+			curFeatures.first = selected;
+			selected = "x:" + selected;
+		}
+		else if (e.target->getName() == "sort-y")
+		{
+			curFeatures.second = selected;
+			selected = "y:" + selected;
+		}
+		_selSortParameter = { false, false };
+		e.target->setLabel(selected);
+		_map.selectFeatures(curFeatures.first, curFeatures.second);
+	}
+}
+
 void NNIPage::updateSelected(int selected, Point point)
 {
 	map<string, float> parameters = point.getParameters();
@@ -334,33 +359,6 @@ void NNIPage::mouseReleased(int x, int y, int button)
 void NNIPage::mouseScrolled(int scroll)
 {
 	_gui->scroll(scroll);
-}
-
-void NNIPage::dropDownEvent(ofxDatGuiDropdownEvent e)
-{
-	string selected = e.target->getSelected()->getLabel();
-	if (selected == _selSortParameterLabel)
-	{
-		if (e.target->getName() == "sort-x") _selSortParameter.first = !_selSortParameter.first;
-		else if (e.target->getName() == "sort-y") _selSortParameter.second = !_selSortParameter.second;
-	}
-	else
-	{
-		pair<string, string> curFeatures = _map.getSelectedFeatures();
-		if (e.target->getName() == "sort-x")
-		{
-			curFeatures.first = selected;
-			selected = "x:" + selected;
- 		}
-		else if (e.target->getName() == "sort-y")
-		{
-			curFeatures.second = selected;
-			selected = "y:" + selected;
-		}
-		_selSortParameter = { false, false };
-		e.target->setLabel(selected);
-		_map.selectFeatures(curFeatures.first, curFeatures.second);
-	}
 }
 
 void NNIPage::load(ofJson& json)

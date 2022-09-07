@@ -88,12 +88,10 @@ def get_data(D):
 	return X, cc, pos
 
 def min_max_normalize(a):
-	a = np.transpose(a)
-	max_values = np.amax(a,1)
-	min_values = np.amin(a,1)
-	a = np.transpose(a)
-	norm = (a - min_values) / (max_values - min_values)
-	return norm
+	min_max = np.amax(a.T,1) - np.amin(a.T,1)
+	min_max[min_max == 0] = 1
+	X = (a - np.amin(a.T,1)) / min_max
+	return X
 
 def save(X, cc, pos, PCA, TSNE, output_file):
 	out = dict()
