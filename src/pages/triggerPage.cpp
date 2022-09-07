@@ -30,15 +30,16 @@ void TriggerPage::setupGui()
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
-	_gui->addToggle("randomize");
-	_gui->addButton("generate");
+	_arrangeFolder->addToggle("randomize");
+	_arrangeFolder->addButton("generate");
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
-	_gui->addToggle("Switch");
-	_gui->addSlider("Radius", 0., 1., _radius);
-	_gui->addSlider("Threshold", 0., 1., _threshold);
-	_gui->addBreak();
+	_settingsFolder = _gui->addFolder("settings");
+	_settingsFolder->addToggle("Switch");
+	_settingsFolder->addSlider("Radius", 0., 1., _radius);
+	_settingsFolder->addSlider("Threshold", 0., 1., _threshold);
+	_settingsFolder->collapse();
 	_gui->addTextInput("add");
 	_gui->addToggle("Learn parameters")->setName("parameterLearn");
 	_gui->onButtonEvent(this, &TriggerPage::buttonEvent);
@@ -49,14 +50,22 @@ void TriggerPage::setupGui()
 	_gui->setOpacity(0.5);
 	_gui->setTheme(new ofxDatGuiThemeWireframe(), true);
 	_gui->setWidth(_guiWidth, 0.3);
-	_gui->setPosition(_position.x + _position.getWidth(), 0);
 	_gui->setMaxHeight(ofGetHeight());
 	_gui->setVisible(false);
 	_gui->setEnabled(false);
 	_gui->update();
 
+	_gui->update();
 	_sortGui->onButtonEvent(this, &TriggerPage::buttonEvent);
 	_sortGui->onDropdownEvent(this, &TriggerPage::dropDownEvent);
+
+	_gui->getToggle("active")->setBorder(_borderColor, 0);
+	_controlFolder->setBorder(_borderColor, 0);
+	_arrangeFolder->setBorder(_borderColor, 0);
+	_settingsFolder->setBorder(_borderColor, 0);
+	_gui->getLabel("Parameters")->setBorder(_borderColor, 0);
+	_gui->getTextInput("add")->setBorder(_borderColor, 0);
+	_gui->getToggle("parameterLearn")->setBorder(_borderColor, 0);
 }
 
 void TriggerPage::setupAnalysis()
@@ -255,21 +264,21 @@ void TriggerPage::dropDownEvent(ofxDatGuiDropdownEvent e)
 void TriggerPage::updateSelected(int selected, Trigger trigger)
 {
 	_gui->clearRemovableSliders();
-	for (auto value : trigger.getParameters())
+	for (auto& value : trigger.getParameters())
 	{
 		vector<string> split = ofSplitString(value.first, "/");
 		string sliderLabel = "ch" + split[0] + "/cc" + split[1];
 		_gui->addSlider(sliderLabel, 0., 1., value.second);
 		_gui->getSlider(sliderLabel)->setName(value.first);
 		_gui->setRemovableSlider(value.first);
-		_gui->getSlider(value.first)->setTheme(new ofxDatGuiThemeWireframe());
-		_gui->setWidth(_guiWidth, 0.3);
-		_gui->setOpacity(0.5);
 	}
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	_gui->getToggle("Switch")->setChecked(_map.getPoint(selected).getSwitch());
 	_gui->getSlider("Radius")->setValue(trigger.getRadius(), false);
 	_gui->getSlider("Threshold")->setValue(trigger.getThreshold(), false);
+	_gui->setTheme(new ofxDatGuiThemeWireframe());
+	_gui->setWidth(_guiWidth, 0.3);
+	_gui->setOpacity(0.5);
 	_gui->update();
 	//for (auto port : _MIDIOutputs) sendMIDICC(parameters, port.second);
 }
@@ -378,19 +387,15 @@ void TriggerPage::mouseReleased(int x, int y, int button)
 			if (removableSlider != "")
 			{
 				pair<string, string> curFeatures = _map.getSelectedFeatures();
-				map<string, float> parameters = _map.getParameters();
-				if (parameters.find(removableSlider) != parameters.end())
+				if (_selSortParameter.first)
 				{
-					if (_selSortParameter.first)
-					{
-						_sortGui->getDropdown("sort-x")->setLabel("x:" + removableSlider);
-						_map.sortByParameter(0, removableSlider);
-					}
-					else if (_selSortParameter.second)
-					{
-						_sortGui->getDropdown("sort-y")->setLabel("y:" + removableSlider);
-						_map.sortByParameter(1, removableSlider);
-					}
+					_sortGui->getDropdown("sort-x")->setLabel("x:" + removableSlider);
+					_map.sortByParameter(0, removableSlider);
+				}
+				else if (_selSortParameter.second)
+				{
+					_sortGui->getDropdown("sort-y")->setLabel("y:" + removableSlider);
+					_map.sortByParameter(1, removableSlider);
 				}
 			}
 			_selSortParameter = { false, false };

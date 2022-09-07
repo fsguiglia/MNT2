@@ -27,8 +27,8 @@ void NNIPage::setupGui()
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
-	_gui->addToggle("randomize");
-	_gui->addButton("generate");
+	_arrangeFolder->addToggle("randomize");
+	_arrangeFolder->addButton("generate");
 	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
@@ -50,6 +50,13 @@ void NNIPage::setupGui()
 
 	_sortGui->onButtonEvent(this, &NNIPage::buttonEvent);
 	_sortGui->onDropdownEvent(this, &NNIPage::dropDownEvent);
+
+	_gui->getToggle("active")->setBorder(_borderColor, 0);
+	_controlFolder->setBorder(_borderColor, 0);
+	_arrangeFolder->setBorder(_borderColor, 0);
+	_gui->getLabel("Parameters")->setBorder(_borderColor, 0);
+	_gui->getTextInput("add")->setBorder(_borderColor, 0);
+	_gui->getToggle("parameterLearn")->setBorder(_borderColor, 0);
 }
 
 void NNIPage::setupAnalysis()

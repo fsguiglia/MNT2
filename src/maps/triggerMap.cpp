@@ -93,12 +93,14 @@ void TriggerMap::generatePoints(int n)
 
 				map<string, float> D, d;
 				D = _points[i].getParameters();
+				d = _points[j].getParameters();
 				for (auto& parameter : D)
 				{
 					if (_points[j].hasParameter(parameter.first))
 					{
-						parameter.second += points[j].getParameter(parameter.first);
-						parameter.second /= 2;
+						float value = (float)parameter.second + (float)points[j].getParameter(parameter.first);
+						value /= 2;
+						D[parameter.first] = value;
 					}
 				}
 				D.insert(d.begin(), d.end());

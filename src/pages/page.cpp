@@ -4,6 +4,7 @@ Page::Page()
 {
 	_controlLearn = false;
 	_parameterLearn = false;
+	_borderColor = ofColor(240);
 }
 
 void Page::setHeader(string label)
@@ -31,6 +32,9 @@ void Page::resize(int w, int h)
 	_position = centerSquarePosition(w - _guiWidth, h);
 	_gui->setPosition(_position.x + _position.getWidth(), 0);
 	_gui->update();
+
+	_sortGui->setPosition(_position.x, 0);
+	_sortGui->update();
 }
 
 void Page::setVisible(bool visible)
@@ -44,6 +48,11 @@ void Page::setVisible(bool visible)
 	}
 	_visible = visible;
 	_inside = visible;
+}
+
+void Page::setBorderColor(ofColor color)
+{
+	_borderColor = color;
 }
 
 void Page::setMidiOutput(bool midiOutput)

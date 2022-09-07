@@ -28,9 +28,9 @@ public:
 
 protected:
 	T _map;
-	ofxDatGui* _sortGui;
 	ofxDatGuiFolder* _controlFolder;
 	ofxDatGuiFolder* _arrangeFolder;
+	ofxDatGuiFolder* _settingsFolder;
 	bool _mouseControl, _useGlobalParameters, _showSortGui;
 	pair<bool, bool> _selSortParameter;
 	int _lastSelectedPoint;
@@ -69,19 +69,18 @@ inline void MapPage<T>::setupGui(string name)
 	_gui = new ScrollGui();
 	_gui->addHeader(name, false)->setName("Header");
 	_gui->addToggle("active");
-	_gui->addToggle("MIDI learn")->setName("controlLearn");
-	_gui->addButton("clear MIDI")->setName("clearMIDI");
 	_controlFolder = _gui->addFolder("Control");
 	_controlFolder->addToggle("Mouse Control", _mouseControl);
 	_controlFolder->addSlider("x", 0., 1.)->setName("x");
 	_controlFolder->addSlider("y", 0., 1.)->setName("y");
+	_controlFolder->addToggle("MIDI learn")->setName("controlLearn");
+	_controlFolder->addButton("clear MIDI")->setName("clearMIDI");
 	_controlFolder->collapse();
-	_gui->addBreak();
-	_gui->addButton("Analyze")->setName("analyze");
-	_arrangeFolder = _gui->addFolder("Analysis settings");
+	_arrangeFolder = _gui->addFolder("Arrange");
+	_arrangeFolder->addButton("Analyze")->setName("analyze");
 	_arrangeFolder->addToggle("Select features")->setName("showSortGui");
 	_arrangeFolder->collapse();
-	_gui->addBreak();
+	_gui->setPosition(_position.x + _position.getWidth(), 0);
 
 	_sortGui = new ScrollGui();
 	_sortGui->addHeader("Select features")->setName("Header");

@@ -22,6 +22,7 @@ public:
 	void resize(int w, int h);
 	void setVisible(bool visible);
 	virtual void setColorPallete(vector<ofColor> colorPallete) = 0;
+	void setBorderColor(ofColor color);
 
 	//gui events
 	//virtual void buttonEvent(ofxDatGuiButtonEvent e) = 0;
@@ -77,6 +78,7 @@ protected:
 
 	//gui
 	ScrollGui* _gui;
+	ofxDatGui* _sortGui;
 	ofRectangle _position;
 	int _guiWidth;
 	bool _visible, _inside;
@@ -93,4 +95,5 @@ protected:
 	string _address;
 	vector<pair<string,float>> _previousOutput, _OSCOutMessages, _MIDIDumpMessages, _MIDIOutMessages;
 	vector<string> _stringMessages;
+	ofColor _borderColor;
 };

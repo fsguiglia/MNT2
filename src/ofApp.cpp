@@ -151,9 +151,9 @@ void ofApp::drawEditMode()
 			ofVec2f(ofGetWidth() - 40, ofGetHeight() * 0.5 + 30),
 			ofVec2f(ofGetWidth() - 10, ofGetHeight() * 0.5)
 		);
-		ofPopStyle();
 	}
 	else _prevNextButton = false;
+	ofPopStyle();
 }
 
 void ofApp::drawTileMode()
