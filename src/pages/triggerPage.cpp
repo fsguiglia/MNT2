@@ -32,7 +32,6 @@ void TriggerPage::setupGui()
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->addButton("generate");
-	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_settingsFolder = _gui->addFolder("settings");
@@ -268,15 +267,15 @@ void TriggerPage::updateSelected(int selected, Trigger trigger)
 	{
 		vector<string> split = ofSplitString(value.first, "/");
 		string sliderLabel = "ch" + split[0] + "/cc" + split[1];
-		_gui->addSlider(sliderLabel, 0., 1., value.second);
-		_gui->getSlider(sliderLabel)->setName(value.first);
+		ofxDatGuiSlider* slider = _gui->addSlider(sliderLabel, 0., 1., value.second);
+		slider->setName(value.first);
+		slider->setTheme(new ofxDatGuiThemeWireframe());
 		_gui->setRemovableSlider(value.first);
 	}
 	_gui->getLabel("Parameters")->setLabel("Parameters: " + ofToString(selected));
 	_gui->getToggle("Switch")->setChecked(_map.getPoint(selected).getSwitch());
 	_gui->getSlider("Radius")->setValue(trigger.getRadius(), false);
 	_gui->getSlider("Threshold")->setValue(trigger.getThreshold(), false);
-	_gui->setTheme(new ofxDatGuiThemeWireframe());
 	_gui->setWidth(_guiWidth, 0.3);
 	_gui->setOpacity(0.5);
 	_gui->update();

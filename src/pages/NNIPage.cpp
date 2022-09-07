@@ -29,7 +29,6 @@ void NNIPage::setupGui()
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->addButton("generate");
-	_gui->addBreak();
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_gui->addTextInput("add");

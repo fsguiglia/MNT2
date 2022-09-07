@@ -34,12 +34,12 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
-	
-	_gui->addSlider("radius", 0, 1, _map.getRadius() * 2);
-	_gui->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
+	_settingsFolder = _gui->addFolder("settings");
+	_settingsFolder->addSlider("radius", 0, 1, _map.getRadius() * 2);
+	_settingsFolder->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
 	_gui->getSlider("units")->setPrecision(0);
-	_gui->addTextInput("address", getAddress());
-	_gui->addBreak();
+	_settingsFolder->addTextInput("address", getAddress());
+	_settingsFolder->addBreak();
 	_gui->addButton("Export single file")->setName("Export_file");
 	_gui->addButton("Export file list")->setName("Export_list");
 	_gui->onButtonEvent(this, &CBCSPage::buttonEvent);
@@ -54,6 +54,13 @@ void CBCSPage::setupGui()
 	_gui->setMaxHeight(ofGetHeight());
 	_gui->setEnabled(false);
 	_gui->setVisible(false);
+
+	_gui->getToggle("active")->setBorder(_borderColor, 0);
+	_controlFolder->setBorder(_borderColor, 0);
+	_arrangeFolder->setBorder(_borderColor, 0);
+	_settingsFolder->setBorder(_borderColor, 0);
+	_gui->getButton("Export_file")->setBorder(_borderColor, 0);
+	_gui->getButton("Export_list")->setBorder(_borderColor, 0);
 
 	_sortGui->onDropdownEvent(this, &CBCSPage::dropDownEvent);
 }
