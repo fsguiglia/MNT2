@@ -14,7 +14,7 @@ public:
 
 	int addPoint(ofVec2f position, float radius, float threshold, bool isSwitch);
 	int addPoint(Trigger point);
-	void generatePoints();
+	void generatePoints(int n);
 
 	void setRadius(int index, float radius);
 	void setThreshold(int index, float threshold);

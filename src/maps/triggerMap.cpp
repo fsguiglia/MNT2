@@ -72,39 +72,47 @@ int TriggerMap::addPoint(Trigger point)
 	return size;
 }
 
-void TriggerMap::generatePoints()
+void TriggerMap::generatePoints(int n)
 {
-	vector<Trigger> newPoints;
-	for (int i = 0; i < _points.size() - 1; i++)
+	vector<Trigger> points, newPoints;
+	points = _points;
+	ofRandomize(points);
+	for (int i = 0; i < points.size() - 1; i++)
 	{
-		for (int j = i; j < _points.size(); j++)
+		for (int j = i; j < points.size(); j++)
 		{
 			if (i != j)
 			{
 				Trigger point;
-				ofVec2f curPosition = _points[i].getPosition() + _points[j].getPosition();
-				curPosition /= 2;
+				ofVec2f curPosition = (points[i].getPosition() + points[j].getPosition()) / 2;
+				float curRadius = (points[i].getRadius() + points[j].getRadius()) / 2;
+				float curThreshold = (points[i].getThreshold() + points[j].getThreshold()) / 2;
 				point.setPosition(curPosition);
+				point.setRadius(curRadius);
+				point.setThreshold(curThreshold);
+
 				map<string, float> D, d;
 				D = _points[i].getParameters();
 				for (auto& parameter : D)
 				{
 					if (_points[j].hasParameter(parameter.first))
 					{
-						parameter.second += _points[j].getParameter(parameter.first);
+						parameter.second += points[j].getParameter(parameter.first);
 						parameter.second /= 2;
 					}
 				}
 				D.insert(d.begin(), d.end());
 				point.setParameters(D);
 				newPoints.push_back(point);
+				if (newPoints.size() >= n) goto addPoints;
 			}
 		}
 	}
-	for (auto& point : newPoints)
-	{
-		addPoint(point);
-	}
+	addPoints:
+		for (auto& point : newPoints)
+		{
+			addPoint(point);
+		}
 }
 
 void TriggerMap::setRadius(int index, float radius)

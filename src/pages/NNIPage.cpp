@@ -79,10 +79,9 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
 	if (e.target->getName() == "analyze")
 	{
-		if (_map.getPoints().size() < 6) _map.generatePoints();
-		if (_dr.getParameter("--perplexity") >= _map.getPoints().size())
+		if (_map.getPoints().size() <= _dr.getParameter("--perplexity") + 3)
 		{
-			_dr.setParameter("--perplexity", _map.getPoints().size() - 1);
+			_map.generatePoints(_dr.getParameter("--perplexity") - _map.getPoints().size() + 3);
 		}
 		if (!_dr.getRunning()) _dr.start(save());
 	}
@@ -92,7 +91,7 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 	}
 	else if (e.target->getName() == "generate")
 	{
-		_map.generatePoints();
+		_map.generatePoints(1);
 	}
 	else if (e.target->getName() == "closeSortGui")
 	{

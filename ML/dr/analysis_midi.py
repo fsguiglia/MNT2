@@ -41,31 +41,10 @@ def analyze(args):
 		PCA = PCA.T
 		PCA = min_max_normalize(PCA)
 		X = min_max_normalize(X)
-		save(X, cc, pos, PCA, TSNE, new_path)
+		save(D, PCA, TSNE, new_path)
 	except:
-		raise
-		#save_empty_file(error, new_path)
-
-		
-def getPCA(data, components):
-	print('Principal component analysis (this can take a while)...')
-	pca = PCA(n_components=components)
-	pca.fit(data)
-	Y = pca.transform(data)
-	print('done, ' + str(Y.shape[1]) + ' components')
-	return Y
-
-def getTSNE(data, components, perplexity, learning_rate, iterations):
-	print('t-distributed stochastic neighbor embedding (this can take a while)...')
-	tsne = TSNE(n_components = components,
-			 perplexity = perplexity,
-			 learning_rate = learning_rate,
-			 n_iter = iterations,
-			 verbose = 1,
-			 )
-	Y = tsne.fit_transform(data)
-	print('done!')
-	return Y
+		#raise
+		save_empty_file(error, new_path)
 
 def get_data(D):
 	cc = D['parameters']
@@ -86,6 +65,26 @@ def get_data(D):
 			F = F.reshape(1, len(cc))
 			X = np.concatenate((X, F))
 	return X, cc, pos
+	
+def getPCA(data, components):
+	print('Principal component analysis (this can take a while)...')
+	pca = PCA(n_components=components)
+	pca.fit(data)
+	Y = pca.transform(data)
+	print('done, ' + str(Y.shape[1]) + ' components')
+	return Y
+
+def getTSNE(data, components, perplexity, learning_rate, iterations):
+	print('t-distributed stochastic neighbor embedding (this can take a while)...')
+	tsne = TSNE(n_components = components,
+			 perplexity = perplexity,
+			 learning_rate = learning_rate,
+			 n_iter = iterations,
+			 verbose = 1,
+			 )
+	Y = tsne.fit_transform(data)
+	print('done!')
+	return Y
 
 def min_max_normalize(a):
 	min_max = np.amax(a.T,1) - np.amin(a.T,1)
@@ -93,39 +92,20 @@ def min_max_normalize(a):
 	X = (a - np.amin(a.T,1)) / min_max
 	return X
 
-def save(X, cc, pos, PCA, TSNE, output_file):
-	out = dict()
-	out['parameters'] = cc
-	out['features'] = ['pos-x', 'pos-y', 'pca-x', 'pca-y', 'tsne-x', 'tsne-y']
-	points = []
-	for i in range(X.shape[0]):
-		curOut = dict()
-		parameters = dict()
+def save(D, PCA, TSNE, output_file):
+	D['features'] = ['pos-x', 'pos-y', 'pca-x', 'pca-y', 'tsne-x', 'tsne-y']
+	for i,point in enumerate(D['points']):
 		features = dict()
-		curPos = dict()
-		for j, parameter in enumerate(cc):
-			parameters[parameter] = float(X[i][j])
-			#features[parameter] = float(X[i][j])
-		features['pos-x'] = float(pos[i][0])
-		features['pos-y'] = float(pos[i][1])
+		features['pos-x'] = point['pos']['x']
+		features['pos-y'] = point['pos']['y']
 		features['pca-x'] = float(PCA[i][0])
 		features['pca-y'] = float(PCA[i][1])
 		features['tsne-x'] = float(TSNE[i][0])
 		features['tsne-y'] = float(TSNE[i][1])
-		
-		curPos['x'] = float(pos[i][0])
-		curPos['y'] = float(pos[i][1])
-		
-		curOut['id'] = i
-		curOut['parameters'] = parameters
-		curOut['features'] = features
-		curOut['pos'] = curPos
-		
-		points.append(curOut)
-	out['points'] = points
-	out['selected'] = ['tsne-x', 'tsne-y']
+		point['features'] = features
+	D['selected'] = ['tsne-x', 'tsne-y']
 	with open(output_file, 'w+') as f:
-		json.dump(out, f, indent = 4)
+		json.dump(D, f, indent = 4)
 
 def save_empty_file(error, output_file):
 	border_msg(error)

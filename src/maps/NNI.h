@@ -16,7 +16,7 @@ public:
 	void drawInterpolationFbo(int x, int y);
 	int addPoint(ofVec2f pos);
 	void addPoint(Point point);
-	void generatePoints();
+	void generatePoints(int n);
 	void setCursor(ofVec2f cursor);
 	void setCursor(ofVec2f cursor, int index);
 	ofVec2f getCursor();
