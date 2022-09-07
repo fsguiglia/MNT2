@@ -68,6 +68,12 @@ int RGBMap::addPoint(ofVec2f position, ofImage img, string path)
 	return _points.size() - 1;
 }
 
+int RGBMap::addPoint(RGBPoint point)
+{
+	BaseMap::addPoint(point);
+	return _points.size() - 1;
+}
+
 void RGBMap::resizePoint(int index, int w, int h)
 {
 	_points[index].setSize(w, h);

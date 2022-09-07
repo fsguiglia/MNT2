@@ -1,6 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "mapPage.h"
+#include "../ML/pythonML.h"
 #include "../maps/RGBMap.h"
 
 class RGBPage : public MapPage<RGBMap> {
@@ -8,11 +9,16 @@ public:
 	RGBPage();
 	void setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages = 50);
 	void setupGui();
+	void setupAnalysis();
+
+	void update();
 
 	void buttonEvent(ofxDatGuiButtonEvent e);
 	void sliderEvent(ofxDatGuiSliderEvent e);
 	void toggleEvent(ofxDatGuiToggleEvent e);
 	void textInputEvent(ofxDatGuiTextInputEvent e);
+	void dropDownEvent(ofxDatGuiDropdownEvent e);
+
 	void updateSelected(int selected, RGBPoint point);
 
 	void mouseMoved(int x, int y);
@@ -25,5 +31,6 @@ public:
 	ofJson save();
 
 private:
+	PythonML _dr;
 	float _radius;
 };

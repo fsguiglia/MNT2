@@ -11,9 +11,12 @@ public:
 	void update();
 	void draw(int x, int y, ofTrueTypeFont& font);
 	void draw(int x, int y, int w, int h, ofTrueTypeFont& font);
+
 	int addPoint(ofVec2f position, ofImage img);
 	int addPoint(ofVec2f position, ofImage img, string path);
+	int addPoint(RGBPoint point);
 	void resizePoint(int index, int w, int h);
+	
 	void setTrigger(int index, bool isTrigger);
 	void setRadius(float radius);
 	void setCursors(vector<ofVec2f> cursors);

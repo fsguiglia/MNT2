@@ -21,22 +21,24 @@ void RGBPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font
 	_map.setCursors(initialCursors);
 	
 	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
+	setupAnalysis();
 	setupGui();
 }
 
 void RGBPage::setupGui()
 {
-	_gui->addToggle("randomize");
-	_gui->addSlider("Radius", 0., 1., _radius)->setName("Radius");
-	_gui->addBreak();
+	_controlFolder->addSlider("Radius", 0., 1., _radius)->setName("Radius");
+	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
+	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
+	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
-	_gui->addToggle("Trigger");
-	_gui->addSlider("x", 0., 1.)->setName("posX");
-	_gui->addSlider("y", 0., 1.)->setName("posY");
-	_gui->addSlider("Width", 0., 1.);
-	_gui->addSlider("Height", 0., 1.);
-	_gui->addBreak();
+	_settingsFolder = _gui->addFolder("settings");
+	_settingsFolder->addToggle("Trigger");
+	_settingsFolder->addSlider("x", 0., 1.)->setName("posX");
+	_settingsFolder->addSlider("y", 0., 1.)->setName("posY");
+	_settingsFolder->addSlider("Width", 0., 1.);
+	_settingsFolder->addSlider("Height", 0., 1.);
 	_gui->addTextInput("add");
 	_gui->addToggle("Learn parameters")->setName("parameterLearn");
 	_gui->onButtonEvent(this, &RGBPage::buttonEvent);
@@ -52,19 +54,69 @@ void RGBPage::setupGui()
 	_gui->setVisible(false);
 	_gui->setEnabled(false);
 	_gui->update();
+
+	_gui->update();
+	_sortGui->onButtonEvent(this, &RGBPage::buttonEvent);
+	_sortGui->onDropdownEvent(this, &RGBPage::dropDownEvent);
+
+	_gui->getToggle("active")->setBorder(_borderColor, 0);
+	_controlFolder->setBorder(_borderColor, 0);
+	_arrangeFolder->setBorder(_borderColor, 0);
+	_settingsFolder->setBorder(_borderColor, 0);
+	_gui->getLabel("Parameters")->setBorder(_borderColor, 0);
+	_gui->getTextInput("add")->setBorder(_borderColor, 0);
+	_gui->getToggle("parameterLearn")->setBorder(_borderColor, 0);
+	_gui->update();
+}
+
+void RGBPage::setupAnalysis()
+{
+	_dr.setup("../../ML/dr/mnt_analysis.py", "rgb", "python"); //py
+	//_audioDr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
+	map<string, float> drParameters;
+	drParameters["--perplexity"] = 5;
+	drParameters["--learning_rate"] = 15;
+	drParameters["--iterations"] = 1000;
+	drParameters["--script"] = 1;
+	_dr.setParameters(drParameters);
+}
+
+void RGBPage::update()
+{
+	if (_dr.getRunning())
+	{
+		if (_dr.getCompleted()) load(_dr.getData());
+		else _dr.check();
+	}
+
+	MapPage::update();
 }
 
 void RGBPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
+	if (e.target->getName() == "analyze")
+	{
+		if (!_dr.getRunning()) _dr.start(save());
+	}
 	if (e.target->getName() == "clearMIDI")
 	{
 		clearMidiMap();
+	}
+	else if (e.target->getName() == "closeSortGui")
+	{
+		_showSortGui = false;
+		_gui->getToggle("showSortGui")->setChecked(false);
 	}
 }
 
 void RGBPage::sliderEvent(ofxDatGuiSliderEvent e)
 {
 	string name = e.target->getName();
+	
+	if (name == "perplexity" || name == "learning rate" || name == "iterations")
+	{
+		_dr.setParameter(name, e.value);
+	}
 	if (name == "x" || name == "y")
 	{
 		_lastControl = "slider/" + name;
@@ -169,6 +221,7 @@ void RGBPage::toggleEvent(ofxDatGuiToggleEvent e)
 			_map.setTrigger(_map.getLastSelected(), e.checked);
 		}
 	}
+	if (e.target->getName() == "showSortGui") _showSortGui = e.checked;
 }
 
 void RGBPage::textInputEvent(ofxDatGuiTextInputEvent e)
@@ -189,6 +242,33 @@ void RGBPage::textInputEvent(ofxDatGuiTextInputEvent e)
 	}
 	e.target->setText("");
 	_parameterLearn = prevLearn;
+}
+
+void RGBPage::dropDownEvent(ofxDatGuiDropdownEvent e)
+{
+	string selected = e.target->getSelected()->getLabel();
+	if (selected == _selSortParameterLabel)
+	{
+		if (e.target->getName() == "sort-x") _selSortParameter.first = !_selSortParameter.first;
+		else if (e.target->getName() == "sort-y") _selSortParameter.second = !_selSortParameter.second;
+	}
+	else
+	{
+		pair<string, string> curFeatures = _map.getSelectedFeatures();
+		if (e.target->getName() == "sort-x")
+		{
+			curFeatures.first = selected;
+			selected = "x:" + selected;
+		}
+		else if (e.target->getName() == "sort-y")
+		{
+			curFeatures.second = selected;
+			selected = "y:" + selected;
+		}
+		_selSortParameter = { false, false };
+		e.target->setLabel(selected);
+		_map.selectFeatures(curFeatures.first, curFeatures.second);
+	}
 }
 
 void RGBPage::updateSelected(int selected, RGBPoint point)
@@ -216,60 +296,69 @@ void RGBPage::updateSelected(int selected, RGBPoint point)
 
 void RGBPage::mouseMoved(int x, int y)
 {
-	if (_visible)
+	if (!_showSortGui)
 	{
-		_inside = _position.inside(x, y);
-		if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position), 0);
+		if (_visible)
+		{
+			_inside = _position.inside(x, y);
+			if (_inside && _mouseControl) _map.setCursor(normalize(ofVec2f(x, y), _position), 0);
+		}
 	}
 }
 
 void RGBPage::mouseDragged(int x, int y, int button)
 {
-	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
-	bool insideGui = guiPosition.inside(x, y);
-	_inside = _position.inside(x, y);
-	if (button < 2 && _inside && !insideGui) {
-		ofVec2f normPosition = normalize(ofVec2f(x, y), _position);
-		if(_lastSelectedPoint >= 0) _map.movePoint(_lastSelectedPoint, normPosition);
+	if (!_showSortGui)
+	{
+		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
+		bool insideGui = guiPosition.inside(x, y);
+		_inside = _position.inside(x, y);
+		if (button < 2 && _inside && !insideGui) {
+			ofVec2f normPosition = normalize(ofVec2f(x, y), _position);
+			if (_lastSelectedPoint >= 0) _map.movePoint(_lastSelectedPoint, normPosition);
+		}
 	}
 }
 
 void RGBPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
-	_inside = _position.inside(x, y);
-	ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
-	bool insideGui = guiPosition.inside(x, y);
-	if (_inside && !insideGui)
+	if (!_showSortGui)
 	{
-		ofVec2f pos = normalize(ofVec2f(x, y), _position);
-		if (doubleClick)
+		_inside = _position.inside(x, y);
+		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
+		bool insideGui = guiPosition.inside(x, y);
+		if (_inside && !insideGui)
 		{
-			ofFileDialogResult openFile = ofSystemLoadDialog("load image", false);
-			ofFile file = openFile.getPath();
-			if (openFile.bSuccess)
+			ofVec2f pos = normalize(ofVec2f(x, y), _position);
+			if (doubleClick)
 			{
-				if (ofToLower(file.getExtension()) == "png")
+				ofFileDialogResult openFile = ofSystemLoadDialog("load image", false);
+				ofFile file = openFile.getPath();
+				if (openFile.bSuccess)
 				{
-					ofImage img;
-					if (img.load(openFile.filePath)) _map.addPoint(pos, img, openFile.filePath);
+					if (ofToLower(file.getExtension()) == "png")
+					{
+						ofImage img;
+						if (img.load(openFile.filePath)) _map.addPoint(pos, img, openFile.filePath);
+					}
 				}
 			}
-		}
-		if (button < 2)
-		{
-			int lastSelected = _map.getLastSelected();
-			array<float, 2> selection = _map.getClosest(pos, false);
-			if (selection[1] < _minClickDistance)
+			if (button < 2)
 			{
-				_lastSelectedPoint = int(selection[0]);
-				_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
-				if (int(selection[0]) != lastSelected && _map.getPoints().size() > 0)
+				int lastSelected = _map.getLastSelected();
+				array<float, 2> selection = _map.getClosest(pos, false);
+				if (selection[1] < _minClickDistance)
 				{
-					RGBPoint point = _map.getPoint(int(selection[0]));
-					updateSelected(int(selection[0]), point);
+					_lastSelectedPoint = int(selection[0]);
+					_map.setLastSelected(_lastSelectedPoint, ofGetElapsedTimeMillis());
+					if (int(selection[0]) != lastSelected && _map.getPoints().size() > 0)
+					{
+						RGBPoint point = _map.getPoint(int(selection[0]));
+						updateSelected(int(selection[0]), point);
+					}
 				}
+				else _lastSelectedPoint = -1;
 			}
-			else _lastSelectedPoint = -1;
 		}
 	}
 }
@@ -280,7 +369,7 @@ void RGBPage::mouseReleased(int x, int y, int button)
 	_inside = _position.inside(x, y);
 	if (button == 2)
 	{
-		if (_inside)
+		if (_inside && !_showSortGui)
 		{
 			_map.removePoint(normalized);
 			if (_map.getPoints().size() > 0)
@@ -309,13 +398,40 @@ void RGBPage::mouseReleased(int x, int y, int button)
 				_gui->update();
 			}
 		}
+		_lastSelectedPoint = -1;
 	}
 	else if (button == 1)
 	{
-		RGBPoint point = _map.getPoint(_map.getLastSelected());
-		updateSelected(_map.getLastSelected(), point);
+		if (!_showSortGui)
+		{
+			RGBPoint point = _map.getPoint(_map.getLastSelected());
+			updateSelected(_map.getLastSelected(), point);
+		}
 	}
-	_lastSelectedPoint = -1;
+	else if (button == 0)
+	{
+		if (_selSortParameter.first || _selSortParameter.second)
+		{
+			_gui->update();
+			_gui->updatePositions();
+			string removableSlider = _gui->inside(x, y);
+			if (removableSlider != "")
+			{
+				pair<string, string> curFeatures = _map.getSelectedFeatures();
+				if (_selSortParameter.first)
+				{
+					_sortGui->getDropdown("sort-x")->setLabel("x:" + removableSlider);
+					_map.sortByParameter(0, removableSlider);
+				}
+				else if (_selSortParameter.second)
+				{
+					_sortGui->getDropdown("sort-y")->setLabel("y:" + removableSlider);
+					_map.sortByParameter(1, removableSlider);
+				}
+			}
+			_selSortParameter = { false, false };
+		}
+	}
 }
 
 void RGBPage::mouseScrolled(int scroll)
@@ -326,50 +442,95 @@ void RGBPage::mouseScrolled(int scroll)
 
 void RGBPage::load(ofJson & json)
 {
-	//clear current map
-	_map.clearPoints();
-	_gui->clearRemovableSliders();
-	//load parameters to map and GUI
-	for (ofJson curPoint : json["points"])
+	if (json.find("error") == json.end())
 	{
-		
-		ofVec2f position = ofVec2f(curPoint["pos"]["x"], curPoint["pos"]["y"]);
-		bool isTrigger = curPoint["trigger"].get<bool>();
-		ofImage img;
-		bool imageLoaded = img.load(curPoint["image_path"].get<string>());
-		if (!imageLoaded)
+		//clear current map
+		_map.clearPoints();
+		_gui->clearRemovableSliders();
+		bool prevFeatures = _map.getFeatures().size() > 0;
+		bool curFeatures = json.find("features") != json.end();
+		vector<string> features;
+		//features
+		if (curFeatures)
 		{
-			img.allocate(100, 100, ofImageType::OF_IMAGE_GRAYSCALE);
-			img.setColor(200);
+			for (auto& feature : json["features"]) features.push_back(feature);
+			_map.setFeatures(features);
 		}
-		int index = _map.addPoint(position, img, curPoint["image_path"].get<string>());
-		_map.setTrigger(index, isTrigger);
-		_map.resizePoint(index, curPoint["width"], curPoint["height"]);
-		if (curPoint.find("parameters") != curPoint.end())
+		//load points
+		for (ofJson point : json["points"])
 		{
-			auto obj = curPoint["parameters"].get<ofJson::object_t>();
-			for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
+			RGBPoint curPoint;
+			ofImage img;
+			bool imageLoaded = img.load(point["image_path"].get<string>());
+			if (!imageLoaded)
+			{
+				img.allocate(100, 100, ofImageType::OF_IMAGE_GRAYSCALE);
+				img.setColor(200);
+			}
+			curPoint.setPosition(point["pos"]["x"], point["pos"]["y"]);
+			curPoint.setTrigger(point["trigger"].get<bool>());
+			curPoint.setImage(img, point["image_path"]);
+			curPoint.setSize(point["width"], point["height"]);
+			if (point.find("parameters") != point.end())
+			{
+				auto obj = point["parameters"].get<ofJson::object_t>();
+				for (auto parameter : obj) curPoint.setParameter(parameter.first, parameter.second);
+			}
+			if (curFeatures)
+			{
+				for (auto& feature : _map.getFeatures()) curPoint.setFeature(feature, point["features"][feature]);
+			}
+			_map.addPoint(curPoint);
 		}
-	}
-	_radius = json["radius"];
-	_map.setRadius(_radius);
+		//clear feature selection gui
+		if (prevFeatures)
+		{
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
+			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
+		}
+		_sortGui->removeComponent(_sortGui->getButton("closeSortGui"));
+		//add parameters to gui
+		if (curFeatures)
+		{
+			_map.selectFeatures(json["selected"][0], json["selected"][1]);
+			vector<string> guiFeatures;
+			for (auto& feature : _map.getFeatures())
+			{
+				if (ofSplitString(feature, "/").size() != 2) guiFeatures.push_back(feature);
+			}
+			guiFeatures.push_back(_selSortParameterLabel);
+			_sortGui->addDropdown("x", guiFeatures)->setName("sort-x");
+			_sortGui->addDropdown("y", guiFeatures)->setName("sort-y");
+			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+			_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
+			_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
+			_sortGui->addButton("close")->setName("closeSortGui");
+			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+			_sortGui->update();
+		}
+		//init
+		_radius = json["radius"];
+		_map.setRadius(_radius);
 
-	if (_map.getPoints().size() != 0)
-	{
-		_map.setLastSelected(0, ofGetElapsedTimeMillis());
-		RGBPoint point = _map.getPoint(0);
-		updateSelected(0, point);
-	}
+		if (_map.getPoints().size() != 0)
+		{
+			_map.setLastSelected(0, ofGetElapsedTimeMillis());
+			RGBPoint point = _map.getPoint(0);
+			updateSelected(0, point);
+		}
 
-	loadMidiMap(json);
-	MapPage::load(json);
+		loadMidiMap(json);
+		MapPage::load(json);
+	}
 }
 
 ofJson RGBPage::save()
 {
 	ofJson jSave = MapPage::save();
 	map<string, float> parameters = _map.getParameters();
-	for (auto element : parameters) jSave["parameters"].push_back(element.first);
+	
+	for (auto& element : _map.getFeatures()) jSave["features"].push_back(element);
+	jSave["selected"] = { _map.getSelectedFeatures().first, _map.getSelectedFeatures().second };
 	jSave["radius"] = _radius;
 	vector<RGBPoint> points = _map.getPoints();
 	for (int i = 0; i < points.size(); i++)
@@ -382,13 +543,20 @@ ofJson RGBPage::save()
 		curPoint["height"] = points[i].getHeight();
 		curPoint["trigger"] = points[i].getTrigger();
 		curPoint["image_path"] = points[i].getImagePath();
-		for (auto parameter : points[i].getParameters())
+		
+		map<string, float> curParameters = points[i].getParameters();
+		for (auto parameter : curParameters)
 		{
 			curPoint["parameters"][parameter.first] = parameter.second;
 		}
+		for (auto& feature : points[i].getFeatures())
+		{
+			curPoint["features"][feature.first] = feature.second;
+		}
 		jSave["points"].push_back(curPoint);
+		parameters.insert(curParameters.begin(), curParameters.end());
 	}
-	
+	for (auto element : parameters) jSave["parameters"].push_back(element.first);
 	saveMidiMap(jSave);
 	return jSave;
 }

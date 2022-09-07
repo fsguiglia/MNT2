@@ -6,7 +6,7 @@ TriggerPage::TriggerPage()
 	setMidiOutput(true);
 	setOscOutput(false);
 	setStringOutput(false);
-	setAddress("cbcs/");
+	setAddress("");
 }
 
 void TriggerPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
@@ -54,7 +54,6 @@ void TriggerPage::setupGui()
 	_gui->setEnabled(false);
 	_gui->update();
 
-	_gui->update();
 	_sortGui->onButtonEvent(this, &TriggerPage::buttonEvent);
 	_sortGui->onDropdownEvent(this, &TriggerPage::dropDownEvent);
 
@@ -65,6 +64,7 @@ void TriggerPage::setupGui()
 	_gui->getLabel("Parameters")->setBorder(_borderColor, 0);
 	_gui->getTextInput("add")->setBorder(_borderColor, 0);
 	_gui->getToggle("parameterLearn")->setBorder(_borderColor, 0);
+	_gui->update();
 }
 
 void TriggerPage::setupAnalysis()
@@ -499,6 +499,7 @@ ofJson TriggerPage::save()
 		curPoint["radius"] = points[i].getRadius();
 		curPoint["threshold"] = points[i].getThreshold();
 		curPoint["switch"] = points[i].getSwitch();
+		
 		map<string, float> curParameters = points[i].getParameters();
 		for (auto parameter : curParameters)
 		{
