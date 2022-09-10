@@ -129,6 +129,27 @@ void RGBMap::selectFeatures(string xFeature, string yFeature)
 	}
 }
 
+void RGBMap::sortByParameter(int axis, string parameter)
+{
+	for (auto& point : _points)
+	{
+		ofVec2f curPos = point.getPosition();
+		float curValue = 0;
+		if (point.hasParameter(parameter)) curValue = point.getParameter(parameter);
+		if (axis == 0)
+		{
+			if (curValue * _width + point.getWidth() > _width) curValue = (float)(_width - point.getWidth()) / _width;
+			curPos.x = curValue;
+		}
+		else
+		{
+			if (curValue * _height + point.getHeight() > _height) curValue = (float)(_height - point.getHeight()) / _height;
+			curPos.y = curValue;
+		}
+		point.setPosition(curPos);
+	}
+}
+
 void RGBMap::updateFbo()
 {
 	ofPushStyle();

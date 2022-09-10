@@ -25,6 +25,7 @@ public:
 	vector<pair<string, float>> getOutput();
 
 	void selectFeatures(string xFeature, string yFeature);
+	void sortByParameter(int axis, string parameter);
 private:
 	void updateFbo();
 	void updateOutput();

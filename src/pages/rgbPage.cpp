@@ -556,7 +556,7 @@ ofJson RGBPage::save()
 		jSave["points"].push_back(curPoint);
 		parameters.insert(curParameters.begin(), curParameters.end());
 	}
-
+	for (auto element : parameters) jSave["parameters"].push_back(element.first);
 	saveMidiMap(jSave);
 	return jSave;
 }

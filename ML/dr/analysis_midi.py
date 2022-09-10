@@ -32,7 +32,7 @@ def analyze(args):
 			D = json.load(f)
 		X, cc, pos = get_data(D)
 		PCA = getPCA(X, 0.8)
-		if PCA.shape[1] < 2: 
+		if PCA.shape[1] < 2: 	
 			PCA = getPCA(X, 2)
 		TSNE = getTSNE(PCA, 2, perplexity, learning_rate, iterations)
 		TSNE = min_max_normalize(TSNE)
