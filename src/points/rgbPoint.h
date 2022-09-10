@@ -24,6 +24,7 @@ private:
 	bool _isTrigger, _state, _updateImage;
 	int _width, _height, _maxPixels;
 	ofImage _img;
+	ofFbo _fbo;
 	ofPixels _pixels;
 	string _imgPath;
 };

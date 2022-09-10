@@ -20,9 +20,16 @@ RGBPoint::RGBPoint(int width, int height, int maxPixels)
 void RGBPoint::setImage(ofImage img)
 {
 	_img = img;
-	_pixels = _img.getPixels();
+	_img.setImageType(ofImageType::OF_IMAGE_GRAYSCALE);
 	_width = _img.getWidth();
 	_height = _img.getHeight();
+	_fbo.allocate(_width, _height);
+	_fbo.begin();
+	ofSetColor(255);
+	ofDrawRectangle(0, 0, _width, _height);
+	_img.draw(0, 0);
+	_fbo.end();
+	_fbo.readToPixels(_pixels);
 }
 
 void RGBPoint::setImage(ofImage img, string path)
@@ -93,13 +100,10 @@ int RGBPoint::getWidth()
 
 void RGBPoint::setSize(int w, int h)
 {
-	if (_img.isAllocated())
-	{
-		_img.resize(w, h);
-		_pixels = _img.getPixels();
-		_width = w;
-		_height = h;
-	}
+	_width = w;
+	_height = h;
+	_fbo.readToPixels(_pixels);
+	_pixels.resize(w, h);
 }
 
 void RGBPoint::setTrigger(bool isTrigger)
@@ -123,8 +127,7 @@ void RGBPoint::draw(int x, int y, int w, int h)
 	{
 		ofPushStyle();
 		ofSetColor(255);
-		ofDrawRectangle(x, y, w, h);
-		_img.draw(x, y, w, h);
+		_fbo.draw(x, y, w, h);
 		ofSetColor(255, 0, 0);
 		ofNoFill();
 		ofDrawRectangle(x, y, w, h);
