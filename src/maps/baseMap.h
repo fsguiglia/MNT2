@@ -25,8 +25,11 @@ public:
 	void removeGlobalParameter(string parameter);
 	void clearGlobalParameters();
 	void addPointParameter(int index, string parameter, float value);
+	void addPointFeature(int index, string feature, float value);
 	void setPointParameter(int index, string parameter, float value);
+	void setPointFeature(int index, string feature, float value);
 	void removePointParameter(int index, string parameter);
+	void removePointFeature(int index, string feature);
 	map<string, float> getParameters();
 	void setActive(bool active);
 	bool getActive();
@@ -232,6 +235,12 @@ void BaseMap<T>::addPointParameter(int index, string parameter, float value)
 	if (!_points[index].hasParameter(parameter)) _points[index].setParameter(parameter, value);
 }
 
+template<typename T>
+inline void BaseMap<T>::addPointFeature(int index, string feature, float value)
+{
+	if (!_points[index].hasFeature(feature)) _points[index].setFeature(feature, value);
+}
+
 
 template<typename T>
 void BaseMap<T>::setPointParameter(int index, string parameter, float value)
@@ -240,9 +249,21 @@ void BaseMap<T>::setPointParameter(int index, string parameter, float value)
 }
 
 template<typename T>
+inline void BaseMap<T>::setPointFeature(int index, string feature, float value)
+{
+	if (_points[index].hasFeature(parameter)) _points[index].setFeature(feature, value);
+}
+
+template<typename T>
 void BaseMap<T>::removePointParameter(int index, string parameter)
 {
 	_points[index].deleteParameter(parameter);
+}
+
+template<typename T>
+inline void BaseMap<T>::removePointFeature(int index, string feature)
+{
+	_points[index].deleteFeature(feature);
 }
 
 template<typename T>

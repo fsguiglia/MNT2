@@ -23,6 +23,8 @@ public:
 	void setCursor(ofVec2f cursor, int index);
 	vector<ofVec2f> getCursors();
 	vector<pair<string, float>> getOutput();
+
+	void selectFeatures(string xFeature, string yFeature);
 private:
 	void updateFbo();
 	void updateOutput();

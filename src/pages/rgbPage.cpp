@@ -439,7 +439,6 @@ void RGBPage::mouseScrolled(int scroll)
 	_gui->scroll(scroll);
 }
 
-
 void RGBPage::load(ofJson & json)
 {
 	if (json.find("error") == json.end())
@@ -456,32 +455,34 @@ void RGBPage::load(ofJson & json)
 			for (auto& feature : json["features"]) features.push_back(feature);
 			_map.setFeatures(features);
 		}
-		//load points
-		for (ofJson point : json["points"])
+		//load points (bug when using addPoint(RGBPoint point) ????)
+		for (ofJson curPoint : json["points"])
 		{
-			RGBPoint curPoint;
+
+			ofVec2f position = ofVec2f(curPoint["pos"]["x"], curPoint["pos"]["y"]);
+			bool isTrigger = curPoint["trigger"].get<bool>();
 			ofImage img;
-			bool imageLoaded = img.load(point["image_path"].get<string>());
+			bool imageLoaded = img.load(curPoint["image_path"].get<string>());
 			if (!imageLoaded)
 			{
 				img.allocate(100, 100, ofImageType::OF_IMAGE_GRAYSCALE);
 				img.setColor(200);
 			}
-			curPoint.setPosition(point["pos"]["x"], point["pos"]["y"]);
-			curPoint.setTrigger(point["trigger"].get<bool>());
-			curPoint.setImage(img, point["image_path"]);
-			curPoint.setSize(point["width"], point["height"]);
-			if (point.find("parameters") != point.end())
+			int index = _map.addPoint(position, img, curPoint["image_path"].get<string>());
+			_map.setTrigger(index, isTrigger);
+			_map.resizePoint(index, curPoint["width"], curPoint["height"]);
+			if (curPoint.find("parameters") != curPoint.end())
 			{
-				auto obj = point["parameters"].get<ofJson::object_t>();
-				for (auto parameter : obj) curPoint.setParameter(parameter.first, parameter.second);
+				auto obj = curPoint["parameters"].get<ofJson::object_t>();
+				for (auto parameter : obj) _map.addPointParameter(index, parameter.first, parameter.second);
 			}
 			if (curFeatures)
 			{
-				for (auto& feature : _map.getFeatures()) curPoint.setFeature(feature, point["features"][feature]);
+				for (auto& feature : _map.getFeatures()) _map.addPointFeature(index, feature, curPoint["features"][feature]);
 			}
-			_map.addPoint(curPoint);
 		}
+		_radius = json["radius"];
+		_map.setRadius(_radius);
 		//clear feature selection gui
 		if (prevFeatures)
 		{
@@ -511,7 +512,6 @@ void RGBPage::load(ofJson & json)
 		//init
 		_radius = json["radius"];
 		_map.setRadius(_radius);
-
 		if (_map.getPoints().size() != 0)
 		{
 			_map.setLastSelected(0, ofGetElapsedTimeMillis());
@@ -528,10 +528,10 @@ ofJson RGBPage::save()
 {
 	ofJson jSave = MapPage::save();
 	map<string, float> parameters = _map.getParameters();
-	
-	for (auto& element : _map.getFeatures()) jSave["features"].push_back(element);
-	jSave["selected"] = { _map.getSelectedFeatures().first, _map.getSelectedFeatures().second };
+
+	for (auto& feature : _map.getFeatures()) jSave["features"].push_back(feature);
 	jSave["radius"] = _radius;
+
 	vector<RGBPoint> points = _map.getPoints();
 	for (int i = 0; i < points.size(); i++)
 	{
@@ -556,7 +556,7 @@ ofJson RGBPage::save()
 		jSave["points"].push_back(curPoint);
 		parameters.insert(curParameters.begin(), curParameters.end());
 	}
-	for (auto element : parameters) jSave["parameters"].push_back(element.first);
+
 	saveMidiMap(jSave);
 	return jSave;
 }

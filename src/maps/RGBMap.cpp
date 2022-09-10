@@ -109,6 +109,26 @@ vector<pair<string, float>> RGBMap::getOutput()
 	return _output;
 }
 
+void RGBMap::selectFeatures(string xFeature, string yFeature)
+{
+	bool valid = std::find(_features.begin(), _features.end(), xFeature) != _features.end();
+	valid = valid && std::find(_features.begin(), _features.end(), yFeature) != _features.end();
+	if (valid)
+	{
+		_selectedFeatures.first = xFeature;
+		_selectedFeatures.second = yFeature;
+		for (auto& point : _points)
+		{
+			ofVec2f position;
+			position.x = point.getFeature(_selectedFeatures.first);
+			if (position.x * _width + point.getWidth() > _width) position.x = (float)(_width - point.getWidth()) / _width;
+			position.y = point.getFeature(_selectedFeatures.second);
+			if (position.y * _height + point.getHeight() > _height) position.y = (float)(_height - point.getHeight()) / _height;
+			point.setPosition(position);
+		}
+	}
+}
+
 void RGBMap::updateFbo()
 {
 	ofPushStyle();
