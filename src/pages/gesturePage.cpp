@@ -31,6 +31,11 @@ void GesturePage::setupGui(string name)
 {
 	_gui = new ScrollGui();
 	_gui->addHeader(name, false)->setName("Header");
+	_controlFolder = _gui->addFolder("Control");
+	_controlFolder->addSlider("x", 0, 1, 0)->setName("x");
+	_controlFolder->addSlider("y", 0, 1, 0)->setName("y");
+	_controlFolder->addToggle("MIDI Learn")->setName("Learn");
+	_controlFolder->addButton("Clear mappings");
 	_transportFolder = _gui->addFolder("Transport");
 	_transportFolder->addToggle("Record")->setName("Record");
 	_transportFolder->addButton("Play")->setName("Play");
@@ -39,16 +44,14 @@ void GesturePage::setupGui(string name)
 	_transportFolder->addButton("Random")->setName("Random");
 	_transportFolder->addSlider("Scrub", 0, 1, 0)->setName("Scrub");
 	_transportFolder->collapse();
+	/*
 	_generateFolder = _gui->addFolder("Generate");
 	_generateFolder->addButton("Generate neural network model")->setName("Train");
 	_generateFolder->addBreak();
 	_generateFolder->addButton("Load model and generate gestures")->setName("Generate");
 	_generateFolder->addSlider("Temperature", 0, 1, _lstmGen.getParameter("--temperature"));
 	_generateFolder->collapse();
-	_gui->addSlider("x", 0, 1, 0)->setName("x");
-	_gui->addSlider("y", 0, 1, 0)->setName("y");
-	_gui->addToggle("MIDI Learn")->setName("Learn");
-	_gui->addButton("Clear mappings");
+	*/
 	_gui->addBreak();
 	_gui->addButton("Delete gesture")->setName("Delete");
 	_gui->addBreak();
@@ -70,14 +73,17 @@ void GesturePage::setupGui(string name)
 	_scrollView->onScrollViewEvent(this, &GesturePage::scrollViewEvent);
 	_scrollView->setOpacity(0.5);
 	_scrollView->setPosition(_gui->getPosition().x + 1, _guiHeight);
-	//_scrollView->setHeight(40);
 	_scrollView->setTheme(new ofxDatGuiThemeWireframe());
 	_scrollView->setBackgroundColor(140);
 	_scrollView->setWidth(_guiWidth - 1, 0.3);
-	_scrollView->setHeight(140);
+	_scrollView->setHeight(300);
 	_scrollView->setEnabled(false);
 	_scrollView->setVisible(false);
 	_scrollView->update();
+
+	_controlFolder->setBorder(_borderColor, 0);
+	_transportFolder->setBorder(_borderColor, 0);
+	_gui->getButton("Delete")->setBorder(_borderColor, 0);
 }
 
 void GesturePage::setupLSTM()
@@ -92,7 +98,7 @@ void GesturePage::setupLSTM()
 	//_lstmGen.setup("../ML/lstm/mnt_lstm.py", "gest", "python"); //exe
 	map<string, float> genParameters;
 	genParameters["--script"] = 1;
-	genParameters["--temperature"] = 0.1;
+	genParameters["--temperature"] = 0.3;
 	_lstmGen.setParameters(genParameters);
 }
 

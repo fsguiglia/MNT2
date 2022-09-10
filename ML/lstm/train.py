@@ -95,14 +95,13 @@ def get_gestures(data):
 	time = 0
 	if(num_points > 0):
 		time = time_sum / num_points
-	
 	return gesture_list, time
 
 def get_mean_std(sequences):
 	x = list()
 	y = list()
 	for sequence in sequences:
-		for point in sequence:
+		for point in sequence:	
 			x.append(point[0])
 			y.append(point[1])
 	x = np.array(x)
@@ -110,6 +109,9 @@ def get_mean_std(sequences):
 	mean = (x.mean(), y.mean())
 	std = (x.std(), y.std())
 	return mean, std
+
+def rotate(sequence, radians):
+	
 
 def get_examples(sequence, length):
 	X = list()
