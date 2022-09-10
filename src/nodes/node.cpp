@@ -19,7 +19,7 @@ void Node::setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeF
 	setName("node", false);
 	_rect.height = h;
 	_rect.width = 50;
-	_connectorWidth = 5;
+	_connectorWidth = 10;
 	_color = ofColor(80, 80, 80);
 	
 	_isInput = false;
@@ -153,7 +153,7 @@ void Node::setName(string name, bool addId)
 	_name = name;
 	if (addId) _name += "/" + ofToString(_id);
 	ofRectangle bb = _font.getStringBoundingBox(_name, 0, 0);
-	_rect.setWidth(bb.width * 1.2);
+	_rect.setWidth(bb.width * 1.2 + 5);
 }
 
 string Node::getName()

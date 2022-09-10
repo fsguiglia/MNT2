@@ -421,8 +421,9 @@ void NNIPage::load(ofJson& json)
 		{
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
+			_sortGui->removeComponent(_sortGui->getButton("closeSortGui"));
 		}
-		_sortGui->removeComponent(_sortGui->getButton("closeSortGui"));
+		
 		//add parameters to gui
 		if (curFeatures)
 		{
@@ -435,11 +436,10 @@ void NNIPage::load(ofJson& json)
 			guiFeatures.push_back(_selSortParameterLabel);
 			_sortGui->addDropdown("x", guiFeatures)->setName("sort-x");
 			_sortGui->addDropdown("y", guiFeatures)->setName("sort-y");
+			_sortGui->addButton("close")->setName("closeSortGui");
 			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
 			_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
 			_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
-			_sortGui->addButton("close")->setName("closeSortGui");
-			_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
 			_sortGui->update();
 		}
 		//init

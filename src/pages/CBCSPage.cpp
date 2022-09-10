@@ -63,6 +63,7 @@ void CBCSPage::setupGui()
 	_gui->getButton("Export_list")->setBorder(_borderColor, 0);
 
 	_sortGui->onDropdownEvent(this, &CBCSPage::dropDownEvent);
+	_sortGui->onButtonEvent(this, &CBCSPage::buttonEvent);
 }
 
 void CBCSPage::setupAnalysis()
@@ -144,7 +145,12 @@ void CBCSPage::updateOutput()
 
 void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 {
-	if (e.target->getName() == "analyze")	if (!_dr.getRunning() && !_export.getRunning()) _dr.start();
+	string name = e.target->getName();
+		int i = 1;
+	if (e.target->getName() == "analyze")
+	{
+		if (!_dr.getRunning() && !_export.getRunning()) _dr.start();
+	}
 	else if (e.target->getName() == "Normalize")
 	{
 		_map.normalize();
@@ -163,6 +169,11 @@ void CBCSPage::buttonEvent(ofxDatGuiButtonEvent e)
 	else if (e.target->getName() == "clearMIDI")
 	{
 		clearMidiMap();
+	}
+	else if (e.target->getName() == "closeSortGui")
+	{
+		_showSortGui = false;
+		_gui->getToggle("showSortGui")->setChecked(false);
 	}
 }
 
@@ -389,8 +400,10 @@ void CBCSPage::loadData(ofJson & json)
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
 		}
+		_sortGui->removeComponent(_sortGui->getButton("closeSortGui"));
 		_sortGui->addDropdown("x", _map.getFeatures())->setName("sort-x");
 		_sortGui->addDropdown("y", _map.getFeatures())->setName("sort-y");
+		_sortGui->addButton("close")->setName("closeSortGui");
 		_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
 		_sortGui->getDropdown("sort-x")->setLabel("x:" + _map.getSelectedFeatures().first);
 		_sortGui->getDropdown("sort-y")->setLabel("y:" + _map.getSelectedFeatures().second);
