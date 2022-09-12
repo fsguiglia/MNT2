@@ -4,6 +4,7 @@ Page::Page()
 {
 	_controlLearn = false;
 	_parameterLearn = false;
+	_listeningMouse = false;
 	_borderColor = ofColor(240);
 }
 
@@ -293,4 +294,14 @@ ofRectangle Page::centerSquarePosition(int w, int h)
 	rect.setY(float(h - min) * 0.5);
 
 	return rect;
+}
+
+bool Page::getListeningMouse()
+{
+	return _listeningMouse;
+}
+
+void Page::setListeningMouse(bool listening)
+{
+	_listeningMouse = listening;
 }

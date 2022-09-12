@@ -5,6 +5,7 @@ GesturePage::GesturePage()
 	setMidiOutput(false);
 	setOscOutput(true);
 	setStringOutput(false);
+	setListeningMouse(true);
 
 	_visible = false;
 	_recording = false;

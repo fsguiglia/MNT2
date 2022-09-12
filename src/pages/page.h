@@ -30,6 +30,8 @@ public:
 	//virtual void sliderEvent(ofxDatGuiSliderEvent e) = 0;
 
 	//mouse input
+	bool getListeningMouse();
+	void setListeningMouse(bool listening);
 	virtual void mouseMoved(int x, int y) = 0;
 	virtual void mouseDragged(int x, int y, int button) = 0;
 	virtual void mousePressed(int x, int y, int button, bool doubleClick = false) = 0;
@@ -81,7 +83,7 @@ protected:
 	ofxDatGui* _sortGui;
 	ofRectangle _position;
 	int _guiWidth;
-	bool _visible, _inside;
+	bool _visible, _inside, _listeningMouse;
 	bool _controlLearn, _parameterLearn; //parameterlearn no tiene sentido para los generadores
 	ofTrueTypeFont _font;
 

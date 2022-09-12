@@ -308,7 +308,7 @@ void RGBPage::mouseMoved(int x, int y)
 
 void RGBPage::mouseDragged(int x, int y, int button)
 {
-	if (!_showSortGui)
+	if (!_showSortGui && !_map.getActive())
 	{
 		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
 		bool insideGui = guiPosition.inside(x, y);
@@ -322,7 +322,7 @@ void RGBPage::mouseDragged(int x, int y, int button)
 
 void RGBPage::mousePressed(int x, int y, int button, bool doubleClick)
 {
-	if (!_showSortGui)
+	if (!_showSortGui & !_map.getActive())
 	{
 		_inside = _position.inside(x, y);
 		ofRectangle guiPosition(_gui->getPosition(), _gui->getWidth(), _gui->getHeight());
@@ -369,7 +369,7 @@ void RGBPage::mouseReleased(int x, int y, int button)
 	_inside = _position.inside(x, y);
 	if (button == 2)
 	{
-		if (_inside && !_showSortGui)
+		if (_inside && !_showSortGui && !_map.getActive())
 		{
 			_map.removePoint(normalized);
 			if (_map.getPoints().size() > 0)

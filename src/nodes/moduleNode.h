@@ -18,6 +18,7 @@ public:
 	int getPageHeight();
 	int getPageWidth();
 
+	bool getListeningMouse();
 	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);
 	void mousePressed(int x, int y, int button, bool doubleClick = false);
@@ -123,6 +124,12 @@ template<typename T>
 inline int ModuleNode<T>::getPageWidth()
 {
 	return _page->getWidth();
+}
+
+template<typename T>
+inline bool ModuleNode<T>::getListeningMouse()
+{
+	return _page->getListeningMouse();
 }
 
 template<typename T>

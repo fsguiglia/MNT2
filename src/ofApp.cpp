@@ -1381,7 +1381,7 @@ void ofApp::mouseMoved(int x, int y){
 	case EDIT_MODE:
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getVisible()) node->mouseMoved(x, y);
+			if (node->getVisible() || node->getListeningMouse()) node->mouseMoved(x, y);
 		}
 		break;
 	case TILE_MODE:
@@ -1423,7 +1423,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 	case EDIT_MODE:
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getVisible()) node->mouseDragged(x, y, button);
+			if (node->getVisible() || node->getListeningMouse()) node->mouseDragged(x, y, button);
 		}
 		break;
 
@@ -1497,7 +1497,7 @@ void ofApp::mousePressed(int x, int y, int button){
 			{
 				doubleClick = ofGetElapsedTimeMillis() - _lastClick < 300;
 			}
-			if (node->getVisible()) node->mousePressed(x, y, button, doubleClick);
+			if (node->getVisible() || node->getListeningMouse()) node->mousePressed(x, y, button, doubleClick);
 		}
 		break;
 
@@ -1623,7 +1623,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 	case EDIT_MODE:
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getVisible()) node->mouseReleased(x, y, button);
+			if (node->getVisible() || node->getListeningMouse()) node->mouseReleased(x, y, button);
 		}
 		if (_prevNextButton)
 		{
@@ -1658,7 +1658,7 @@ void ofApp::mouseScrolled(ofMouseEventArgs& mouse)
 	case EDIT_MODE:
 		for (auto& node : _moduleNodes)
 		{
-			if (node->getVisible()) node->mouseScrolled(mouse.scrollY * 5);
+			if (node->getVisible() || node->getListeningMouse()) node->mouseScrolled(mouse.scrollY * 5);
 		}
 		break;
 	case TILE_MODE:
