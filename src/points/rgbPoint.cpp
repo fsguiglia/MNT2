@@ -29,7 +29,7 @@ void RGBPoint::setImage(ofImage img)
 	ofDrawRectangle(0, 0, _width, _height);
 	_img.draw(0, 0);
 	_fbo.end();
-	_fbo.readToPixels(_pixels);
+	_pixels = _img.getPixels();
 }
 
 void RGBPoint::setImage(ofImage img, string path)
@@ -102,8 +102,7 @@ void RGBPoint::setSize(int w, int h)
 {
 	_width = w;
 	_height = h;
-	_fbo.readToPixels(_pixels);
-	_pixels.resize(w, h);
+	_pixels.resize(_width, _height);
 }
 
 void RGBPoint::setTrigger(bool isTrigger)

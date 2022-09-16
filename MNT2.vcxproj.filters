@@ -115,9 +115,6 @@
     <ClCompile Include="src\points\trigger.cpp">
       <Filter>src\points</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\mntUtils.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\pages\gesturePage.cpp">
       <Filter>src\pages</Filter>
     </ClCompile>
@@ -138,6 +135,9 @@
     </ClCompile>
     <ClCompile Include="src\pages\noiseGenerator.cpp">
       <Filter>src\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\mntUtils.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

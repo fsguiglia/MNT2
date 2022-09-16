@@ -7,6 +7,8 @@ ofVec2f normalize(ofVec2f pos, ofRectangle rect);
 
 vector<float> normalize(vector<float> values);
 
+vector<ofVec2f> normalize(vector<ofVec2f> values);
+
 float standardize(float value, float mean, float sd);
 
 vector<float> standardize(vector<float> values, float mean, float sd);

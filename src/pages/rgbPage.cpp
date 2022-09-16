@@ -11,7 +11,7 @@ RGBPage::RGBPage()
 
 void RGBPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
 {
-	_radius = 0.05;
+	_radius = 0.01;
 	_map.setup(w, h);
 	_map.setActive(false);
 	_map.setRandomize(0.);

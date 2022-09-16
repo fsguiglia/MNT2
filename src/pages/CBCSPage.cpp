@@ -6,7 +6,7 @@ CBCSPage::CBCSPage()
 	setMidiOutput(false);
 	setOscOutput(true);
 	setStringOutput(true);
-	setAddress("/concatenate");
+	setAddress("/cbcs");
 }
 
 void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font, int maxMessages)
@@ -19,7 +19,7 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont fon
 	_map.setDrawSelected(true);
 	_map.setCursor(ofVec2f(-1, -1));
 	
-	setAddress("/" + name);
+	//setAddress("/" + name);
 	
 	MapPage::setup(name, w, h, guiWidth, font, maxMessages);
 	setupAnalysis();

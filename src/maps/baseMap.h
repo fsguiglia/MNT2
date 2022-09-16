@@ -1,5 +1,6 @@
 #pragma once
 #include "ofMain.h"
+#include "../utils/mntUtils.h"
 
 template<typename T> class BaseMap {
 public:
@@ -324,6 +325,7 @@ int BaseMap<T>::size()
 template<typename T>
 inline void BaseMap<T>::selectFeatures(string xFeature, string yFeature)
 {
+	vector<ofVec2f> positions;
 	bool valid = std::find(_features.begin(), _features.end(), xFeature) != _features.end();
 	valid = valid && std::find(_features.begin(), _features.end(), yFeature) != _features.end();
 	if (valid)
@@ -335,8 +337,14 @@ inline void BaseMap<T>::selectFeatures(string xFeature, string yFeature)
 			ofVec2f position;
 			position.x = point.getFeature(_selectedFeatures.first);
 			position.y = point.getFeature(_selectedFeatures.second);
-			point.setPosition(position);
+			positions.push_back(position);
 		}
+		positions = normalize(positions);
+		for (int i = 0; i < positions.size(); i++)
+		{
+			_points[i].setPosition(positions[i]);
+		}
+
 	}
 }
 
@@ -361,6 +369,7 @@ inline pair<string, string> BaseMap<T>::getSelectedFeatures()
 template<typename T>
 inline void BaseMap<T>::sortByParameter(int axis, string parameter)
 {
+	vector<ofVec2f> positions;
 	for (auto& point : _points)
 	{
 		ofVec2f curPos = point.getPosition();
@@ -368,7 +377,13 @@ inline void BaseMap<T>::sortByParameter(int axis, string parameter)
 		if (point.hasParameter(parameter)) curValue = point.getParameter(parameter);
 		if (axis == 0) curPos.x = curValue;
 		else curPos.y = curValue;
-		point.setPosition(curPos);
+		positions.push_back(curPos);
+	}
+	positions = normalize(positions);
+	for (int i = 0; i < positions.size(); i++)
+	{
+		cout << positions[i].x << "," << positions[i].y << endl;
+		_points[i].setPosition(positions[i]);
 	}
 }
 

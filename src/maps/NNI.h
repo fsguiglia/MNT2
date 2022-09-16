@@ -23,6 +23,8 @@ public:
 	vector<ofVec2f> getCursors();
 	void setDrawInterpolation(bool drawInterpolation);
 	vector<pair<string, float>> getOutput();
+	void sortByParameter(int axis, string parameter);
+	void selectFeatures(string xFeature, string yFeature);
 private:
 	map<string, float> interpolate(ofVec2f pos, bool renderNewZone = false);
 	void update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites);

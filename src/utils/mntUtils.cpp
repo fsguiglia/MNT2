@@ -2,7 +2,7 @@
 
 float normalize(float value, float min, float max)
 {
-	value = (value - min) / (max - min);
+	if(max != min) value = (value - min) / (max - min);
 	return value;
 }
 
@@ -26,6 +26,37 @@ vector<float> normalize(vector<float> values)
 			if (value > max) max = value;
 		}
 		for (float& value : values) value = normalize(value, min, max);
+	}
+	return values;
+}
+
+vector<ofVec2f> normalize(vector<ofVec2f> values)
+{
+	if (values.size() > 0)
+	{
+		float minX = values[0].x;
+		float maxX = values[0].x;
+		float minY = values[0].y;
+		float maxY = values[0].y;
+		for (auto& value : values)
+		{
+			if (value.x < minX) minX = value.x;
+			if (value.x > maxX) maxX = value.x;
+			if (value.y < minY) minY = value.y;
+			if (value.y > maxY) maxY = value.y;
+		}
+		for (auto& value : values)
+		{
+			if (value.x < minX) minX = value.x;
+			if (value.x > maxX) maxX = value.x;
+			if (value.y < minY) minY = value.y;
+			if (value.y > maxY) maxY = value.y;
+		}
+		for (auto& value : values)
+		{
+			value.x = normalize(value.x, minX, maxX);
+			value.y = normalize(value.y, minY, maxY);
+		}
 	}
 	return values;
 }

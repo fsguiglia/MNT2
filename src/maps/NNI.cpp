@@ -160,6 +160,8 @@ void NNI::generatePoints(int n)
 		{
 			BaseMap::addPoint(point);
 		}
+		_positionChanged = true;
+		update();
 }
 
 void NNI::setCursor(ofVec2f cursor)
@@ -192,6 +194,20 @@ void NNI::setDrawInterpolation(bool drawInterpolation)
 vector<pair<string, float>> NNI::getOutput()
 {
 	return _output;
+}
+
+void NNI::sortByParameter(int axis, string parameter)
+{
+	BaseMap::sortByParameter(axis, parameter);
+	_positionChanged = true;
+	update();
+}
+
+void NNI::selectFeatures(string xFeature, string yFeature)
+{
+	BaseMap::selectFeatures(xFeature, yFeature);
+	_positionChanged = true;
+	update();
 }
 
 void NNI::update(ofFbo& fbo, int mode, int interpolate, vector<Point>& sites)
