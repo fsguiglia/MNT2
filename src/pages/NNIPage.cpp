@@ -422,6 +422,7 @@ void NNIPage::load(ofJson& json)
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-x"));
 			_sortGui->removeComponent(_sortGui->getDropdown("sort-y"));
 			_sortGui->removeComponent(_sortGui->getButton("closeSortGui"));
+			_sortGui->update();
 		}
 		
 		//add parameters to gui

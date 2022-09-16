@@ -382,7 +382,6 @@ inline void BaseMap<T>::sortByParameter(int axis, string parameter)
 	positions = normalize(positions);
 	for (int i = 0; i < positions.size(); i++)
 	{
-		cout << positions[i].x << "," << positions[i].y << endl;
 		_points[i].setPosition(positions[i]);
 	}
 }
