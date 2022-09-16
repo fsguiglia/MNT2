@@ -399,8 +399,8 @@ int ofApp::setupModule(string type, float x, float y)
 	_moduleNodes[index]->setup(x, y, _moduleNodeHeight, 1, 1, _verdana, _moduleColor);
 	_moduleNodes[index]->setName(type, true);
 	_moduleNodes[index]->setPosition(
-		(ofGetWidth() - _moduleNodes[index]->getWidth()) * 0.5 / (float)ofGetWidth(),
-		(ofGetHeight() - _moduleNodes[index]->getHeight()) * 0.5 / (float)ofGetHeight()
+		(ofGetWidth() - _moduleNodes[index]->getWidth()) * x / (float)ofGetWidth(),
+		(ofGetHeight() - _moduleNodes[index]->getHeight()) * y / (float)ofGetHeight()
 	);
 	return index;
 }
