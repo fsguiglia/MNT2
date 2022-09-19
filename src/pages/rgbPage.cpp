@@ -71,8 +71,8 @@ void RGBPage::setupGui()
 
 void RGBPage::setupAnalysis()
 {
-	_dr.setup("../../ML/dr/mnt_analysis.py", "rgb", "python"); //py
-	//_audioDr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
+	//_dr.setup("../../ML/dr/mnt_analysis.py", "rgb", "python"); //py
+	_dr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 5;
 	drParameters["--learning_rate"] = 15;

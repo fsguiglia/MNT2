@@ -34,6 +34,7 @@ void CBCSPage::setupGui()
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
+	_arrangeFolder->addButton("Normalize")->setName("Normalize");
 	_settingsFolder = _gui->addFolder("settings");
 	_settingsFolder->addSlider("radius", 0, 1, _map.getRadius() * 2);
 	_settingsFolder->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
@@ -68,8 +69,8 @@ void CBCSPage::setupGui()
 
 void CBCSPage::setupAnalysis()
 {
-	_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //py
-	//_dr.setup("../ML/dr/mnt_analysis.exe", "cbcs"); //exe
+	//_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //py
+	_dr.setup("../ML/dr/mnt_analysis.exe", "cbcs"); //exe
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;
@@ -82,8 +83,8 @@ void CBCSPage::setupAnalysis()
 
 void CBCSPage::setupExport()
 {
-	_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
-	//_dr.setup("../ML/dr/single_file.exe", "export"); //exe
+	//_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
+	_export.setup("../ML/dr/mnt_analysis.exe", "export"); //exe
 	_export.setParameter("--unit_length", _dr.getParameter("--unit_length"));
 	_export.setParameter("--script", 2);
 }

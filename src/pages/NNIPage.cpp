@@ -60,8 +60,8 @@ void NNIPage::setupGui()
 
 void NNIPage::setupAnalysis()
 {
-	_dr.setup("../../ML/dr/mnt_analysis.py", "nni", "python"); //py
-	//_audioDr.setup("../ML/dr/mnt_analysis.exe", "nni_audio"); //exe
+	//_dr.setup("../../ML/dr/mnt_analysis.py", "nni", "python"); //py
+	_dr.setup("../ML/dr/mnt_analysis.exe", "nni_audio"); //exe
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 5;
 	drParameters["--learning_rate"] = 15;
