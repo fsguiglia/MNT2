@@ -75,8 +75,9 @@ vector<float> standardize(vector<float> values, float mean, float sd)
 
 vector<float> standardize(vector<float> values)
 {
-	float sum = 0.0, mean, sd = 0.0;
+	float sum = 0.0, mean = 0.0, sd = 0.0;
 	for (float value : values) sum += value;
+	mean = sum / values.size();
 	for (float value : values) sd += pow(value - mean, 2);
 	sd = sqrt(sd / values.size());
 	for (float& value : values) value = standardize(value, mean, sd);
