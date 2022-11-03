@@ -1,9 +1,10 @@
 #pragma once
 #include "ofMain.h"
-#include "node.h"
+#include "mntNode.h"
 
-class ModuleInterface : public Node {
+class ModuleInterface : public MNTNode {
 public:
+	virtual ~ModuleInterface() = default;
 	virtual void setupPage(string name, int w, int h, int guiWidth, ofTrueTypeFont font, vector<ofColor> colorPalette) = 0;
 	virtual void setPageHeader(string label) = 0;
 	virtual void update() = 0;

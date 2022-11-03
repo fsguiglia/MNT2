@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "../points/rgbPoint.h"
-#include "BaseMap.h"
+#include "baseMap.h"
 
 class RGBMap : public BaseMap<RGBPoint>
 {

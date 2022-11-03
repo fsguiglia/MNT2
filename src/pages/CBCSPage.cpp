@@ -31,9 +31,11 @@ void CBCSPage::setupGui()
 {
 	_arrangeFolder->addToggle("Analyze complete files", true)->setName("complete");
 	_arrangeFolder->addSlider("unit length", 100, 1000, _dr.getParameter("--unit_length"))->setName("--unit_length");
+	/*
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
+	*/
 	_arrangeFolder->addButton("Normalize")->setName("Normalize");
 	_settingsFolder = _gui->addFolder("settings");
 	_settingsFolder->addSlider("radius", 0, 1, _map.getRadius() * 2);

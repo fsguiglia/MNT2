@@ -4,7 +4,7 @@
 #include "ofxDatGui.h"
 #include "ofxOsc.h"
 #include "ofxMidi.h"
-#include "nodes/node.h"
+#include "nodes/mntNode.h"
 #include "nodes/moduleInterface.h"
 #include "nodes/moduleNode.h"
 #include "nodes/connection.h"
@@ -82,8 +82,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 
 		//Nodes
 		vector<unique_ptr<ModuleInterface>> _moduleNodes;
-		vector<Node> _inputNodes;
-		vector<Node> _outputNodes;
+		vector<MNTNode> _inputNodes;
+		vector<MNTNode> _outputNodes;
 		vector<Connection> _connections;
 		string _selected = ""; 
 		ofVec2f _selectionOffset;

@@ -1,8 +1,8 @@
-#include "node.h"
+#include "mntNode.h"
 
-Node::Node()
+MNTNode::MNTNode()
 {
-	_name = "node";
+	_name = "MNTNode";
 	_rect.width = 50;
 	_rect.height = 30;
 	_color = ofColor(80, 80, 80);
@@ -14,9 +14,9 @@ Node::Node()
 	setName(_name, false);
 }
 
-void Node::setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeFont font, ofColor color)
+void MNTNode::setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeFont font, ofColor color)
 {
-	setName("node", false);
+	setName("MNTNode", false);
 	_rect.height = h;
 	_rect.width = 50;
 	_connectorWidth = 10;
@@ -33,7 +33,7 @@ void Node::setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeF
 	_font = font;
 }
 
-void Node::setInputs(int inputs)
+void MNTNode::setInputs(int inputs)
 {
 	_inputs = inputs;
 	_inPositions.clear();
@@ -48,7 +48,7 @@ void Node::setInputs(int inputs)
 	}
 }
 
-void Node::setOutputs(int outputs)
+void MNTNode::setOutputs(int outputs)
 {
 	_outputs = outputs;
 	_outPositions.clear();
@@ -63,12 +63,12 @@ void Node::setOutputs(int outputs)
 	}
 }
 
-void Node::setColor(ofColor color)
+void MNTNode::setColor(ofColor color)
 {
 	_color = color;
 }
 
-void Node::draw()
+void MNTNode::draw()
 {
 	ofPushStyle();
 	ofSetColor(_color);
@@ -97,43 +97,43 @@ void Node::draw()
 	ofPopStyle();
 }
 
-void Node::setSize(int w, int h)
+void MNTNode::setSize(int w, int h)
 {
 	_rect.setWidth(w);
 	_rect.setHeight(h);
 }
 
-void Node::setPosition(float x, float y)
+void MNTNode::setPosition(float x, float y)
 {
 	_rect.setPosition(x, y);
 }
 
-ofVec2f Node::getPosition()
+ofVec2f MNTNode::getPosition()
 {
 	return _rect.getPosition();
 }
 
-int Node::getWidth()
+int MNTNode::getWidth()
 {
 	return _rect.width;
 }
 
-int Node::getHeight()
+int MNTNode::getHeight()
 {
 	return _rect.height;
 }
 
-int Node::getInputs()
+int MNTNode::getInputs()
 {
 	return _inputs;
 }
 
-int Node::getOutputs()
+int MNTNode::getOutputs()
 {
 	return _outputs;
 }
 
-ofRectangle Node::getInputConnector(int index)
+ofRectangle MNTNode::getInputConnector(int index)
 {
 	ofRectangle connector = _rect;
 	connector.width = 30;
@@ -142,13 +142,13 @@ ofRectangle Node::getInputConnector(int index)
 	return connector;
 }
 
-ofRectangle Node::getOutputConnector(int index)
+ofRectangle MNTNode::getOutputConnector(int index)
 {
 	ofRectangle connector = _outPositions[index];
 	return connector;
 }
 
-void Node::setName(string name, bool addId)
+void MNTNode::setName(string name, bool addId)
 {
 	_name = name;
 	if (addId) _name += "/" + ofToString(_id);
@@ -156,22 +156,22 @@ void Node::setName(string name, bool addId)
 	_rect.setWidth(bb.width * 1.2 + 5);
 }
 
-string Node::getName()
+string MNTNode::getName()
 {
 	return _name;
 }
 
-void Node::setId(int id)
+void MNTNode::setId(int id)
 {
 	_id = id;
 }
 
-int Node::getId()
+int MNTNode::getId()
 {
 	return _id;
 }
 
-int Node::inside(int x, int y, bool select)
+int MNTNode::inside(int x, int y, bool select)
 {
 	int in = -1;
 	_selectedOut = -1;
@@ -197,31 +197,31 @@ int Node::inside(int x, int y, bool select)
 	return in;
 }
 
-void Node::setAsInput(bool isInput)
+void MNTNode::setAsInput(bool isInput)
 {
 	_isInput = isInput;
 	_inputs = 0;
 	_outputs = 1;
 }
 
-void Node::setAsOutput(bool isOutput)
+void MNTNode::setAsOutput(bool isOutput)
 {
 	_isOutput = isOutput;
 	_inputs = 1;
 	_outputs = 0;
 }
 
-bool Node::isInput()
+bool MNTNode::isInput()
 {
 	return _isInput;
 }
 
-bool Node::isOutput()
+bool MNTNode::isOutput()
 {
 	return _isOutput;
 }
 
-ofRectangle Node::getBox()
+ofRectangle MNTNode::getBox()
 {
 	return _rect;
 }

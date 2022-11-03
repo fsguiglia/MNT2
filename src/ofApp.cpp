@@ -405,8 +405,6 @@ int ofApp::setupModule(string type, float x, float y)
 	return index;
 }
 
-
-
 void ofApp::setupModulePage(int index)
 {
 	_moduleNodes[index]->setupPage(
@@ -485,7 +483,7 @@ string ofApp::createMIDIInput(string port, float x, float y)
 	_MIDIInputs[name].openPort(_MIDIInPorts[port]);
 	_MIDIInputs[name].addListener(this);
 
-	Node node;
+	MNTNode node;
 	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
 	node.setName(name);
 	node.setAsInput(true);
@@ -530,7 +528,7 @@ string ofApp::createMIDIOutput(string port, float x, float y)
 	_MIDIOutputs[name] = ofxMidiOut();
 	_MIDIOutputs[name].openPort(_MIDIOutPorts[port]);
 
-	Node node;
+	MNTNode node;
 	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
 	node.setName(name);
 	node.setAsOutput(true);
@@ -632,7 +630,7 @@ void ofApp::createOscInput(string port, float x, float y)
 	_oscReceivers[port] = ofxOscReceiver();
 	_oscReceivers[port].setup(ofToInt(port));
 
-	Node node;
+	MNTNode node;
 	node.setup(x, y, 30, 0, 1, _verdana, _ioColor);
 	node.setName("osc:" + port);
 	node.setAsInput(true);
@@ -673,7 +671,7 @@ void ofApp::createOscOutput(string ip, string port, float x, float y)
 	sender.setup(ip, ofToInt(port));
 	_oscSenders[name] = sender;
 
-	Node node;
+	MNTNode node;
 	node.setup(x, y, 30, 1, 0, _verdana, _ioColor);
 	node.setName("osc:" + name);
 	node.setAsOutput(true);
@@ -892,7 +890,7 @@ void ofApp::updateConnections()
 							}
 						}
 						if (node->getOscOutput()) {
-							vector<pair<string, float>>& curOutput = node->getOSCOut();
+							vector<pair<string, float>> curOutput = node->getOSCOut();
 							for (auto& message : curOutput) OSCMessages[message.first].push_back(message.second);
 						}
 						if (node->getStringOutput())

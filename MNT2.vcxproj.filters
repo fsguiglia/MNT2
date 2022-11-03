@@ -103,9 +103,6 @@
     <ClCompile Include="src\ML\pythonML.cpp">
       <Filter>src\ML</Filter>
     </ClCompile>
-    <ClCompile Include="src\nodes\node.cpp">
-      <Filter>src\nodes</Filter>
-    </ClCompile>
     <ClCompile Include="src\points\point.cpp">
       <Filter>src\points</Filter>
     </ClCompile>
@@ -138,6 +135,9 @@
     </ClCompile>
     <ClCompile Include="src\utils\mntUtils.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nodes\mntNode.cpp">
+      <Filter>src\nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -464,9 +464,6 @@
     <ClInclude Include="src\nodes\moduleNode.h">
       <Filter>src\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="src\nodes\node.h">
-      <Filter>src\nodes</Filter>
-    </ClInclude>
     <ClInclude Include="src\points\point.h">
       <Filter>src\points</Filter>
     </ClInclude>
@@ -503,6 +500,9 @@
     </ClInclude>
     <ClInclude Include="src\pages\noiseGenerator.h">
       <Filter>src\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nodes\mntNode.h">
+      <Filter>src\nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,10 @@
 #pragma once
 #include "ofMain.h"
 
-class Node
+class MNTNode
 {
 public:
-	Node();
+	MNTNode();
 	void setup(float x, float y, float h, int inputs, int outputs, ofTrueTypeFont font, ofColor color);
 	void setInputs(int inputs);
 	void setOutputs(int outputs);

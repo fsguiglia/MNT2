@@ -51,7 +51,6 @@ private:
 	bool _visible;
 };
 
-
 template<typename T>
 int ModuleNode<T>::ID = 0;
 

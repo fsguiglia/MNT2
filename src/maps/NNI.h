@@ -1,6 +1,6 @@
 #pragma once
 #include "ofMain.h"
-#include "BaseMap.h"
+#include "baseMap.h"
 #include "../points/point.h"
 
 class NNI : public BaseMap<Point>

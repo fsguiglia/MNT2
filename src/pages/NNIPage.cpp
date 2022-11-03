@@ -24,9 +24,11 @@ void NNIPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font
 
 void NNIPage::setupGui()
 {
+	/*
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
+	*/
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->addButton("generate");
 	_gui->addLabel("Parameters")->setName("Parameters");
@@ -61,7 +63,7 @@ void NNIPage::setupGui()
 void NNIPage::setupAnalysis()
 {
 	//_dr.setup("../../ML/dr/mnt_analysis.py", "nni", "python"); //py
-	_dr.setup("../ML/dr/mnt_analysis.exe", "nni_audio"); //exe
+	_dr.setup("../ML/dr/mnt_analysis.exe", "nni"); //exe
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 5;
 	drParameters["--learning_rate"] = 15;

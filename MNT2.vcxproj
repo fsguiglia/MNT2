@@ -192,7 +192,7 @@
     <ClCompile Include="src\maps\RGBMap.cpp" />
     <ClCompile Include="src\maps\triggerMap.cpp" />
     <ClCompile Include="src\ML\pythonML.cpp" />
-    <ClCompile Include="src\nodes\node.cpp" />
+    <ClCompile Include="src\nodes\mntNode.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\core\ofxDatGuiComponent.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDatGui\src\libs\ofxSmartFont\ofxSmartFont.cpp" />
@@ -244,7 +244,7 @@
     <ClInclude Include="src\nodes\connection.h" />
     <ClInclude Include="src\nodes\moduleInterface.h" />
     <ClInclude Include="src\nodes\moduleNode.h" />
-    <ClInclude Include="src\nodes\node.h" />
+    <ClInclude Include="src\nodes\mntNode.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGui2dPad.h" />
     <ClInclude Include="..\..\..\addons\ofxDatGui\src\components\ofxDatGuiButton.h" />

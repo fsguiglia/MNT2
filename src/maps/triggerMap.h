@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "../points/trigger.h"
-#include "BaseMap.h"
+#include "baseMap.h"
 
 class TriggerMap : public BaseMap<Trigger>{
 

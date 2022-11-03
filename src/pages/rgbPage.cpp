@@ -28,9 +28,11 @@ void RGBPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont font
 void RGBPage::setupGui()
 {
 	_controlFolder->addSlider("Radius", 0., 1., _radius)->setName("Radius");
+	/*
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
+	*/
 	_gui->addLabel("Parameters")->setName("Parameters");
 	_gui->getLabel("Parameters")->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 	_settingsFolder = _gui->addFolder("settings");
@@ -72,7 +74,7 @@ void RGBPage::setupGui()
 void RGBPage::setupAnalysis()
 {
 	//_dr.setup("../../ML/dr/mnt_analysis.py", "rgb", "python"); //py
-	_dr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
+	_dr.setup("../ML/dr/mnt_analysis.exe", "rgb"); //exe
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 5;
 	drParameters["--learning_rate"] = 15;

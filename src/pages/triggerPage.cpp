@@ -27,9 +27,11 @@ void TriggerPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont 
 
 void TriggerPage::setupGui()
 {
+	/*
 	_arrangeFolder->addSlider("perplexity", 5, 50, _dr.getParameter("--perplexity"))->setName("--perplexity");
 	_arrangeFolder->addSlider("learning rate", 10, 1000, _dr.getParameter("--learning_rate"))->setName("--learning_rate");
 	_arrangeFolder->addSlider("iterations", 250, 2500, _dr.getParameter("--iterations"))->setName("--iterations");
+	*/
 	_arrangeFolder->addToggle("randomize");
 	_arrangeFolder->addButton("generate");
 	_gui->addLabel("Parameters")->setName("Parameters");
