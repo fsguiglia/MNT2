@@ -85,6 +85,18 @@ void GesturePage::setupGui(string name)
 	_controlFolder->setBorder(_borderColor, 0);
 	_transportFolder->setBorder(_borderColor, 0);
 	_gui->getButton("Delete")->setBorder(_borderColor, 0);
+
+	/*
+	para evitar errores en resize -> tengo que ordenar mejor page->map page->mapas
+																 ->gesture
+																 ->noise
+	*/
+	_sortGui = new ScrollGui();
+	_sortGui->addHeader("Select features", false)->setName("Header");
+	_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+	_sortGui->setAutoDraw(false);
+	_sortGui->setPosition(_position.x, 0);
+	_sortGui->update();
 }
 
 void GesturePage::setupLSTM()

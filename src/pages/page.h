@@ -80,7 +80,7 @@ protected:
 
 	//gui
 	ScrollGui* _gui;
-	ofxDatGui* _sortGui;
+	ScrollGui* _sortGui;
 	ofRectangle _position;
 	int _guiWidth;
 	bool _visible, _inside, _listeningMouse;

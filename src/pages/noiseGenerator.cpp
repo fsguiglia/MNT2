@@ -59,6 +59,18 @@ void NoiseGenerator::setupGui(string name)
 	_gui->setEnabled(false);
 	_gui->setVisible(false);
 	_gui->update();
+
+	/*
+	para evitar errores en resize -> tengo que ordenar mejor page->map page->mapas
+																 ->gesture
+																 ->noise
+	*/
+	_sortGui = new ScrollGui();
+	_sortGui->addHeader("Select features", false)->setName("Header");
+	_sortGui->setTheme(new ofxDatGuiThemeWireframe(), true);
+	_sortGui->setAutoDraw(false);
+	_sortGui->setPosition(_position.x, 0);
+	_sortGui->update();
 }
 
 void NoiseGenerator::update()
