@@ -199,28 +199,31 @@ float CBCS::getRadius()
 
 void CBCS::normalize()
 {
-	_positions.clear();
-	for (auto& point : _points) _positions.push_back(point.getPosition());
-	float minX = _positions[0].x;
-	float maxX = _positions[0].x;
-	float minY = _positions[0].y;
-	float maxY = _positions[0].y;
-
-	for (auto position : _positions)
+	if (_points.size() > 1)
 	{
-		if (position.x < minX) minX = position.x;
-		if (position.x > maxX) maxX = position.x;
-		if (position.y < minY) minY = position.y;
-		if (position.y > maxY) maxY = position.y;
-	}
+		_positions.clear();
+		for (auto& point : _points) _positions.push_back(point.getPosition());
+		float minX = _positions[0].x;
+		float maxX = _positions[0].x;
+		float minY = _positions[0].y;
+		float maxY = _positions[0].y;
 
-	for (int i = 0; i < _positions.size(); i++)
-	{
-		if (minX != maxX) _positions[i].x = (_positions[i].x - minX) / (maxX - minX);
-		if (minY != maxY) _positions[i].y = (_positions[i].y - minY) / (maxY - minY);
-		_points[i].setPosition(_positions[i]);
+		for (auto position : _positions)
+		{
+			if (position.x < minX) minX = position.x;
+			if (position.x > maxX) maxX = position.x;
+			if (position.y < minY) minY = position.y;
+			if (position.y > maxY) maxY = position.y;
+		}
+
+		for (int i = 0; i < _positions.size(); i++)
+		{
+			if (minX != maxX) _positions[i].x = (_positions[i].x - minX) / (maxX - minX);
+			if (minY != maxY) _positions[i].y = (_positions[i].y - minY) / (maxY - minY);
+			_points[i].setPosition(_positions[i]);
+		}
+		build();
 	}
-	build();
 }
 
 void CBCS::build()
