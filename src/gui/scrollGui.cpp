@@ -30,7 +30,7 @@ string ScrollGui::inside(int x, int y)
 	string inside = "";
 	for (auto removableSlider : _removableSliders)
 	{
-		updatePositions();
+		//updatePositions();
 		if (removableSlider.second.inside(x, y))
 		{
 			inside = removableSlider.first;
