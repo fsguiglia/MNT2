@@ -1134,6 +1134,7 @@ void ofApp::load()
 					if (portAvailable)
 					{
 						string name = createMIDIInput(split[1], element["x"], element["y"]);
+						_gui->getToggle(split[1], "Midi In")->setChecked(true);
 					}
 				}
 			}
@@ -1168,6 +1169,7 @@ void ofApp::load()
 					if (portAvailable)
 					{
 						string name = createMIDIOutput(split[1], element["x"], element["y"]);
+						_gui->getToggle(split[1], "Midi Out")->setChecked(true);
 					}
 				}
 			}
