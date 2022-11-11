@@ -43,6 +43,7 @@ void TriggerPage::setupGui()
 	_settingsFolder->collapse();
 	_gui->addTextInput("add");
 	_gui->addToggle("Learn parameters")->setName("parameterLearn");
+	_gui->addButton("Random")->setName("randomParameters");
 	_gui->onButtonEvent(this, &TriggerPage::buttonEvent);
 	_gui->onToggleEvent(this, &TriggerPage::toggleEvent);
 	_gui->onSliderEvent(this, &TriggerPage::sliderEvent);
@@ -66,6 +67,7 @@ void TriggerPage::setupGui()
 	_gui->getLabel("Parameters")->setBorder(_borderColor, 0);
 	_gui->getTextInput("add")->setBorder(_borderColor, 0);
 	_gui->getToggle("parameterLearn")->setBorder(_borderColor, 0);
+	_gui->getButton("randomParameters")->setBorder(_borderColor, 0);
 	_gui->update();
 }
 
@@ -114,6 +116,15 @@ void TriggerPage::buttonEvent(ofxDatGuiButtonEvent e)
 	{
 		_showSortGui = false;
 		_gui->getToggle("showSortGui")->setChecked(false);
+	}
+	else if (e.target->getName() == "randomParameters")
+	{
+		map<string, float> curParameters = _map.getPoint(_lastSelectedPoint).getParameters();
+		for (auto parameter : curParameters)
+		{
+			float value = abs(ofRandomf());
+			_gui->getSlider(parameter.first)->setValue(value);
+		}
 	}
 }
 

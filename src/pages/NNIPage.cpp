@@ -60,6 +60,7 @@ void NNIPage::setupGui()
 	_gui->getTextInput("add")->setBorder(_borderColor, 0);
 	_gui->getToggle("parameterLearn")->setBorder(_borderColor, 0);
 	_gui->getButton("randomParameters")->setBorder(_borderColor, 0);
+	_gui->update();
 }
 
 void NNIPage::setupAnalysis()
