@@ -73,8 +73,8 @@ void TriggerPage::setupGui()
 
 void TriggerPage::setupAnalysis()
 {
-	//_dr.setup("../../ML/dr/mnt_analysis.py", "trg", "python"); //py
-	_dr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
+	_dr.setup("../../ML/dr/mnt_analysis.py", "trg", "python"); //py
+	//_dr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 5;
 	drParameters["--learning_rate"] = 15;
@@ -119,11 +119,14 @@ void TriggerPage::buttonEvent(ofxDatGuiButtonEvent e)
 	}
 	else if (e.target->getName() == "randomParameters")
 	{
-		map<string, float> curParameters = _map.getPoint(_lastSelectedPoint).getParameters();
-		for (auto parameter : curParameters)
+		if (_map.getPoints().size() > 0)
 		{
-			float value = abs(ofRandomf());
-			_gui->getSlider(parameter.first)->setValue(value);
+			map<string, float> curParameters = _map.getPoint(_lastSelectedPoint).getParameters();
+			for (auto parameter : curParameters)
+			{
+				float value = abs(ofRandomf());
+				_gui->getSlider(parameter.first)->setValue(value);
+			}
 		}
 	}
 }

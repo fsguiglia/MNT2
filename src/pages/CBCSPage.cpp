@@ -71,8 +71,8 @@ void CBCSPage::setupGui()
 
 void CBCSPage::setupAnalysis()
 {
-	//_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //py
-	_dr.setup("../ML/dr/mnt_analysis.exe", "cbcs"); //exe
+	_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //py
+	//_dr.setup("../ML/dr/mnt_analysis.exe", "cbcs"); //exe
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;

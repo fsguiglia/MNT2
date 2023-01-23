@@ -49,7 +49,7 @@ def analyze(args):
 		for index, file in enumerate(files):
 			try:
 				cur_file_position, cur_X = getFilePosition(manager, file, sample_rate, unit_length, mode)
-				for file in cur_file_position:
+				for file in cur_file_position:	
 					file_position.append(file)
 				X = np.concatenate((X, cur_X))
 			except:
@@ -63,14 +63,14 @@ def analyze(args):
 			save_empty_file(error, new_path)
 
 		print('getting features...')
-		D, F = getFeatures(manager, X, window_size, hop_length)
-		print('done')
+		F, MFCC = getFeatures(manager, X, window_size, hop_length)
 		TSNE = np.zeros((len(file_position),2))
 		
 		#0.8 variance needs to be tested
-		PCA = getPCA(D, 0.8)
+		PCA = getPCA(MFCC, 0.8)
 		if PCA.shape[1] < 2: 
-			PCA = getPCA(D, 2)
+			PCA = getPCA(MFCC, 2)
+		print(PCA.shape)
 		TSNE = getTSNE(PCA, 2, perplexity, learning_rate, iterations)
 		TSNE = min_max_normalize(TSNE)
 		#keep first two components of PCA and normalize
@@ -133,9 +133,9 @@ def getFilePosition(manager, file, sample_rate, unit_length, mode=0):
 	return X, D
 
 def getFeatures(manager, samples, window_size, hop_length):
-	#size of stft result is  (window size / 2 + 1) * (samples / hop length + 1)
-	shape = int((1 + window_size * 0.5))
-	shape *= int(samples[0].shape[0] / hop_length) + 1
+	#size of mfcc result ONLY FOR DEFAULT PARAMETERS -> fix
+	shape = 19 * int(1 + samples[0].shape[0] / 512)
+	print(shape)
 	D = np.array([]).reshape(0, shape)
 	#rms, centroid, bandwidth, flatness, rolloff
 	F = np.array([]).reshape(0, 5)
@@ -154,13 +154,22 @@ def getFeatures(manager, samples, window_size, hop_length):
 		f =  np.array([rms, sc, bw, sf, sr]) 
 		f = f.reshape(1,5)
 		F = np.concatenate((F,f))
-		#stft
-		S = np.abs(S)
-		S = S.reshape(S.shape[0] * S.shape[1])
-		S = S.reshape(1, shape)
-		D = np.concatenate((D, S))
+
+		mfcc = librosa.feature.mfcc(sample)[1:]
+		mfcc = mfcc.reshape(mfcc.shape[0] * mfcc.shape[1])
+		mfcc = mfcc.reshape(1, shape)
+		D = np.concatenate((D,mfcc))
 		bar.update()
-	return D, F
+	
+	return F, D
+
+	for index, sample in (enumerate(samples)):
+		mfcc = librosa.feature.mfcc(sample)[1:]
+		mfcc = mfcc.reshape(mfcc.shape[0] * mfcc.shape[1])
+		mfcc = mfcc.reshape(1, shape)
+		Y = np.concatenate((D,mfcc))
+		
+	return Y
 
 def getPCA(data, components):
 	print('Principal component analysis (this can take a while)...')
