@@ -85,8 +85,8 @@ void CBCSPage::setupAnalysis()
 
 void CBCSPage::setupExport()
 {
-	//_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
-	_export.setup("../ML/dr/mnt_analysis.exe", "export"); //exe
+	_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
+	//_export.setup("../ML/dr/mnt_analysis.exe", "export"); //exe
 	_export.setParameter("--unit_length", _dr.getParameter("--unit_length"));
 	_export.setParameter("--script", 2);
 }
@@ -421,7 +421,7 @@ void CBCSPage::loadSingleFile(ofJson & json)
 		Point curPoint = _map.getPoint(i);
 		int offset = json["files"][curPoint.getName()];
 		int curPosition = offset + curPoint.getFeature("position");
-		_map.setPointParameter(i, "single-file-position", curPosition);
+		_map.setPointFeature(i, "single-file-position", curPosition);
 	}
 }
 

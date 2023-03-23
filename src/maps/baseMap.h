@@ -246,7 +246,10 @@ inline void BaseMap<T>::addPointFeature(int index, string feature, float value)
 template<typename T>
 void BaseMap<T>::setPointParameter(int index, string parameter, float value)
 {
-	if (_points[index].hasParameter(parameter)) _points[index].setParameter(parameter, value);
+	if (_points[index].hasParameter(parameter))
+	{
+		_points[index].setParameter(parameter, value);
+	}
 }
 
 template<typename T>

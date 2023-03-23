@@ -70,7 +70,6 @@ def analyze(args):
 		PCA = getPCA(MFCC, 0.8)
 		if PCA.shape[1] < 2: 
 			PCA = getPCA(MFCC, 2)
-		print(PCA.shape)
 		TSNE = getTSNE(PCA, 2, perplexity, learning_rate, iterations)
 		TSNE = min_max_normalize(TSNE)
 		#keep first two components of PCA and normalize
@@ -135,7 +134,6 @@ def getFilePosition(manager, file, sample_rate, unit_length, mode=0):
 def getFeatures(manager, samples, window_size, hop_length):
 	#size of mfcc result ONLY FOR DEFAULT PARAMETERS -> fix
 	shape = 19 * int(1 + samples[0].shape[0] / 512)
-	print(shape)
 	D = np.array([]).reshape(0, shape)
 	#rms, centroid, bandwidth, flatness, rolloff
 	F = np.array([]).reshape(0, 5)

@@ -110,8 +110,9 @@ def get_mean_std(sequences):
 	std = (x.std(), y.std())
 	return mean, std
 
+'''
 def rotate(sequence, radians):
-	
+'''
 
 def get_examples(sequence, length):
 	X = list()

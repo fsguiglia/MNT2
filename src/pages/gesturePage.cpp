@@ -536,6 +536,21 @@ void GesturePage::moduleOSCIn(string address, float value)
 				if (split[1] == "y") cursor.y = value;
 				_cursor = cursor;
 			}
+			else if (split[0] == "transport")
+			{
+				if (value > 1) value = 1;
+				if (value < 0) value = 0;
+				if (split[1] == "scrub") getCursorAtPercent(value);
+				if (split[1] == "record")
+				{
+					if (value == 1) startRecording();
+					else if(value == 0) endRecording();
+				}
+				if (split[1] == "next") next();
+				if (split[1] == "previous") previous();
+				if (split[1] == "random") random();
+				if (split[1] == "play") startPlaying();
+			}
 		}
 	}
 }
