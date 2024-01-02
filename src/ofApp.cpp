@@ -847,6 +847,8 @@ void ofApp::updateConnections()
 						if (msg.portName == _MIDIInPorts[split[1]])
 						{
 							string sPort = msg.portName;
+							sPort.erase(std::remove(sPort.begin(), sPort.end(), ' '), sPort.end());
+							sPort.erase(std::remove(sPort.begin(), sPort.end(), '/'), sPort.end());
 							string sChannel = ofToString(msg.channel);
 							string sControl = ofToString(msg.control);
 							string key = sPort + "/" + sChannel + "/" + sControl;
