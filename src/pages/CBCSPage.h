@@ -39,4 +39,5 @@ public:
 	ofJson save();
 private:
 	PythonML _dr, _export;
+	float _radius;
 };

@@ -13,7 +13,8 @@ void CBCSPage::setup(string name, int w, int h, int guiWidth, ofTrueTypeFont fon
 {
 	_map.setup(w, h);
 	_map.setMaxSamples(15);
-	_map.setRadius(0.05);
+	_radius = 0.1;
+	_map.setRadius(_radius / 2);
 	_map.setActive(false);
 	_map.setRandomize(0.);
 	_map.setDrawSelected(true);
@@ -38,7 +39,7 @@ void CBCSPage::setupGui()
 	*/
 	_arrangeFolder->addButton("Normalize")->setName("Normalize");
 	_settingsFolder = _gui->addFolder("settings");
-	_settingsFolder->addSlider("radius", 0, 1, _map.getRadius() * 2);
+	_controlFolder->addSlider("Radius", 0., 1., _radius)->setName("Radius");
 	_settingsFolder->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
 	_gui->getSlider("units")->setPrecision(0);
 	_settingsFolder->addTextInput("address", getAddress());
@@ -200,6 +201,7 @@ void CBCSPage::sliderEvent(ofxDatGuiSliderEvent e)
 	}
 	else if (name == "radius")
 	{
+		_radius = e.value;
 		_map.setRadius(e.value * 0.5);
 	}
 	else if (name == "units")
@@ -370,6 +372,9 @@ void CBCSPage::load(ofJson & json)
 	_map.clearPoints();
 	loadData(json);
 	loadMidiMap(json);
+	_radius = json["radius"];
+	_map.setRadius(_radius * 0.5);
+	_gui->getSlider("radius")->setValue(_radius);
 	MapPage::load(json);
 }
 
@@ -389,6 +394,7 @@ void CBCSPage::loadData(ofJson & json)
 		{
 			Point curPoint;
 			//info
+			curPoint.setPosition(point["x"], point["y"]);
 			curPoint.setName(point["name"].get<string>());
 			curPoint.setFeature("position", point["position"]);
 			curPoint.setFeature("single-file-position", point["single-file-position"]);
@@ -396,7 +402,8 @@ void CBCSPage::loadData(ofJson & json)
 			_map.addPoint(curPoint);
 		}
 
-		_map.selectFeatures(selected[0], selected[1]);
+		//_map.selectFeatures(selected[0], selected[1]);
+		_map.build();
 
 		if (hasFeatures) 
 		{
@@ -431,9 +438,11 @@ ofJson CBCSPage::save()
 	vector<Point> points = _map.getPoints();
 	vector<string> features = _map.getFeatures();
 
+	jSave["radius"] = _radius;
 	for (auto& feature : features) jSave["features"].push_back(feature);
 	jSave["selected"].push_back(_map.getSelectedFeatures().first);
 	jSave["selected"].push_back(_map.getSelectedFeatures().second);
+	
 	for (int i = 0; i < points.size(); i++)
 	{
 		ofJson curPoint;
