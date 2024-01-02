@@ -24,7 +24,6 @@ public:
 	void endRecording();
 	
 	void play();
-	void stop();
 	void next();
 	void previous();
 	void random();

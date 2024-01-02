@@ -40,7 +40,6 @@ void GesturePage::setupGui(string name)
 	_transportFolder = _gui->addFolder("Transport");
 	_transportFolder->addToggle("Record")->setName("Record");
 	_transportFolder->addButton("Play")->setName("Play");
-	_transportFolder->addButton("Stop")->setName("Stop");
 	_transportFolder->addButton("Next")->setName("Next");
 	_transportFolder->addButton("Previous")->setName("Previous");
 	_transportFolder->addButton("Random")->setName("Random");
@@ -275,16 +274,11 @@ void GesturePage::play()
 	}
 	else
 	{
-		stop();
+		_playPoly.clear();
+		_playGestureIndex = 0;
+		_playing = false;
+		_cursor.set(-1, -1);
 	}
-}
-
-void GesturePage::stop()
-{
-	_playPoly.clear();
-	_playGestureIndex = 0;
-	_playing = false;
-	_cursor.set(-1, -1);
 }
 
 void GesturePage::next()
@@ -370,11 +364,6 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 	{
 		if(_controlLearn) _lastControl = "button/Play";
 		else startPlaying();
-	}
-	if (e.target->getName() == "Stop")
-	{
-		if (_controlLearn) _lastControl = "button/Stop";
-		else stop();
 	}
 	if (e.target->getName() == "Next")
 	{
@@ -517,7 +506,6 @@ void GesturePage::moduleMIDIMap(string port, int channel, int control, float val
 						if (name[1] == "Previous") previous();
 						if (name[1] == "Random") random();
 						if (name[1] == "Play") startPlaying();
-						if (name[1] == "Stop") stop();
 					}
 				}
 				else if (name[0] == "slider")
@@ -562,7 +550,6 @@ void GesturePage::moduleOSCIn(string address, float value)
 				if (split[1] == "previous") previous();
 				if (split[1] == "random") random();
 				if (split[1] == "play") startPlaying();
-				if (split[1] == "stop") stop();
 			}
 		}
 	}
