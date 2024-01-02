@@ -402,6 +402,7 @@ int ofApp::setupModule(string type, float x, float y)
 		(ofGetWidth() - _moduleNodes[index]->getWidth()) * x / (float)ofGetWidth(),
 		(ofGetHeight() - _moduleNodes[index]->getHeight()) * y / (float)ofGetHeight()
 	);
+	_moduleNodes[index]->setType(type);
 	return index;
 }
 
@@ -1519,78 +1520,57 @@ void ofApp::mouseReleased(int x, int y, int button){
 	}
 	switch (_mode)
 	{
-	case CONNECT_MODE:
-		if (button == 2)
-		{
-			auto node = selectNode(x, y);
-			string curSelected = get<0>(node);
-			int mode = get<4>(node);
-		
-			if (mode != -1)
+		case CONNECT_MODE:
+			if (button == 2)
 			{
-				vector<int> deleteConnection;
-				for (int i = 0; i < _connections.size(); i++)
+				auto node = selectNode(x, y);
+				string curSelected = get<0>(node);
+				int mode = get<4>(node);
+		
+				if (mode != -1)
 				{
-					if (mode == 0)
+					vector<int> deleteConnection;
+					for (int i = 0; i < _connections.size(); i++)
 					{
-						if (_connections[i].fromId == curSelected || _connections[i].toId == curSelected)
+						if (mode == 0)
 						{
-							deleteConnection.push_back(i);
+							if (_connections[i].fromId == curSelected || _connections[i].toId == curSelected)
+							{
+								deleteConnection.push_back(i);
+							}
+						}
+						else
+						{
+							if (_connections[i].fromId == curSelected)
+							{
+								deleteConnection.push_back(i);
+							}
+						}
+					}
+					if (deleteConnection.size() > 0)
+					{
+						for (int i = deleteConnection.size() - 1; i >= 0; i--)
+						{
+							_connections.erase(_connections.begin() + deleteConnection[i]);
 						}
 					}
 					else
 					{
-						if (_connections[i].fromId == curSelected)
+						int index = -1;
+						for (int i = 0; i < _moduleNodes.size(); i++)
 						{
-							deleteConnection.push_back(i);
-						}
-					}
-				}
-				if (deleteConnection.size() > 0)
-				{
-					for (int i = deleteConnection.size() - 1; i >= 0; i--)
-					{
-						_connections.erase(_connections.begin() + deleteConnection[i]);
-					}
-				}
-				else
-				{
-					int index = -1;
-					for (int i = 0; i < _moduleNodes.size(); i++)
-					{
-						if (_moduleNodes[i]->getName() == curSelected)
-						{
-							index = i;
-							break;
-						}
-					}
-					if(index != -1) _moduleNodes.erase(_moduleNodes.begin() + index);
-					else
-					{
-						for (int i = 0; i < _inputNodes.size(); i++)
-						{
-							if (_inputNodes[i].getName() == curSelected)
+							if (_moduleNodes[i]->getName() == curSelected)
 							{
 								index = i;
 								break;
 							}
 						}
-						if (index != -1)
-						{
-							vector<string> split = ofSplitString(curSelected, ":");
-							bool osc = false;
-							if (split.size() > 1)
-							{
-								if (split[0] == "osc") osc = true;
-							}
-							if (osc) deleteOscInput(split[1]);
-							else deleteMIDIInput(split[1]);
-						}
+						if(index != -1) _moduleNodes.erase(_moduleNodes.begin() + index);
 						else
 						{
-							for (int i = 0; i < _outputNodes.size(); i++)
+							for (int i = 0; i < _inputNodes.size(); i++)
 							{
-								if (_outputNodes[i].getName() == curSelected)
+								if (_inputNodes[i].getName() == curSelected)
 								{
 									index = i;
 									break;
@@ -1604,51 +1584,98 @@ void ofApp::mouseReleased(int x, int y, int button){
 								{
 									if (split[0] == "osc") osc = true;
 								}
-								if (osc) deleteOscOutput(split[1],split[2]);
-								else deleteMIDIOutput(split[1]);
+								if (osc) deleteOscInput(split[1]);
+								else deleteMIDIInput(split[1]);
+							}
+							else
+							{
+								for (int i = 0; i < _outputNodes.size(); i++)
+								{
+									if (_outputNodes[i].getName() == curSelected)
+									{
+										index = i;
+										break;
+									}
+								}
+								if (index != -1)
+								{
+									vector<string> split = ofSplitString(curSelected, ":");
+									bool osc = false;
+									if (split.size() > 1)
+									{
+										if (split[0] == "osc") osc = true;
+									}
+									if (osc) deleteOscOutput(split[1],split[2]);
+									else deleteMIDIOutput(split[1]);
+								}
 							}
 						}
 					}
 				}
+				_selected = "";
+				_selectionOffset.set(0, 0);
 			}
-			_selected = "";
-			_selectionOffset.set(0, 0);
-		}
-		//tile icon
-		if (button == 0 && _tileIconHovered && _moduleNodes.size() > 0)
-		{
-			if (_mode == TILE_MODE) _mode = CONNECT_MODE;
-			else _mode = TILE_MODE;
-			for (auto& node : _moduleNodes) node->setVisible(false);
-		}
-		break;
-
-	case EDIT_MODE:
-		for (auto& node : _moduleNodes)
-		{
-			if (node->getVisible() || node->getListeningMouse()) node->mouseReleased(x, y, button);
-		}
-		if (_prevNextButton)
-		{
-			if (x < 40 || x > ofGetWidth() - 40)
+			else if (button == 1)
 			{
-				if (x < 40)
-				{
-					_page--;
-					if (_page < 0) _page = _moduleNodes.size() - 1;
-				}
-				if (x > ofGetWidth() - 40)
-				{
-					_page++;
-					if (_page >= _moduleNodes.size()) _page = 0;
-				}
-				changePage(_page);
-			}
-		}
-		break;
+				auto node = selectNode(x, y);
+				string curSelected = get<0>(node);
 
-	case TILE_MODE:
-		break;
+				int index = -1;
+				for (int i = 0; i < _moduleNodes.size(); i++)
+				{
+					if (_moduleNodes[i]->getName() == curSelected)
+					{
+						index = i;
+						break;
+					}
+				}
+				if (index != -1)
+				{
+					ofJson data = _moduleNodes[index]->save();
+					createModule(_moduleNodes[index]->getType(), 0.5, 0.5);
+					int curIndex = _moduleNodes.size() - 1;
+					int id = _moduleNodes[_moduleNodes.size() - 1]->getId();
+					string type = _moduleNodes[curIndex]->getType();
+					_moduleNodes[curIndex]->load(data);
+					_moduleNodes[curIndex]->setId(id);
+					_moduleNodes[curIndex]->setName(type, true);
+				}
+			}
+			//tile icon
+			if (button == 0 && _tileIconHovered && _moduleNodes.size() > 0)
+			{
+				if (_mode == TILE_MODE) _mode = CONNECT_MODE;
+				else _mode = TILE_MODE;
+				for (auto& node : _moduleNodes) node->setVisible(false);
+			}
+			break;
+
+		case EDIT_MODE:
+			for (auto& node : _moduleNodes)
+			{
+				if (node->getVisible() || node->getListeningMouse()) node->mouseReleased(x, y, button);
+			}
+			if (_prevNextButton)
+			{
+				if (x < 40 || x > ofGetWidth() - 40)
+				{
+					if (x < 40)
+					{
+						_page--;
+						if (_page < 0) _page = _moduleNodes.size() - 1;
+					}
+					if (x > ofGetWidth() - 40)
+					{
+						_page++;
+						if (_page >= _moduleNodes.size()) _page = 0;
+					}
+					changePage(_page);
+				}
+			}
+			break;
+
+		case TILE_MODE:
+			break;
 	}
 }
 

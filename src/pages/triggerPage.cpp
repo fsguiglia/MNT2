@@ -73,8 +73,8 @@ void TriggerPage::setupGui()
 
 void TriggerPage::setupAnalysis()
 {
-	_dr.setup("../../ML/dr/mnt_analysis.py", "trg", "python"); //py
-	//_dr.setup("../ML/dr/mnt_analysis.exe", "trg"); //exe
+	if(USECOMPILEDANALYSISSCRIPT) _dr.setup("../ML/dr/mnt_analysis.exe", "trg");
+	else _dr.setup("../../ML/dr/mnt_analysis.py", "trg", "python");
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 5;
 	drParameters["--learning_rate"] = 15;

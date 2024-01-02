@@ -16,6 +16,8 @@
 #include "pages/noiseGenerator.h"
 #include "utils/mntUtils.h"
 
+#define useExe true
+
 class ofApp : public ofBaseApp, public ofxMidiListener {
 	public:
 		void setup();

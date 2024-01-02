@@ -504,6 +504,9 @@
     <ClInclude Include="src\nodes\mntNode.h">
       <Filter>src\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\defines.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

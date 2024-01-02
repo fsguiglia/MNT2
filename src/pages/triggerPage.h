@@ -3,6 +3,7 @@
 #include "mapPage.h"
 #include "../ML/pythonML.h"
 #include "../maps/triggerMap.h"
+#include "../utils/defines.h"
 
 class TriggerPage : public MapPage<TriggerMap> {
 public:

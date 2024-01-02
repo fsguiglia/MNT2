@@ -3,6 +3,7 @@
 #include "mapPage.h"
 #include "../ML/pythonML.h"
 #include "../maps/NNI.h"
+#include "../utils/defines.h"
 
 class NNIPage : public MapPage<NNI> {
 public:
@@ -29,6 +30,8 @@ public:
 
 	void load(ofJson& json);
 	ofJson save();
+	void saveUndoData();
+	void loadUndoData();
 
 private:
 		PythonML _dr;

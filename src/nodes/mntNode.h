@@ -22,6 +22,8 @@ public:
 	ofRectangle getOutputConnector(int index);
 	void setName(string name, bool addId=false);
 	string getName();
+	void setType(string type);
+	string getType();
 	void setId(int id);
 	int getId();
 	int inside(int x, int y, bool select = false);
@@ -40,7 +42,7 @@ private:
 	ofTrueTypeFont _font;
 	ofColor _color;
 
-	string _name;
+	string _name, _type;
 	//static int ID;
 	int _id;
 };

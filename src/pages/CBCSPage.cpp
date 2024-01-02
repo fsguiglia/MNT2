@@ -72,8 +72,8 @@ void CBCSPage::setupGui()
 
 void CBCSPage::setupAnalysis()
 {
-	_dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python"); //py
-	//_dr.setup("../ML/dr/mnt_analysis.exe", "cbcs"); //exe
+	if(USECOMPILEDANALYSISSCRIPT) _dr.setup("../ML/dr/mnt_analysis.exe", "cbcs");
+	else _dr.setup("../../ML/dr/mnt_analysis.py", "cbcs", "python");
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 30;
 	drParameters["--learning_rate"] = 200;
@@ -86,8 +86,8 @@ void CBCSPage::setupAnalysis()
 
 void CBCSPage::setupExport()
 {
-	_export.setup("../../ML/dr/mnt_analysis.py", "export", "python"); //py
-	//_export.setup("../ML/dr/mnt_analysis.exe", "export"); //exe
+	if(USECOMPILEDANALYSISSCRIPT) _export.setup("../ML/dr/mnt_analysis.exe", "export");
+	else _export.setup("../../ML/dr/mnt_analysis.py", "export", "python");
 	_export.setParameter("--unit_length", _dr.getParameter("--unit_length"));
 	_export.setParameter("--script", 2);
 }
@@ -389,12 +389,16 @@ void CBCSPage::loadData(ofJson & json)
 
 		for (auto& feature : featureList) features.push_back(feature);
 		_map.setFeatures(features);
-
+		bool newMap = true;
 		for (ofJson point : json["points"])
 		{
 			Point curPoint;
 			//info
-			curPoint.setPosition(point["x"], point["y"]);
+			if (point.contains("x"))
+			{
+				curPoint.setPosition(point["x"], point["y"]);
+				newMap = false;
+			}
 			curPoint.setName(point["name"].get<string>());
 			curPoint.setFeature("position", point["position"]);
 			curPoint.setFeature("single-file-position", point["single-file-position"]);
@@ -402,8 +406,8 @@ void CBCSPage::loadData(ofJson & json)
 			_map.addPoint(curPoint);
 		}
 
-		//_map.selectFeatures(selected[0], selected[1]);
-		_map.build();
+		if(newMap) _map.selectFeatures(selected[0], selected[1]);
+		else _map.build();
 
 		if (hasFeatures) 
 		{

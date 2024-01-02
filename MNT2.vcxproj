@@ -313,6 +313,7 @@
     <ClInclude Include="src\points\point.h" />
     <ClInclude Include="src\points\rgbPoint.h" />
     <ClInclude Include="src\points\trigger.h" />
+    <ClInclude Include="src\utils\defines.h" />
     <ClInclude Include="src\utils\mntUtils.h" />
   </ItemGroup>
   <ItemGroup>

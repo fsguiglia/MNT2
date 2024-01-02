@@ -161,6 +161,16 @@ string MNTNode::getName()
 	return _name;
 }
 
+void MNTNode::setType(string type)
+{
+	_type = type;
+}
+
+string MNTNode::getType()
+{
+	return _type;
+}
+
 void MNTNode::setId(int id)
 {
 	_id = id;
