@@ -166,7 +166,13 @@ void NNI::generatePoints(int n)
 
 void NNI::setCursor(ofVec2f cursor)
 {
-	_cursor = cursor;
+	if (cursor.x > 0 && cursor.x < 1)
+	{
+		if (cursor.y > 0 && cursor.y < 1)
+		{
+			_cursor = cursor;
+		}
+	}
 }
 
 void NNI::setCursor(ofVec2f cursor, int index)
@@ -284,5 +290,5 @@ map<string, float> NNI::interpolate(ofVec2f pos, bool renderNewZone)
 		}
 		values[parameter.first] = value;
 	}
-	return values;
+		return values;
 }
