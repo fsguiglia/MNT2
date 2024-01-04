@@ -3,6 +3,7 @@
 #include "mapPage.h"
 #include "../ML/pythonML.h"
 #include "../maps/CBCS.h"
+#include "../utils/defines.h"
 
 class CBCSPage : public MapPage<CBCS>
 {

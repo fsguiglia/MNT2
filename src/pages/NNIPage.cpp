@@ -60,13 +60,14 @@ void NNIPage::setupGui()
 	_gui->getTextInput("add")->setBorder(_borderColor, 0);
 	_gui->getToggle("parameterLearn")->setBorder(_borderColor, 0);
 	_gui->getButton("randomParameters")->setBorder(_borderColor, 0);
+	_gui->addButton("undo");
 	_gui->update();
 }
 
 void NNIPage::setupAnalysis()
 {
-	_dr.setup("../../ML/dr/mnt_analysis.py", "nni", "python"); //py
-	//_dr.setup("../ML/dr/mnt_analysis.exe", "nni"); //exe
+	if(USECOMPILEDANALYSISSCRIPT) _dr.setup("../ML/dr/mnt_analysis.exe", "nni");
+	else _dr.setup("../../ML/dr/mnt_analysis.py", "nni", "python");
 	map<string, float> drParameters;
 	drParameters["--perplexity"] = 5;
 	drParameters["--learning_rate"] = 15;
@@ -99,10 +100,12 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 	else if (e.target->getName() == "clearMIDI")
 	{
 		clearMidiMap();
+		saveUndoData();
 	}
 	else if (e.target->getName() == "generate")
 	{
 		_map.generatePoints(1);
+		saveUndoData();
 	}
 	else if (e.target->getName() == "closeSortGui")
 	{
@@ -120,6 +123,11 @@ void NNIPage::buttonEvent(ofxDatGuiButtonEvent e)
 				_gui->getSlider(parameter.first)->setValue(value);
 			}
 		}
+		saveUndoData();
+	}
+	else if (e.target->getName() == "undo")
+	{
+		loadUndoData();
 	}
 }
 
@@ -196,6 +204,7 @@ void NNIPage::toggleEvent(ofxDatGuiToggleEvent e)
 	if (e.target->getName() == "randomize") _map.setRandomize(float(e.checked));
 	if (e.target->getName() == "Mouse Control") _mouseControl = e.checked;
 	if (e.target->getName() == "showSortGui") _showSortGui = e.checked;
+	saveUndoData();
 }
 
 void NNIPage::textInputEvent(ofxDatGuiTextInputEvent e)
@@ -216,6 +225,7 @@ void NNIPage::textInputEvent(ofxDatGuiTextInputEvent e)
 	}
 	e.target->setText("");
 	_parameterLearn = prevLearn;
+	saveUndoData();
 }
 
 void NNIPage::dropDownEvent(ofxDatGuiDropdownEvent e)
@@ -243,6 +253,7 @@ void NNIPage::dropDownEvent(ofxDatGuiDropdownEvent e)
 		e.target->setLabel(selected);
 		_map.selectFeatures(curFeatures.first, curFeatures.second);
 	}
+	saveUndoData();
 }
 
 void NNIPage::updateSelected(int selected, Point point)
@@ -254,6 +265,7 @@ void NNIPage::updateSelected(int selected, Point point)
 	curMessage.assign(parameters.begin(), parameters.end());
 	addMessages(curMessage, _MIDIOutMessages);
 	addMessages(curMessage, _MIDIDumpMessages);
+	saveUndoData();
 }
 
 void NNIPage::mouseMoved(int x, int y)
@@ -280,6 +292,7 @@ void NNIPage::mouseDragged(int x, int y, int button)
 			if (_lastSelectedPoint >= 0)	_map.movePoint(_lastSelectedPoint, normPosition);
 		}
 	}
+	saveUndoData();
 }
 
 void NNIPage::mousePressed(int x, int y, int button, bool doubleClick)
@@ -309,6 +322,7 @@ void NNIPage::mousePressed(int x, int y, int button, bool doubleClick)
 				}
 				else _lastSelectedPoint = -1;
 			}
+			saveUndoData();
 		}
 	}
 }
@@ -332,6 +346,7 @@ void NNIPage::mouseReleased(int x, int y, int button)
 				}
 				else _map.setLastSelected(-1);
 			}
+			saveUndoData();
 		}
 		else
 		{
@@ -375,7 +390,7 @@ void NNIPage::mouseReleased(int x, int y, int button)
 			}
 			_selSortParameter = { false, false };
 		}
-	}	
+	}
 }
 
 void NNIPage::mouseScrolled(int scroll)
@@ -498,4 +513,22 @@ ofJson NNIPage::save()
 
 	saveMidiMap(jSave);
 	return jSave;
+}
+
+void NNIPage::saveUndoData()
+{
+	_undoData.push_back(save());
+	if (_undoData.size() > 5)
+	{
+		_undoData.erase(_undoData.begin());
+	}
+}
+
+void NNIPage::loadUndoData()
+{
+	if (_undoData.size() >= 2)
+	{
+		load(_undoData[_undoData.size() - 2]);
+		_undoData.pop_back();
+	}
 }

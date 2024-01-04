@@ -3,6 +3,7 @@
 #include "mapPage.h"
 #include "../ML/pythonML.h"
 #include "../maps/RGBMap.h"
+#include "../utils/defines.h"
 
 class RGBPage : public MapPage<RGBMap> {
 public:
