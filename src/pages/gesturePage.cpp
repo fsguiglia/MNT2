@@ -10,6 +10,7 @@ GesturePage::GesturePage()
 	_visible = false;
 	_recording = false;
 	_playing = false;
+	_loop = false;
 	_mouseControl = false;
 	_inside = false;
 	_cursor.set(-1, -1);
@@ -40,6 +41,8 @@ void GesturePage::setupGui(string name)
 	_transportFolder = _gui->addFolder("Transport");
 	_transportFolder->addToggle("Record")->setName("Record");
 	_transportFolder->addButton("Play")->setName("Play");
+	_transportFolder->addToggle("Loop")->setName("Loop");
+	_transportFolder->addButton("Stop")->setName("Stop");
 	_transportFolder->addButton("Next")->setName("Next");
 	_transportFolder->addButton("Previous")->setName("Previous");
 	_transportFolder->addButton("Random")->setName("Random");
@@ -106,7 +109,7 @@ void GesturePage::setupLSTM()
 	map<string, float> trainParameters;
 	trainParameters["--script"] = 0;
 	_lstmTrain.setParameters(trainParameters);
-	
+
 	_lstmGen.setup("../../ML/lstm/mnt_lstm.py", "gest", "python"); //py
 	//_lstmGen.setup("../ML/lstm/mnt_lstm.py", "gest", "python"); //exe
 	map<string, float> genParameters;
@@ -135,8 +138,8 @@ void GesturePage::update()
 		_OSCOutMessages.clear();
 		if (_cursor.x >= 0 && _cursor.x <= 1 && _cursor.y >= 0 && _cursor.y <= 1)
 		{
-			_OSCOutMessages.push_back(pair<string,float>("/global/control/x", _cursor.x));
-			_OSCOutMessages.push_back(pair<string,float>("/global/control/y", _cursor.y));
+			_OSCOutMessages.push_back(pair<string, float>("/global/control/x", _cursor.x));
+			_OSCOutMessages.push_back(pair<string, float>("/global/control/y", _cursor.y));
 		}
 	}
 	_prevCursor = _cursor;
@@ -274,11 +277,17 @@ void GesturePage::play()
 	}
 	else
 	{
-		_playPoly.clear();
-		_playGestureIndex = 0;
-		_playing = false;
-		_cursor.set(-1, -1);
+		stop();
+		if (_loop) startPlaying();
 	}
+}
+
+void GesturePage::stop()
+{
+	_playPoly.clear();
+	_playGestureIndex = 0;
+	_playing = false;
+	_cursor.set(-1, -1);
 }
 
 void GesturePage::next()
@@ -362,8 +371,13 @@ void GesturePage::buttonEvent(ofxDatGuiButtonEvent e)
 	}
 	if (e.target->getName() == "Play")
 	{
-		if(_controlLearn) _lastControl = "button/Play";
+		if (_controlLearn) _lastControl = "button/Play";
 		else startPlaying();
+	}
+	if (e.target->getName() == "Stop")
+	{
+		if (_controlLearn) _lastControl = "button/Stop";
+		else stop();
 	}
 	if (e.target->getName() == "Next")
 	{
@@ -402,6 +416,18 @@ void GesturePage::toggleEvent(ofxDatGuiToggleEvent e)
 		{
 			if (e.target->getChecked()) startRecording();
 			else endRecording();
+		}
+	}
+	else if (e.target->getName() == "Loop")
+	{
+		if (_controlLearn)
+		{
+			_lastControl = "toggle/Record";
+			e.target->setChecked(false);
+		}
+		else
+		{
+			_loop = e.checked;
 		}
 	}
 	if (e.target->getName() == "Learn")
@@ -459,7 +485,7 @@ void GesturePage::mouseReleased(int x, int y, int button)
 	bool inside = _position.inside(x, y);
 	if (button == 0)
 	{
-		if(inside) _cursor.set(-1, -1);
+		if (inside) _cursor.set(-1, -1);
 	}
 }
 
@@ -506,6 +532,7 @@ void GesturePage::moduleMIDIMap(string port, int channel, int control, float val
 						if (name[1] == "Previous") previous();
 						if (name[1] == "Random") random();
 						if (name[1] == "Play") startPlaying();
+						if (name[1] == "Stop") stop();
 					}
 				}
 				else if (name[0] == "slider")
@@ -544,12 +571,13 @@ void GesturePage::moduleOSCIn(string address, float value)
 				if (split[1] == "record")
 				{
 					if (value == 1) startRecording();
-					else if(value == 0) endRecording();
+					else if (value == 0) endRecording();
 				}
 				if (split[1] == "next") next();
 				if (split[1] == "previous") previous();
 				if (split[1] == "random") random();
 				if (split[1] == "play") startPlaying();
+				if (split[1] == "stop") stop();
 			}
 		}
 	}
@@ -564,13 +592,13 @@ void GesturePage::load(ofJson & json)
 
 	for (auto element : json["gestures"])
 	{
-		
+
 		Gesture gesture;
 		gesture.load(element["data"]);
 
 		string name = element["name"].get<string>();
 		if (ofToInt(name) > _index) _index = ofToInt(name);
-		
+
 		addGesture(gesture, name);
 		next();
 	}
@@ -589,7 +617,7 @@ ofJson GesturePage::save()
 		gesture["data"] = element.second.save();
 		jSave["gestures"].push_back(gesture);
 	}
-	
+
 	saveMidiMap(jSave);
 	return jSave;
 }

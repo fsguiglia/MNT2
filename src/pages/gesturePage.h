@@ -24,6 +24,7 @@ public:
 	void endRecording();
 	
 	void play();
+	void stop();
 	void next();
 	void previous();
 	void random();
@@ -71,7 +72,7 @@ private:
 	float _scrubPolySpacing;
 	int _playGestureIndex;
 	int _lastPointTime;
-	bool _playing;
+	bool _playing, _loop;
 
 	int _guiHeight;
 	ofxDatGuiFolder* _transportFolder;
