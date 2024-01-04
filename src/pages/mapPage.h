@@ -36,7 +36,6 @@ protected:
 	int _lastSelectedPoint;
 	float _minClickDistance;
 	string _selSortParameterLabel;
-	vector<ofJson> _undoData;
 };
 
 template<typename T>

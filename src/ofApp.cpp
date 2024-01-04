@@ -32,7 +32,8 @@ void ofApp::setup(){
 	_tileIcon.resize(30, 30);
 	_shift = false;
 	_connectorSelected = false;
-	_mode = false;
+	_prevMode = 0;
+	_mode = 0;
 	_selected = "";
 	_selectionOffset.set(0, 0);
 	_shiftSelected = { "",-1,-1, ofVec2f(-1,-1), -1 };
@@ -54,7 +55,7 @@ void ofApp::update() {
 		for (auto& node : _moduleNodes) node->update();
 		updateConnections();
 
-		_gui->setVisible(_mode != EDIT_MODE);
+		_gui->setVisible(_mode == CONNECT_MODE);
 		_gui->setEnabled(_mode == CONNECT_MODE);
 		_gui->update();
 	}
@@ -156,34 +157,38 @@ void ofApp::drawEditMode()
 	ofPopStyle();
 }
 
+void ofApp::setupTileMode()
+{
+	
+
+}
 void ofApp::drawTileMode()
 {
-	//only active pages?
 	ofPushStyle();
 	ofSetColor(0);
-	int columns = COLUMNS;
-	if (_moduleNodes.size() < COLUMNS) columns = _moduleNodes.size();
-	int rows = int(ceil((float)_moduleNodes.size() / columns));
-	int cell_width = ofGetWidth() / columns;
-	int cell_height = ofGetHeight() / rows;
-	int tile_size = cell_width;
-	if (cell_height < cell_width) tile_size = cell_height;
-	tile_size -= 10;
-	int spacing_x = int(floor((float)(ofGetWidth() - columns * tile_size) / (columns + 1)));
-	int spacing_y = int(floor((float)(ofGetHeight() - rows * tile_size) / (rows + 1)));
+	_columns = COLUMNS;
+	if (_moduleNodes.size() < COLUMNS) _columns = _moduleNodes.size();
+	_rows = int(ceil((float)_moduleNodes.size() / _columns));
+	int cell_width = ofGetWidth() / _columns;
+	int cell_height = ofGetHeight() / _rows;
+	int tileSize = cell_width;
+	if (cell_height < cell_width) tileSize = cell_height;
+	tileSize -= 10;
+	int spacingX = int(floor((float)(ofGetWidth() - _columns * tileSize) / (_columns + 1)));
+	int spacingY = int(floor((float)(ofGetHeight() - _rows * tileSize) / (_rows + 1)));
 	int index = 0;
 
-	for (int i = 0; i < rows; i++)
+	for (int i = 0; i < _rows; i++)
 	{
-		for (int j = 0; j < columns; j++)
+		for (int j = 0; j < _columns; j++)
 		{
 			if (index < _moduleNodes.size())
 			{
 				_moduleNodes[index]->drawTile(
-					j * tile_size + spacing_x * (j + 1),
-					i * tile_size + spacing_y * (i + 1),
-					tile_size,
-					tile_size,
+					j * tileSize + spacingX * (j + 1),
+					i * tileSize + spacingY * (i + 1),
+					tileSize,
+					tileSize,
 					4
 				);
 			}
@@ -1359,7 +1364,8 @@ void ofApp::keyReleased(int key){
 		_control = false;
 		break;
 	case(OF_KEY_ESC):
-		_mode = CONNECT_MODE;
+		if (_mode == EDIT_MODE) _mode = _prevMode;
+		else _mode = CONNECT_MODE;
 		for (auto& node : _moduleNodes)
 		{
 			_page = -1;
@@ -1476,7 +1482,8 @@ void ofApp::mousePressed(int x, int y, int button){
 					{
 						if (_moduleNodes[i]->getName() == _selected)
 						{
-							_mode = true;
+							_prevMode = _mode;
+							_mode = EDIT_MODE;
 							_moduleNodes[i]->setVisible(true);
 							_page = i;
 							_pageMarginLeft = _moduleNodes[i]->getPagePosition().x;
@@ -1644,12 +1651,12 @@ void ofApp::mouseReleased(int x, int y, int button){
 			//tile icon
 			if (button == 0 && _tileIconHovered && _moduleNodes.size() > 0)
 			{
-				if (_mode == TILE_MODE) _mode = CONNECT_MODE;
-				else _mode = TILE_MODE;
+				setupTileMode();
+				_prevMode = _mode;
+				_mode = TILE_MODE;
 				for (auto& node : _moduleNodes) node->setVisible(false);
 			}
 			break;
-
 		case EDIT_MODE:
 			for (auto& node : _moduleNodes)
 			{
@@ -1675,6 +1682,18 @@ void ofApp::mouseReleased(int x, int y, int button){
 			break;
 
 		case TILE_MODE:
+			int colSize = ofGetWidth() / _columns;
+			int rowSize = ofGetHeight() / _rows;
+			int i = int(y / rowSize) * _columns + int(x / colSize);
+			if (i < _moduleNodes.size())
+			{
+				_prevMode = _mode;
+				_mode = EDIT_MODE;
+				_moduleNodes[i]->setVisible(true);
+				_page = i;
+				_pageMarginLeft = _moduleNodes[i]->getPagePosition().x;
+				_pageMarginRight = _pageMarginLeft + _moduleNodes[i]->getPageWidth();
+			}
 			break;
 	}
 }

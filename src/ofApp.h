@@ -26,6 +26,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		void drawIntro();
 		void drawConnectionMode();
 		void drawEditMode();
+		void setupTileMode();
 		void drawTileMode();
 		void drawCurConnection();
 		void drawConnection(Connection& connection);
@@ -120,9 +121,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener {
 		const int _tileIconMargin = 20;
 		bool _tileIconHovered = false;
 		const int COLUMNS = 3;
+		int _rows, _columns;
 
 		//Modes
 		int _mode = 0;
+		int _prevMode = 0;
 		static constexpr int CONNECT_MODE = 0;
 		static constexpr int EDIT_MODE = 1;
 		static constexpr int TILE_MODE = 2;

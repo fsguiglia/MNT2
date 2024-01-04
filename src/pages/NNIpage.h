@@ -30,8 +30,6 @@ public:
 
 	void load(ofJson& json);
 	ofJson save();
-	void saveUndoData();
-	void loadUndoData();
 
 private:
 		PythonML _dr;
