@@ -1,2 +1,2 @@
 #pragma once
-#define USECOMPILEDANALYSISSCRIPT false
+#define USECOMPILEDANALYSISSCRIPT true

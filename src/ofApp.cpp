@@ -946,8 +946,8 @@ void ofApp::updateConnections()
 				for (auto& element : MIDIMessages)
 				{
 					string name = split[1] + ":" + split[2];
-					string channel = "channel" + ofSplitString(element.first, "/")[2];
-					string control = "control" + ofSplitString(element.first, "/")[3];
+					string channel = "channel" + ofSplitString(element.first, "/")[1];
+					string control = "control" + ofSplitString(element.first, "/")[2];
 					float value = element.second;
 					ofxOscMessage m;
 					m.setAddress(channel + "/" + control);

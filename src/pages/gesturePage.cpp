@@ -422,7 +422,7 @@ void GesturePage::toggleEvent(ofxDatGuiToggleEvent e)
 	{
 		if (_controlLearn)
 		{
-			_lastControl = "toggle/Record";
+			_lastControl = "toggle/Loop";
 			e.target->setChecked(false);
 		}
 		else
