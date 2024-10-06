@@ -39,7 +39,7 @@ void CBCSPage::setupGui()
 	*/
 	_arrangeFolder->addButton("Normalize")->setName("Normalize");
 	_settingsFolder = _gui->addFolder("settings");
-	_controlFolder->addSlider("Radius", 0., 1., _radius)->setName("Radius");
+	_controlFolder->addSlider("Radius", 0., 1., _radius)->setName("radius");
 	_settingsFolder->addSlider("max units", 1, 100, _map.getMaxSamples())->setName("units");
 	_gui->getSlider("units")->setPrecision(0);
 	_settingsFolder->addTextInput("address", getAddress());

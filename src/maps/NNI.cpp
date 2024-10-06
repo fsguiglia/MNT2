@@ -8,7 +8,7 @@ void NNI::setup(int width, int height)
 {
 	_width = width;
 	_height = height;
-
+	_cursor.set(0.5, 0.5);
 	_colorFbo.allocate(_width, _height);
 	_colorFbo.begin();
 	ofPushStyle();
