@@ -79,7 +79,7 @@ void CBCSPage::setupAnalysis()
 	drParameters["--learning_rate"] = 200;
 	drParameters["--iterations"] = 1000;
 	drParameters["--cbcs_mode"] = 1;
-	drParameters["--unit_length"] = 500;
+	drParameters["--unit_length"] = 200;
 	drParameters["--script"] = 0;
 	_dr.setParameters(drParameters);
 }
