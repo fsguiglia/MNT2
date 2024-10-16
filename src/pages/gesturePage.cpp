@@ -5,7 +5,7 @@ GesturePage::GesturePage()
 	setMidiOutput(false);
 	setOscOutput(true);
 	setStringOutput(false);
-	setListeningMouse(true);
+	setListeningMouse(false);
 
 	_visible = false;
 	_recording = false;
@@ -240,6 +240,7 @@ void GesturePage::record()
 
 void GesturePage::startRecording()
 {
+	setListeningMouse(true);
 	_recording = true;
 	_curGesture.clear();
 }
@@ -257,6 +258,7 @@ void GesturePage::endRecording()
 		_cursor.set(-1, -1);
 		_scrubPoly = _curGesture.getPolyline().getResampledByCount(20);
 	}
+	setListeningMouse(false);
 }
 
 void GesturePage::play()
