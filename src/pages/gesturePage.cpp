@@ -582,6 +582,10 @@ void GesturePage::moduleOSCIn(string address, float value)
 				if (split[1] == "stop") stop();
 			}
 		}
+		if (split[0] == "gesture")
+		{
+			selectGesture((int)value);
+		}
 	}
 }
 
